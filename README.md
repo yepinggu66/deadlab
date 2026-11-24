@@ -1,10 +1,12 @@
-# 程序员逆天卦-沙盘 · DEADLAB
+# 程序员逆天卦-沙盘 · DEADLAB (Global Edition)
 
-**在线：https://pingguye.cn/deadlab/**（主站，自有服务器）
-镜像：https://yepinggu66.github.io/deadlab/
-仓库：https://github.com/yepinggu66/deadlab
+> **Every AI writes your plan. DEADLAB calculates how it dies first.**
+> 先算它怎么死，再决定要不要做。
 
-先算它怎么死，再决定要不要做。
+- **主站在线**：[https://pingguye.cn/deadlab/](https://pingguye.cn/deadlab/)（中文版）
+- **Global Live**：[https://pingguye.cn/deadlab/en/](https://pingguye.cn/deadlab/en/)（English Edition）
+- **全球镜像**：[https://yepinggu66.github.io/deadlab/](https://yepinggu66.github.io/deadlab/)
+- **开源仓库**：[https://github.com/yepinggu66/deadlab](https://github.com/yepinggu66/deadlab)
 
 ## 目录
 
