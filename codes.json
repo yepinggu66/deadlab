@@ -1,0 +1,27 @@
+{
+    "price":  "9.9",
+    "created":  "2026-11-25",
+    "note":  "演示用提取码（前端校验，仅用于验证购买意愿，正式售卖请改为服务端校验）",
+    "codes":  [
+                  "DL-KD3N-GHV3",
+                  "DL-QLTN-PQN9",
+                  "DL-Q4F3-MKUR",
+                  "DL-W6KA-TMRA",
+                  "DL-HALX-4EVD",
+                  "DL-AG6H-7UKD",
+                  "DL-TLD7-X6N9",
+                  "DL-PHXK-6UHD",
+                  "DL-YTFN-EWDM",
+                  "DL-FC3F-NMTD",
+                  "DL-TGMG-KTHK",
+                  "DL-TMHT-LLFL",
+                  "DL-9YNK-N496",
+                  "DL-HVYW-DHQD",
+                  "DL-UVXW-HAXG",
+                  "DL-L43W-NPA3",
+                  "DL-4NGU-7HUW",
+                  "DL-HQ7V-3RGL",
+                  "DL-4F9W-UPE7",
+                  "DL-CH9T-AHNX"
+              ]
+}
