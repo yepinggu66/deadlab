@@ -60,6 +60,10 @@ td.k{color:var(--mute);width:110px}
 .paybox h3{margin:0;font-size:19px}
 .paybox .p{font-family:var(--mono);font-size:34px;color:#FF5A5F;margin:10px 0 4px;letter-spacing:-.02em}
 .paybox .s{font-size:12px;color:#8B93A3;line-height:1.8}
+.pay-tabs{display:flex;justify-content:center;gap:10px;margin:14px 0 -4px}
+.pay-tab{padding:5px 14px;font-size:12px;border-radius:6px;cursor:pointer;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:#8B93A3;transition:all .15s}
+.pay-tab.active{border-color:#52C41A;color:#fff;background:rgba(82,196,26,.15);font-weight:600}
+.pay-tab.ali.active{border-color:#1677FF;color:#fff;background:rgba(22,119,255,.15);font-weight:600}
 .qr{margin:18px 0;border:1px dashed rgba(255,255,255,.2);border-radius:12px;padding:22px;text-align:center;color:#565E6E;font-size:12px;line-height:1.8}
 .qr img{width:190px;height:190px;object-fit:contain;display:block;margin:0 auto;border-radius:8px;background:#fff}
 .paybox input{width:100%;background:#090B0F;border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:12px;color:#F1F3F7;font-family:var(--mono);font-size:14px;letter-spacing:.1em;outline:none;text-transform:uppercase}
@@ -189,6 +193,10 @@ if(d){
     <h3>解锁完整报告</h3>
     <div class="p">¥9.9</div>
     <div class="s">一次推演，一份报告：一句话判词、六爻、死法清单、命门与止损动作。<br>付款后输入提取码，即可打印 / 存为 PDF。</div>
+    <div class="pay-tabs">
+      <span class="pay-tab active" id="tabWx">微信支付</span>
+      <span class="pay-tab ali" id="tabAli">支付宝</span>
+    </div>
     <div class="qr" id="qr">把收款码放这里<br><span style="font-size:11px">把图片存成 assets/pay.png 就会自动显示</span></div>
     <input id="codeIn" placeholder="DL-XXXX-XXXX" autocomplete="off" spellcheck="false">
     <div class="err" id="payErr"></div>
@@ -221,15 +229,33 @@ if(d){
   document.getElementById('payClose').addEventListener('click', close);
   pay.addEventListener('click', function(e){ if(e.target === pay) close(); });
 
-  var img = new Image();
-  img.onload = function(){
-    var qr = document.getElementById('qr');
-    qr.innerHTML = '';
-    qr.style.border = '0';
-    qr.style.padding = '0';
-    qr.appendChild(img);
-  };
-  img.src = 'assets/pay.png';
+  function loadQr(src){
+    var img = new Image();
+    img.onload = function(){
+      var qr = document.getElementById('qr');
+      qr.innerHTML = '';
+      qr.style.border = '0';
+      qr.style.padding = '0';
+      qr.appendChild(img);
+    };
+    img.src = src;
+  }
+  loadQr('assets/pay_wx.png');
+
+  var tabWx = document.getElementById('tabWx');
+  var tabAli = document.getElementById('tabAli');
+  if(tabWx && tabAli){
+    tabWx.addEventListener('click', function(){
+      tabWx.classList.add('active');
+      tabAli.classList.remove('active');
+      loadQr('assets/pay_wx.png');
+    });
+    tabAli.addEventListener('click', function(){
+      tabAli.classList.add('active');
+      tabWx.classList.remove('active');
+      loadQr('assets/pay_ali.png');
+    });
+  }
 
   document.getElementById('payOk').addEventListener('click', function(){
     var code = (document.getElementById('codeIn').value || '').trim().toUpperCase();
