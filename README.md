@@ -1,5 +1,8 @@
 # 程序员逆天卦-沙盘 · DEADLAB
 
+**在线：https://yepinggu66.github.io/deadlab/**
+仓库：https://github.com/yepinggu66/deadlab
+
 先算它怎么死，再决定要不要做。
 
 ## 目录
@@ -43,13 +46,22 @@
 
 ## 部署
 
-纯静态，整个文件夹就是产物。
+已部署在 GitHub Pages（`main` 分支根目录）。改完文件：
 
 ```bash
-npx wrangler pages deploy . --project-name deadlab   # Cloudflare Pages
-npx vercel --prod                                     # Vercel
-npx netlify deploy --prod --dir .                     # Netlify
+git add -A && git commit -m "..." && git push
 ```
+
+约 1 分钟后自动生效。接自定义域名：仓库 Settings → Pages → Custom domain，
+或加 `CNAME` 文件；DNS 指向 `yepinggu66.github.io`（CNAME）或 GitHub 的 4 条 A 记录。
+
+## 付费墙（¥9.9 单次报告）
+
+- 收款码：把图片存成 `assets/pay.png`，`report.html` 的弹窗会自动显示。
+- 提取码：在 `codes.json` 里维护，初始 20 个，格式 `DL-XXXX-XXXX`。
+- 解锁后写 `localStorage.deadlab_paid=1`，直接调起打印（可存 PDF）。
+- ⚠️ 校验在前端，能被绕过。它的用途是**验证付费意愿**，不是防破解；
+  真要卖，就换成"付款后人工发 PDF"，或接一个带服务端的收款回调。
 
 ## 视频
 
