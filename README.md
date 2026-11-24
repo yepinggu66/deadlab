@@ -1,6 +1,7 @@
 # 程序员逆天卦-沙盘 · DEADLAB
 
-**在线：https://yepinggu66.github.io/deadlab/**
+**在线：https://pingguye.cn/deadlab/**（主站，自有服务器）
+镜像：https://yepinggu66.github.io/deadlab/
 仓库：https://github.com/yepinggu66/deadlab
 
 先算它怎么死，再决定要不要做。
@@ -46,14 +47,25 @@
 
 ## 部署
 
-已部署在 GitHub Pages（`main` 分支根目录）。改完文件：
+主站跑在自有 Lighthouse 服务器（154.8.153.201）的 `/var/www/html/deadlab/`，
+走 `pingguye.cn` 的现有 nginx，**不需要单独配 vhost 或证书**。
 
-```bash
-git add -A && git commit -m "..." && git push
+更新：
+
+```powershell
+tar -czf $env:TEMP\deadlab.tgz --exclude=.git --exclude="预览-*.png" --exclude=CNAME .
+scp -i "$env:USERPROFILE\.ssh\pingguye_lighthouse.pem" $env:TEMP\deadlab.tgz ubuntu@154.8.153.201:/tmp/
+ssh -i "$env:USERPROFILE\.ssh\pingguye_lighthouse.pem" ubuntu@154.8.153.201 `
+  "sudo tar -xzf /tmp/deadlab.tgz -C /var/www/html/deadlab && sudo chown -R www-data:www-data /var/www/html/deadlab && rm /tmp/deadlab.tgz"
 ```
 
-约 1 分钟后自动生效。接自定义域名：仓库 Settings → Pages → Custom domain，
-或加 `CNAME` 文件；DNS 指向 `yepinggu66.github.io`（CNAME）或 GitHub 的 4 条 A 记录。
+镜像（GitHub Pages）：`git push` 后约 1 分钟自动重建。
+
+### 子域 deadlab.pingguye.cn（待办）
+
+DNSPod 加一条 CNAME：`deadlab` → `yepinggu66.github.io`，然后在仓库 Settings → Pages
+填自定义域。**注意：DNS 未生效前不要提交 `CNAME` 文件**，否则 GitHub 会把
+github.io 地址重定向到一个解析不了的域名（本次已踩过，回滚方式见 git log）。
 
 ## 付费墙（¥9.9 单次报告）
 
