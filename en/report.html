@@ -194,14 +194,26 @@ if(d){
     <div class="p">$4.99</div>
     <div class="s">One simulation, one rigorous report: Oracle verdict, 6 Yao breakdown, mortality spectrum, and immediate pivot levers.<br>Enter your unlock code below to print or download PDF.</div>
     <div class="pay-tabs">
-      <span class="pay-tab active" id="tabCard">Credit / Debit Card</span>
-      <span class="pay-tab ali" id="tabQr">WeChat / Alipay</span>
+      <span class="pay-tab active" id="tabPaypal">PayPal / Card ($4.99)</span>
+      <span class="pay-tab ali" id="tabWx">WeChat / Alipay (¥35)</span>
     </div>
-    <div class="qr" id="qr" style="border:0;padding:10px 0;">
-      <div id="cardBox" style="padding:16px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:10px;text-align:center;">
-        <div style="font-size:13px;color:#F1F3F7;margin-bottom:8px">Global Instant Checkout ($4.99)</div>
-        <div style="font-size:11px;color:#8B93A3;line-height:1.6;margin-bottom:12px">Supports Visa, Mastercard, Apple Pay, PayPal & Crypto</div>
-        <a href="https://buymeacoffee.com" target="_blank" style="display:inline-block;background:#FFDD00;color:#000;font-weight:600;font-size:12px;padding:8px 18px;border-radius:6px;text-decoration:none">Buy with Card / PayPal →</a>
+    <div class="qr" id="qr" style="border:0;padding:14px 0 10px;">
+      <div id="paypalBox" style="padding:16px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:12px;text-align:center;">
+        <div style="font-size:14px;color:#F1F3F7;font-weight:600;margin-bottom:6px">PayPal Instant Checkout · $4.99 USD</div>
+        <div style="font-size:11px;color:#8B93A3;line-height:1.6;margin-bottom:14px">Supports Visa, Mastercard, AMEX, Apple Pay & PayPal balance</div>
+        <a href="https://www.paypal.com/ncp/payment/7G6M6X7889A2Q" target="_blank" style="display:block;background:#0070ba;color:#fff;font-weight:600;font-size:13px;padding:11px 18px;border-radius:8px;text-decoration:none;">
+          Pay $4.99 USD via PayPal Checkout →
+        </a>
+        <div style="margin-top:10px;font-size:11px;color:#8B93A3">
+          Or pay directly: <a href="https://paypal.me/pinggu80/4.99USD" target="_blank" style="color:#38BDF8;text-decoration:underline;">paypal.me/pinggu80/4.99USD</a>
+        </div>
+      </div>
+      <div id="qrBox" style="display:none;text-align:center;">
+        <div style="font-size:12px;color:#8B93A3;margin-bottom:10px">Scan WeChat Pay (¥35)</div>
+        <img src="../assets/pay_wx.png" style="width:180px;height:180px;display:block;margin:0 auto;border-radius:8px;background:#fff" alt="WeChat Pay">
+        <div style="margin-top:8px;font-size:11px;color:#8B93A3">
+          Or Alipay: <a href="https://skillpay.alipay.com/public/yepinggu-skills" target="_blank" style="color:#1677FF;text-decoration:underline;">Alipay Checkout</a>
+        </div>
       </div>
     </div>
     <input id="codeIn" placeholder="UNLOCK CODE (DL-XXXX-XXXX)" autocomplete="off" spellcheck="false">
@@ -235,31 +247,22 @@ if(d){
   document.getElementById('payClose').addEventListener('click', close);
   pay.addEventListener('click', function(e){ if(e.target === pay) close(); });
 
-  function loadQr(src){
-    var img = new Image();
-    img.onload = function(){
-      var qr = document.getElementById('qr');
-      qr.innerHTML = '';
-      qr.style.border = '0';
-      qr.style.padding = '0';
-      qr.appendChild(img);
-    };
-    img.src = src;
-  }
-  loadQr('assets/pay_wx.png');
-
+  var tabPaypal = document.getElementById('tabPaypal');
   var tabWx = document.getElementById('tabWx');
-  var tabAli = document.getElementById('tabAli');
-  if(tabWx && tabAli){
+  var paypalBox = document.getElementById('paypalBox');
+  var qrBox = document.getElementById('qrBox');
+  if(tabPaypal && tabWx){
+    tabPaypal.addEventListener('click', function(){
+      tabPaypal.classList.add('active');
+      tabWx.classList.remove('active');
+      paypalBox.style.display = 'block';
+      qrBox.style.display = 'none';
+    });
     tabWx.addEventListener('click', function(){
       tabWx.classList.add('active');
-      tabAli.classList.remove('active');
-      loadQr('assets/pay_wx.png');
-    });
-    tabAli.addEventListener('click', function(){
-      tabAli.classList.add('active');
-      tabWx.classList.remove('active');
-      loadQr('assets/pay_ali.png');
+      tabPaypal.classList.remove('active');
+      paypalBox.style.display = 'none';
+      qrBox.style.display = 'block';
     });
   }
 

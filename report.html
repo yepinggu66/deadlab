@@ -196,6 +196,17 @@ if(d){
     <div class="pay-tabs">
       <span class="pay-tab active" id="tabWx">微信支付</span>
       <span class="pay-tab ali" id="tabAli">支付宝</span>
+      <span class="pay-tab" id="tabPaypal">PayPal ($4.99)</span>
+    </div>
+    <div id="paypalCard" style="display:none;margin:16px 0;padding:16px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:12px;text-align:center;">
+      <div style="font-size:14px;color:#F1F3F7;font-weight:600;margin-bottom:6px">PayPal 快捷支付 · $4.99 USD</div>
+      <div style="font-size:11px;color:#8B93A3;line-height:1.6;margin-bottom:14px">支持全球信用卡、借记卡及 PayPal 余额</div>
+      <a href="https://www.paypal.com/ncp/payment/7G6M6X7889A2Q" target="_blank" style="display:block;background:#0070ba;color:#fff;font-weight:600;font-size:13px;padding:10px 18px;border-radius:8px;text-decoration:none;">
+        前往 PayPal 收银台支付 →
+      </a>
+      <div style="margin-top:10px;font-size:11px;color:#8B93A3">
+        直达链接：<a href="https://paypal.me/pinggu80/4.99USD" target="_blank" style="color:#38BDF8;text-decoration:underline;">paypal.me/pinggu80/4.99USD</a>
+      </div>
     </div>
     <div class="qr" id="qr">把收款码放这里<br><span style="font-size:11px">把图片存成 assets/pay.png 就会自动显示</span></div>
     <input id="codeIn" placeholder="DL-XXXX-XXXX" autocomplete="off" spellcheck="false">
@@ -244,17 +255,36 @@ if(d){
 
   var tabWx = document.getElementById('tabWx');
   var tabAli = document.getElementById('tabAli');
+  var tabPaypal = document.getElementById('tabPaypal');
+  var paypalCard = document.getElementById('paypalCard');
+  var qr = document.getElementById('qr');
+
   if(tabWx && tabAli){
     tabWx.addEventListener('click', function(){
       tabWx.classList.add('active');
       tabAli.classList.remove('active');
+      if(tabPaypal) tabPaypal.classList.remove('active');
+      if(paypalCard) paypalCard.style.display = 'none';
+      qr.style.display = 'block';
       loadQr('assets/pay_wx.png');
     });
     tabAli.addEventListener('click', function(){
       tabAli.classList.add('active');
       tabWx.classList.remove('active');
+      if(tabPaypal) tabPaypal.classList.remove('active');
+      if(paypalCard) paypalCard.style.display = 'none';
+      qr.style.display = 'block';
       loadQr('assets/pay_ali.png');
     });
+    if(tabPaypal){
+      tabPaypal.addEventListener('click', function(){
+        tabPaypal.classList.add('active');
+        tabWx.classList.remove('active');
+        tabAli.classList.remove('active');
+        qr.style.display = 'none';
+        if(paypalCard) paypalCard.style.display = 'block';
+      });
+    }
   }
 
   document.getElementById('payOk').addEventListener('click', function(){
