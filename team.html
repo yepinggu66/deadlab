@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>团队模式 · 程序员逆天卦-沙盘</title>
+<link rel="stylesheet" href="ui.css">
+<style>
+.members{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+@media(max-width:820px){.members{grid-template-columns:1fr}}
+.mem{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--panel2)}
+.mem h3{margin:0 0 12px;font-size:13px;font-family:var(--mono);letter-spacing:.14em;color:var(--dim)}
+.mem h3 span{color:var(--red)}
+.mem label{display:block;font-size:11px;color:var(--dim2);margin:10px 0 4px}
+.mem .sel{width:100%}
+.out{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+@media(max-width:820px){.out{grid-template-columns:1fr}}
+.scn{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--panel2)}
+.scn .k{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--dim2)}
+.scn .v{font-family:var(--mono);font-size:44px;letter-spacing:-.03em;margin-top:6px}
+.scn.pess .v{color:var(--red2)} .scn.opt .v{color:var(--green)}
+.diss{color:var(--red2)}
+.badge{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--dim2)}
+.badge.red{color:var(--red2);border-color:rgba(255,90,95,.4)}
+</style>
+</head>
+<body>
+<div class="gridbg"></div>
+<div class="shell">
+  <div class="top">
+    <a class="logo" href="index.html"><span class="mark"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="name">程序员逆天卦-沙盘</span><span class="cn">TEAM</span></a>
+    <div class="nav">
+      <a href="index.html">沙盘</a><a href="import.html">导入</a><a href="cases.html">案例</a><a href="library.html">案例库</a>
+      <a class="on" href="team.html">团队</a><a href="compare.html">对比</a><a href="report.html">报告</a><a href="api.html">API</a>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="eyebrow">TEAM MODE / 三个人，三卦</div>
+    <h1>分歧最大的那一爻，<br>就是你们没谈拢的事</h1>
+    <p class="lead">三个人各自填六爻，系统合并出共识卦，并把分歧 ≥2 档的爻标红。同一家公司，三张不同的命盘。</p>
+  </section>
+
+  <section class="card">
+    <div class="sec"><span class="n">01</span><h2>INPUT</h2><em>各填各的，别商量</em><span class="rule"></span></div>
+    <div class="members" id="members"></div>
+    <button class="primary" id="runBtn">合并推演</button>
+  </section>
+
+  <section class="card hidden" id="outCard">
+    <div class="sec"><span class="n">02</span><h2>CONSENSUS</h2><em>共识卦</em><span class="rule"></span></div>
+    <div class="out" id="out"></div>
+    <table class="tb" id="dissTable"></table>
+    <p class="desc" id="note"></p>
+  </section>
+
+  <footer>
+    <div>
+      <div class="mono" style="margin-bottom:8px">程序员逆天卦-沙盘 · DEADLAB</div>
+      <div class="fnav"><a href="index.html">沙盘</a><a href="import.html">导入</a><a href="cases.html">案例</a><a href="library.html">案例库</a><a href="team.html">团队</a><a href="compare.html">对比</a><a href="report.html">报告</a><a href="api.html">API</a></div>
+    </div>
+    <span>团队模式只做合并与分歧提示，不做人格评测。</span>
+  </footer>
+</div>
+
+<script src="engine.js"></script>
+<script>
+const {VARS, hexOf, runSim, CAUSES} = DEADLAB;
+const M = ['A','B','C'];
+const vals = {A:{}, B:{}, C:{}};
+VARS.forEach(v=>M.forEach(m=>vals[m][v.k]=1));
+
+const box = document.getElementById('members');
+box.innerHTML = M.map((m,i)=>`<div class="mem"><h3>成员 <span>${m}</span></h3>`+
+  VARS.map(v=>`<label>${v.yao}爻 · ${v.name}</label>
+    <select class="sel" data-m="${m}" data-k="${v.k}">
+      ${v.lv.map((t,j)=>`<option value="${j}" ${j===1?'selected':''}>${t}</option>`).join('')}
+    </select>`).join('')+`</div>`).join('');
+
+box.addEventListener('change', e=>{
+  const t = e.target; if(!t.dataset.k) return;
+  vals[t.dataset.m][t.dataset.k] = +t.value;
+});
+
+document.getElementById('runBtn').addEventListener('click', ()=>{
+  const keys = VARS.map(v=>v.k);
+  const cons={}, lo={}, hi={};
+  keys.forEach(k=>{
+    const a=vals.A[k], b=vals.B[k], c=vals.C[k];
+    cons[k]=Math.round((a+b+c)/3); lo[k]=Math.min(a,b,c); hi[k]=Math.max(a,b,c);
+  });
+  const rc = runSim(cons, 5000, 7);
+  const rl = runSim(lo, 3000, 11);
+  const rh = runSim(hi, 3000, 13);
+  const hx = hexOf(cons);
+  document.getElementById('out').innerHTML = `
+    <div class="scn pess"><div class="k">PESSIMIST · 三人里最悲观</div><div class="v">${Math.round(rl.s12*100)}%</div><div class="k" style="margin-top:8px">${hexOf(lo)[2]}</div></div>
+    <div class="scn"><div class="k">CONSENSUS · 共识 ${hx[2]}</div><div class="v">${Math.round(rc.s12*100)}%</div><div class="k" style="margin-top:8px">${hx[3]}</div></div>
+    <div class="scn opt"><div class="k">OPTIMIST · 三人里最乐观</div><div class="v">${Math.round(rh.s12*100)}%</div><div class="k" style="margin-top:8px">${hexOf(hi)[2]}</div></div>`;
+
+  const rows = VARS.map(v=>{
+    const sp = hi[v.k]-lo[v.k];
+    return `<tr><td>${v.name}</td><td>${vals.A[v.k]} / ${vals.B[v.k]} / ${vals.C[v.k]}</td>
+      <td>${v.lv[cons[v.k]]}</td>
+      <td>${sp>=2?`<span class="badge red">分歧 ${sp} 档</span>`:`<span class="badge">一致</span>`}</td></tr>`;
+  }).join('');
+  document.getElementById('dissTable').innerHTML =
+    `<thead><tr><th>爻</th><th>A / B / C</th><th>共识</th><th>状态</th></tr></thead><tbody>${rows}</tbody>`;
+
+  const worst = VARS.map(v=>[v, hi[v.k]-lo[v.k]]).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('note').textContent = worst[1] >= 2
+    ? `分歧最大的是「${worst[0].name}」（相差 ${worst[1]} 档，${worst[0].lv[lo[worst[0].k]]} ↔ ${worst[0].lv[hi[worst[0].k]]}）。这不是数据问题，是你们对同一件事的判断不一样。`
+    : "三个人六爻基本一致。要么真的想清楚了，要么没人敢说真话。";
+  document.getElementById('outCard').classList.remove('hidden');
+  document.getElementById('outCard').scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+if(location.search.indexOf('demo')>=0){
+  vals.A = {need:3,cap:2,econ:2,dist:1,dep:1,stam:2};
+  vals.B = {need:2,cap:1,econ:1,dist:3,dep:1,stam:1};
+  vals.C = {need:3,cap:2,econ:2,dist:0,dep:2,stam:2};
+  Array.from(document.querySelectorAll('#members select')).forEach(s=>{
+    s.value = vals[s.dataset.m][s.dataset.k];
+  });
+  setTimeout(()=>document.getElementById('runBtn').click(), 200);
+}
+</script>
+</body>
+</html>

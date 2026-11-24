@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>API · 程序员逆天卦-沙盘</title>
+<link rel="stylesheet" href="ui.css">
+<style>
+pre{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;font-size:12px;line-height:1.7;color:#CFD6E2;font-family:var(--mono);margin:12px 0}
+code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.06);padding:2px 6px;border-radius:5px}
+textarea{width:100%;min-height:150px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;color:var(--txt);font-family:var(--mono);font-size:12.5px;line-height:1.7;outline:none;resize:vertical}
+textarea:focus{border-color:rgba(255,90,95,.45)}
+.kv{display:grid;grid-template-columns:200px 1fr;gap:8px 16px;margin-top:12px;font-size:12.5px}
+.kv .k{font-family:var(--mono);color:var(--red2);font-size:11.5px}
+.kv .v{color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="gridbg"></div>
+<div class="shell">
+  <div class="top">
+    <a class="logo" href="index.html"><span class="mark"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="name">程序员逆天卦-沙盘</span><span class="cn">API</span></a>
+    <div class="nav">
+      <a href="index.html">沙盘</a><a href="import.html">导入</a><a href="cases.html">案例</a><a href="library.html">案例库</a>
+      <a href="team.html">团队</a><a href="compare.html">对比</a><a href="report.html">报告</a><a class="on" href="api.html">API</a>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="eyebrow">DEADLAB API / 纯前端，零依赖</div>
+    <h1>把沙盘嵌进你的产品里</h1>
+    <p class="lead">一个 JS 文件，一个函数。不联网、不上传、不收集数据——所有推演都在浏览器里算完。</p>
+  </section>
+
+  <section class="card">
+    <div class="sec"><span class="n">01</span><h2>USAGE</h2><em>三行接入</em><span class="rule"></span></div>
+    <pre>&lt;script src="engine.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  const r = DEADLAB.forecast({ need:2, cap:2, econ:1, dist:0, dep:2, stam:1 }, {}, 5000);
+  console.log(r.s12);          // 0.34 —— 24 个月存活率
+&lt;/script&gt;</pre>
+    <p class="desc">六个变量取值 0–3（老阴 / 少阴 / 少阳 / 老阳）。第三个参数是推演次数，第四个是随机种子（可选）。</p>
+  </section>
+
+  <section class="card">
+    <div class="sec"><span class="n">02</span><h2>TRY IT</h2><em>线上试跑</em><span class="rule"></span></div>
+    <textarea id="inp">{
+  "vars": { "need": 2, "cap": 2, "econ": 1, "dist": 0, "dep": 2, "stam": 1 },
+  "veto": { "copy": false, "lic": false, "plat": false }
+}</textarea>
+    <button class="primary" id="run">运行 forecast()</button>
+    <pre id="out">// 结果会出现在这里</pre>
+  </section>
+
+  <section class="card">
+    <div class="sec"><span class="n">03</span><h2>RETURNS</h2><em>字段说明</em><span class="rule"></span></div>
+    <div class="kv">
+      <div class="k">s12</div><div class="v">24 个月存活率（0–1）</div>
+      <div class="k">s</div><div class="v">长度 25 的生存曲线，s[t] = 第 t 个月仍活着的比例</div>
+      <div class="k">median</div><div class="v">中位死亡月（0–24，24 表示活过两年）</div>
+      <div class="k">causeShare</div><div class="v">死因占比 { demo, trust, cost, dist, dep, burn }</div>
+      <div class="k">outTop</div><div class="v">活下来的最可能形态 [名称, 次数]</div>
+      <div class="k">vetoed</div><div class="v">是否被一票否决；为 true 时 s12 = 0</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="sec"><span class="n">04</span><h2>NOTE</h2><em>边界</em><span class="rule"></span></div>
+    <p class="desc" style="line-height:1.9">
+      模型是结构化的直觉，不是统计模型。绝对值别信，排序可信。<br>
+      推演完全在客户端完成，没有服务器，也不会上传任何数据——适合嵌入内部工具。<br>
+      商用请保留出处：<code>程序员逆天卦-沙盘 · DEADLAB</code>。
+    </p>
+  </section>
+
+  <section class="card">
+    <div class="sec"><span class="n">05</span><h2>BULK</h2><em>孵化器 / 加速器席位</em><span class="rule"></span></div>
+    <p class="desc" style="line-height:1.9">
+      批量授权：一次接入，给整批入营项目各跑一卦，统一导出 PDF 报告。<br>
+      适合做「入营体检」「Demo Day 前压力测试」——比让每个团队自己讲故事更有信息量。<br>
+      联系方式写在部署方的商务页；本页只说明能力边界。
+    </p>
+  </section>
+
+  <footer>
+    <div>
+      <div class="mono" style="margin-bottom:8px">程序员逆天卦-沙盘 · DEADLAB</div>
+      <div class="fnav"><a href="index.html">沙盘</a><a href="import.html">导入</a><a href="cases.html">案例</a><a href="library.html">案例库</a><a href="team.html">团队</a><a href="compare.html">对比</a><a href="report.html">报告</a><a href="api.html">API</a></div>
+    </div>
+    <span>MIT-style 署名使用；模型参数见 engine.js 顶部常量。</span>
+  </footer>
+</div>
+
+<script src="engine.js"></script>
+<script>
+document.getElementById('run').addEventListener('click', ()=>{
+  let cfg;
+  try{ cfg = JSON.parse(document.getElementById('inp').value); }
+  catch(e){ document.getElementById('out').textContent = 'JSON 解析失败：' + e.message; return; }
+  const vars = Object.assign({need:1,cap:1,econ:1,dist:1,dep:1,stam:1}, cfg.vars || {});
+  const r = DEADLAB.forecast(vars, cfg.veto || {}, 5000, 42);
+  const out = {
+    s12: +r.s12.toFixed(3),
+    median: r.median,
+    vetoed: !!r.vetoed,
+    causeShare: Object.fromEntries(Object.entries(r.causeShare).map(([k,v])=>[k, +v.toFixed(3)])),
+    outTop: r.outTop,
+    curve: r.s.map(x=>+x.toFixed(3))
+  };
+  document.getElementById('out').textContent = JSON.stringify(out, null, 2);
+});
+</script>
+</body>
+</html>

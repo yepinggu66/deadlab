@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>方案对比 · 程序员逆天卦-沙盘</title>
+<link rel="stylesheet" href="ui.css">
+<style>
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+@media(max-width:820px){.cmp{grid-template-columns:1fr}}
+.panel{border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--panel2)}
+.panel.b{border-color:rgba(62,224,143,.28)}
+.panel h3{margin:0 0 12px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;color:var(--dim)}
+.panel.a h3{color:var(--red2)} .panel.b h3{color:var(--green)}
+.panel .row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:8px 0}
+.panel .row span{font-size:12px;color:var(--dim)}
+.panel .sel{width:58%}
+.curve{width:100%;height:auto;margin-top:8px}
+.curve .gl{stroke:rgba(255,255,255,.055);stroke-width:1}
+.curve .ax{fill:#565E6E;font-size:10px;font-family:var(--mono)}
+.curve .lnA{fill:none;stroke:#FF6B6B;stroke-width:2.2}
+.curve .lnB{fill:none;stroke:#3EE08F;stroke-width:2.2;stroke-dasharray:5 4}
+.res{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+@media(max-width:820px){.res{grid-template-columns:1fr}}
+.metric{border:1px solid var(--line);border-radius:14px;padding:18px;text-align:center}
+.metric .v{font-family:var(--mono);font-size:52px;letter-spacing:-.04em}
+.metric.a .v{color:var(--red2)} .metric.b .v{color:var(--green)}
+.metric .k{font-size:11px;color:var(--dim2);letter-spacing:.16em;font-family:var(--mono);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="gridbg"></div>
+<div class="shell">
+  <div class="top">
+    <a class="logo" href="index.html"><span class="mark"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="name">程序员逆天卦-沙盘</span><span class="cn">COMPARE</span></a>
+    <div class="nav">
+      <a href="index.html">沙盘</a><a href="import.html">导入</a><a href="cases.html">案例</a><a href="library.html">案例库</a>
+      <a href="team.html">团队</a><a class="on" href="compare.html">对比</a><a href="report.html">报告</a><a href="api.html">API</a>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="eyebrow">COUNTERFACTUAL / 反事实对比</div>
+    <h1>不是选哪个更好，<br>是选哪个死得晚</h1>
+    <p class="lead">同一条时间轴，两条生存曲线。改一个变量，看它把死亡推后了几个月。</p>
+  </section>
+
+  <section class="card">
+    <div class="sec"><span class="n">01</span><h2>SETUP</h2><em>方案 A / 方案 B</em><span class="rule"></span></div>
+    <div class="cmp">
+      <div class="panel a" id="pa"></div>
+      <div class="panel b" id="pb"></div>
+    </div>
+    <button class="primary" id="runBtn">同时推演两个方案</button>
+  </section>
+
+  <section class="card hidden" id="outCard">
+    <div class="sec"><span class="n">02</span><h2>RESULT</h2><em>24 个月对照</em><span class="rule"></span></div>
+    <div class="res" id="metrics"></div>
+    <svg class="curve" id="curve" viewBox="0 0 660 268">
+      <g id="grid"></g>
+      <path class="lnA" id="lineA" d=""></path>
+      <path class="lnB" id="lineB" d=""></path>
+      <g id="labels"></g>
+    </svg>
+    <table class="tb" id="causeTable"></table>
+  </section>
+
+  <footer>
+    <div>
+      <div class="mono" style="margin-bottom:8px">程序员逆天卦-沙盘 · DEADLAB</div>
+      <div class="fnav"><a href="index.html">沙盘</a><a href="import.html">导入</a><a href="cases.html">案例</a><a href="library.html">案例库</a><a href="team.html">团队</a><a href="compare.html">对比</a><a href="report.html">报告</a><a href="api.html">API</a></div>
+    </div>
+    <span>两个方案用同一套模型、同一批随机种子，差异只来自输入。</span>
+  </footer>
+</div>
+
+<script src="engine.js"></script>
+<script>
+const {VARS, runSim, hexOf, CAUSES} = DEADLAB;
+const A = {need:2,cap:2,econ:1,dist:1,dep:1,stam:2};
+const B = {need:2,cap:2,econ:2,dist:3,dep:1,stam:2};
+
+function panel(el, name, data, cls){
+  el.innerHTML = `<h3>${name}</h3>` + VARS.map(v=>`
+    <div class="row"><span>${v.name}</span>
+      <select class="sel" data-k="${v.k}">
+        ${v.lv.map((t,j)=>`<option value="${j}" ${j===data[v.k]?'selected':''}>${t}</option>`).join('')}
+      </select></div>`).join('');
+  el.addEventListener('change', e=>{ if(e.target.dataset.k) data[e.target.dataset.k] = +e.target.value; });
+}
+panel(document.getElementById('pa'), '方案 A', A, 'a');
+panel(document.getElementById('pb'), '方案 B', B, 'b');
+
+const X = t => 56 + t*(560/24);
+const Y = s => 218 - s*180;
+const pathOf = s => s.map((v,t)=>(t?'L':'M')+X(t).toFixed(1)+' '+Y(v).toFixed(1)).join(' ');
+function grid(){
+  let g='';
+  [0,.25,.5,.75,1].forEach(s=>{ g+=`<line class="gl" x1="56" y1="${Y(s)}" x2="616" y2="${Y(s)}"/><text class="ax" x="44" y="${Y(s)+3}" text-anchor="end">${s*100}%</text>`; });
+  [0,6,12,18,24].forEach(t=>{ g+=`<line class="gl" x1="${X(t)}" y1="38" x2="${X(t)}" y2="218"/><text class="ax" x="${X(t)}" y="234" text-anchor="middle">${t?t+'M':'0'}</text>`; });
+  document.getElementById('grid').innerHTML = g;
+}
+
+document.getElementById('runBtn').addEventListener('click', ()=>{
+  const ra = runSim(A, 5000, 101), rb = runSim(B, 5000, 101);
+  document.getElementById('metrics').innerHTML = `
+    <div class="metric a"><div class="v">${Math.round(ra.s12*100)}%</div><div class="k">A · ${hexOf(A)[2]}</div></div>
+    <div class="metric b"><div class="v">${Math.round(rb.s12*100)}%</div><div class="k">B · ${hexOf(B)[2]}　Δ ${Math.round((rb.s12-ra.s12)*100)>0?'+':''}${Math.round((rb.s12-ra.s12)*100)}pt</div></div>`;
+  grid();
+  document.getElementById('lineA').setAttribute('d', pathOf(ra.s));
+  document.getElementById('lineB').setAttribute('d', pathOf(rb.s));
+
+  const keys = Object.keys(ra.causeShare).sort((x,y)=>ra.causeShare[y]-ra.causeShare[x]);
+  document.getElementById('causeTable').innerHTML =
+    `<thead><tr><th>死因</th><th>方案 A</th><th>方案 B</th><th>差</th></tr></thead><tbody>`+
+    keys.map(k=>{
+      const a = Math.round(ra.causeShare[k]*100), b = Math.round(rb.causeShare[k]*100);
+      return `<tr><td>${CAUSES[k].n}</td><td>${a}%</td><td>${b}%</td><td style="color:${b-a>0?'var(--red2)':'var(--green)'}">${b-a>0?'+':''}${b-a}pt</td></tr>`;
+    }).join('')+`</tbody>`;
+  document.getElementById('outCard').classList.remove('hidden');
+});
+
+if(location.search.indexOf('demo')>=0) setTimeout(()=>document.getElementById('runBtn').click(), 200);
+</script>
+</body>
+</html>

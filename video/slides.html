@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>promo v2</title>
+<style>
+:root{
+  --bg:#07080B; --txt:#F1F3F7; --dim:#8B93A3; --dim2:#565E6E;
+  --red:#FF5A5F; --red2:#FF9A7A; --green:#3EE08F; --line:rgba(255,255,255,.10);
+  --mono:ui-monospace,SFMono-Regular,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--txt);font-family:var(--sans)}
+.grid{position:fixed;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.07) 1px, transparent 1px);background-size:34px 34px;
+  -webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 20%, #000 10%, transparent 80%);
+  mask-image:radial-gradient(ellipse 70% 60% at 50% 20%, #000 10%, transparent 80%);}
+.glow{position:fixed;inset:0;background:
+  radial-gradient(900px 560px at 12% -10%, rgba(255,90,95,.16), transparent 62%),
+  radial-gradient(760px 460px at 92% 4%, rgba(80,120,255,.10), transparent 60%);}
+.scene{position:absolute;inset:0;padding:96px 120px;display:none;flex-direction:column;justify-content:center}
+.scene.on{display:flex}
+.topbar{position:absolute;top:56px;left:120px;right:120px;display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--mono);font-size:22px;letter-spacing:.18em;color:var(--dim2)}
+.topbar .b{color:var(--dim);display:flex;align-items:center;gap:14px}
+.mk{display:grid;grid-template-columns:repeat(3,6px);gap:3px}
+.mk i{width:6px;height:6px;background:var(--red);display:block;border-radius:1px}
+.mk i:nth-child(2n){background:rgba(255,255,255,.3)}
+.eyebrow{display:flex;align-items:center;gap:18px;font-family:var(--mono);font-size:24px;letter-spacing:.24em;color:var(--red)}
+.eyebrow::before{content:"";width:46px;height:2px;background:var(--red)}
+h1{font-size:190px;line-height:1.02;letter-spacing:-.035em;font-weight:600;margin-top:26px}
+h1 .r{color:var(--red)}
+h2{font-size:100px;line-height:1.1;letter-spacing:-.02em;font-weight:600}
+h2 .r{color:var(--red)}
+h2 .g{color:var(--green)}
+.lead{margin-top:30px;font-size:44px;color:var(--dim)}
+.lead .en{display:block;margin-top:14px;font-family:var(--mono);font-size:26px;letter-spacing:.08em;color:var(--dim2)}
+.kick{font-family:var(--mono);font-size:24px;letter-spacing:.24em;color:var(--red);margin-bottom:20px}
+.sub{margin-top:22px;font-size:34px;color:var(--dim)}
+.nums{display:flex;align-items:baseline;gap:34px;margin-top:44px}
+.nums .n{font-family:var(--mono);font-size:200px;font-weight:500;letter-spacing:-.05em;line-height:1}
+.nums .n.red{color:var(--red)} .nums .n.green{color:var(--green)}
+.nums .arrow{font-family:var(--mono);font-size:90px;color:var(--dim2)}
+.nums .cap{font-size:30px;color:var(--dim);margin-left:10px}
+.note{margin-top:34px;font-size:36px;color:#CFC7B6;line-height:1.6}
+.note b{color:var(--txt);font-weight:600}
+.tagline{margin-top:30px;display:inline-block;border-left:3px solid var(--red);padding-left:22px;font-size:36px;color:#EAD9D7}
+.bigline{font-family:var(--mono);font-size:34px;color:var(--dim);margin-top:48px;letter-spacing:.06em}
+.bigline b{color:var(--txt);font-weight:500}
+.veto{display:flex;gap:18px;margin-top:44px}
+.veto div{border:1px solid rgba(255,90,95,.45);background:rgba(255,90,95,.07);border-radius:16px;padding:22px 34px;font-size:34px;color:#FFC9C6}
+.veto em{align-self:center;font-style:normal;font-family:var(--mono);font-size:26px;color:var(--red);letter-spacing:.12em}
+.mock{margin-top:40px;display:flex;align-items:center;gap:18px;border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:16px;padding:26px 30px;font-family:var(--mono);font-size:32px;color:var(--dim)}
+.mock b{color:var(--txt);font-weight:400}
+.six{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:30px;width:1560px}
+.six > div{border:1px solid var(--line);border-radius:14px;padding:18px 20px;background:rgba(255,255,255,.02)}
+.six .k{font-family:var(--mono);font-size:18px;color:var(--dim2);letter-spacing:.14em}
+.six .v{font-size:32px;font-weight:600;margin-top:8px}
+.six .n{font-family:var(--mono);font-size:20px;color:var(--red2);margin-top:6px}
+.url{margin-top:20px;font-family:var(--mono);font-size:26px;color:var(--red2);letter-spacing:.04em}
+</style>
+</head>
+<body>
+<div class="glow"></div><div class="grid"></div>
+
+<!-- 1 -->
+<section class="scene" id="s1">
+  <div class="topbar"><div class="b"><span class="mk"><i></i><i></i><i></i><i></i><i></i><i></i></span> 程序员逆天卦-沙盘</div><div>01 / 07</div></div>
+  <div class="eyebrow">PRE-MORTEM SANDBOX</div>
+  <h1>先算它<span class="r">怎么死</span></h1>
+  <div class="lead">再决定要不要做。
+    <span class="en">Every AI writes your plan. We kill it first.</span>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="scene" id="s2">
+  <div class="topbar"><div class="b"><span class="mk"><i></i><i></i><i></i><i></i><i></i><i></i></span> 程序员逆天卦-沙盘</div><div>02 / 07</div></div>
+  <div class="kick">THE PROBLEM</div>
+  <h2>生成是白菜价，<br><span class="r">杀死</span>是稀缺品。</h2>
+  <div class="sub">所有 AI 都在帮你写方案。没有人帮你提前杀死它。</div>
+</section>
+
+<!-- 3 -->
+<section class="scene" id="s3">
+  <div class="topbar"><div class="b"><span class="mk"><i></i><i></i><i></i><i></i><i></i><i></i></span> 程序员逆天卦-沙盘</div><div>03 / 07</div></div>
+  <div class="kick">METHOD</div>
+  <h2>六爻，加三票否决。</h2>
+  <div class="veto">
+    <div>版权</div><div>牌照</div><div>平台</div>
+    <em>ANY RED = 0%</em>
+  </div>
+  <div class="bigline">全绿才推演 <b>5,000</b> 次 → <b>死法</b> · <b>死期</b> · <b>命门</b></div>
+</section>
+
+<!-- 4 -->
+<section class="scene" id="s4">
+  <div class="topbar"><div class="b"><span class="mk"><i></i><i></i><i></i><i></i><i></i><i></i></span> 程序员逆天卦-沙盘</div><div>04 / 07</div></div>
+  <div class="kick">CASE 01 / 音乐本地化</div>
+  <h2>把中文歌做成英文版，<br>旋律不变。</h2>
+  <div class="nums"><div class="n">36%</div><span class="arrow">→</span><div class="n red">0%</div><div class="cap">24 个月存活率</div></div>
+  <div class="note">没有词曲授权，这叫衍生作品。<b>法务不是概率，是一票否决。</b></div>
+</section>
+
+<!-- 5 -->
+<section class="scene" id="s5">
+  <div class="topbar"><div class="b"><span class="mk"><i></i><i></i><i></i><i></i><i></i><i></i></span> 程序员逆天卦-沙盘</div><div>05 / 07</div></div>
+  <div class="kick">CASE 05 / 我们自己</div>
+  <h2>九项功能做完，<br>我们把自己算了一遍。</h2>
+  <div class="nums"><div class="n">67%</div><div class="cap">最可能死于：<b style="color:#F1F3F7">被复刻 34%</b></div></div>
+  <div class="note">补上校准数据和品牌 → <b style="color:#3EE08F">73%</b>。<br>下一个死因立刻变成：<b style="color:#FF9A7A">没人真的需要 32%</b>。</div>
+</section>
+
+<!-- 6 -->
+<section class="scene" id="s6">
+  <div class="topbar"><div class="b"><span class="mk"><i></i><i></i><i></i><i></i><i></i><i></i></span> 程序员逆天卦-沙盘</div><div>06 / 07</div></div>
+  <div class="kick">IMPORT / 不用手填</div>
+  <h2>粘一个 GitHub 地址。</h2>
+  <div class="mock">▸ <b>https://github.com/owner/repo</b>　　30s</div>
+  <div class="six">
+    <div><div class="k">初爻 · 需求</div><div class="v">供不应求</div><div class="n">3</div></div>
+    <div><div class="k">二爻 · 能力</div><div class="v">稳定可用</div><div class="n">3</div></div>
+    <div><div class="k">三爻 · 经济</div><div class="v">勉强持平</div><div class="n">1</div></div>
+    <div><div class="k">四爻 · 分发</div><div class="v">自己会涨</div><div class="n">3</div></div>
+    <div><div class="k">五爻 · 依赖</div><div class="v">有备选</div><div class="n">2</div></div>
+    <div><div class="k">上爻 · 续航</div><div class="v">长期主义</div><div class="n">3</div></div>
+  </div>
+  <div class="sub">每一条推断都附证据，置信度低的那几爻你自己改。</div>
+</section>
+
+<!-- 7 -->
+<section class="scene" id="s7">
+  <div class="topbar"><div class="b"><span class="mk"><i></i><i></i><i></i><i></i><i></i><i></i></span> 程序员逆天卦-沙盘</div><div>07 / 07</div></div>
+  <div class="eyebrow">RUN IT ON YOURS</div>
+  <h1 style="font-size:150px">你的项目<br>会怎么死？</h1>
+  <div class="lead" style="font-size:38px">六个变量，五千次推演，三条结论：死法、死期、命门。
+    <span class="en">See how it dies. Then change the ending.</span>
+  </div>
+  <div class="url">copyrights-simulations-featuring-farmer.trycloudflare.com</div>
+</section>
+
+<script>
+const n = parseInt(new URLSearchParams(location.search).get('s') || '1', 10);
+document.getElementById('s'+n)?.classList.add('on');
+</script>
+</body>
+</html>

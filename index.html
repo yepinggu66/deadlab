@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>程序员逆天卦-沙盘 · 先算它怎么死</title>
+<style>
+:root{
+  --bg:#07080B;
+  --panel:#0D0F14;
+  --panel2:#090B0F;
+  --line:rgba(255,255,255,.075);
+  --line2:rgba(255,255,255,.045);
+  --txt:#F1F3F7;
+  --dim:#8B93A3;
+  --dim2:#565E6E;
+  --red:#FF5A5F;
+  --red2:#FF9A7A;
+  --green:#3EE08F;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--txt); font-family:var(--sans);
+  line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+body::before{
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(760px 420px at 18% -6%, rgba(255,90,95,.13), transparent 62%),
+    radial-gradient(620px 380px at 88% 0%, rgba(80,120,255,.08), transparent 60%);
+}
+.gridbg{
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px);
+  background-size:26px 26px;
+  -webkit-mask-image:radial-gradient(ellipse 75% 50% at 50% 0%, #000 10%, transparent 78%);
+  mask-image:radial-gradient(ellipse 75% 50% at 50% 0%, #000 10%, transparent 78%);
+}
+.shell{position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+/* top */
+.top{display:flex; align-items:center; justify-content:space-between; padding:22px 0; border-bottom:1px solid var(--line2); gap:16px}
+.logo{display:flex; align-items:center; gap:11px; font-size:17px; letter-spacing:.01em; color:var(--txt)}
+.logo .name{font-family:var(--sans); font-weight:600; letter-spacing:.01em}
+.mark{display:grid; grid-template-columns:repeat(3,4px); gap:2px}
+.mark i{width:4px; height:4px; display:block; border-radius:1px; background:var(--red)}
+.mark i:nth-child(2n){background:rgba(255,255,255,.32)}
+.logo .cn{font-family:var(--mono); font-size:12.5px; letter-spacing:.18em; color:var(--dim2); border-left:1px solid var(--line); padding-left:12px}
+.tag{font-family:var(--mono); font-size:11.8px; letter-spacing:.16em; color:var(--dim2); border:1px solid var(--line); padding:5px 10px; border-radius:6px; white-space:nowrap}
+.top-right{display:flex; align-items:center; gap:10px}
+a.cases-link{font-family:var(--mono); font-size:12px; letter-spacing:.14em; color:var(--dim); text-decoration:none; border:1px solid var(--line); padding:6px 11px; border-radius:6px; white-space:nowrap; transition:.15s}
+a.cases-link:hover{color:var(--txt); border-color:rgba(255,255,255,.22)}
+@media(max-width:760px){a.cases-link{display:none}}
+
+/* hero */
+.hero{padding:58px 0 46px}
+.eyebrow{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12.4px; letter-spacing:.22em; color:var(--red)}
+.eyebrow::before{content:""; width:24px; height:1px; background:var(--red); display:block}
+.hero h1{margin:18px 0 0; font-size:80.2px; line-height:1.03; letter-spacing:-.03em; font-weight:600}
+.hero h1 .red{color:var(--red)}
+.lead{margin:20px 0 0; font-size:17.7px; color:var(--dim); max-width:660px}
+.lead .en{display:block; margin-top:8px; font-family:var(--mono); font-size:13.6px; letter-spacing:.06em; color:var(--dim2)}
+.chips{display:flex; gap:8px; margin-top:26px; flex-wrap:wrap}
+.chips span{font-family:var(--mono); font-size:11.8px; letter-spacing:.14em; color:var(--dim); border:1px solid var(--line); padding:6px 11px; border-radius:6px; background:rgba(255,255,255,.02)}
+@media(max-width:760px){
+  .hero h1{font-size:49.6px}
+  .tag{display:none}
+}
+
+/* cards */
+.card{
+  background:var(--panel); border:1px solid var(--line); border-radius:18px;
+  padding:26px 28px; margin-bottom:16px; animation:rise .45s ease both;
+}
+@keyframes rise{from{opacity:0; transform:translateY(9px)} to{opacity:1; transform:none}}
+.card:nth-of-type(2){animation-delay:.04s}
+.card:nth-of-type(3){animation-delay:.08s}
+.card:nth-of-type(4){animation-delay:.12s}
+.card:nth-of-type(5){animation-delay:.16s}
+.card:nth-of-type(6){animation-delay:.2s}
+.sec{display:flex; align-items:center; gap:13px}
+.sec .n{font-family:var(--mono); font-size:12.4px; color:var(--red); letter-spacing:.1em}
+.sec h2{margin:0; font-family:var(--mono); font-size:14.2px; font-weight:600; letter-spacing:.18em; color:var(--txt)}
+.sec em{font-style:normal; font-size:14.8px; color:var(--dim); margin-left:2px}
+.sec .rule{flex:1; height:1px; background:var(--line2)}
+.desc{margin:10px 0 4px; font-size:14.2px; color:var(--dim2)}
+.hidden{display:none !important}
+
+/* rows */
+.rows{display:flex; flex-direction:column}
+.row{display:grid; grid-template-columns:176px 1fr; gap:20px; align-items:center; padding:12px 0; border-bottom:1px solid var(--line2)}
+.row:last-child{border-bottom:none}
+.lbl .idx{font-family:var(--mono); font-size:11.2px; color:var(--dim2); letter-spacing:.12em}
+.lbl .n{font-size:16.5px; margin-left:7px; color:var(--txt)}
+.lbl .q{display:block; font-size:13px; color:var(--dim2); margin-top:1px}
+.seg{display:grid; grid-template-columns:repeat(4,1fr); gap:4px; padding:4px; background:var(--panel2); border:1px solid var(--line2); border-radius:12px}
+.seg button{border:0; background:transparent; color:var(--dim); font-family:var(--sans); font-size:14.2px; padding:9px 3px; border-radius:8px; cursor:pointer; transition:background .15s,color .15s}
+.seg button:hover{background:rgba(255,255,255,.045); color:var(--txt)}
+.seg button.on{background:#EDEFF4; color:#0A0B0E; font-weight:600}
+@media(max-width:760px){
+  .row{grid-template-columns:1fr; gap:8px}
+  .seg button{font-size:13px; padding:8px 2px}
+}
+
+/* buttons */
+button{font-family:var(--sans)}
+button.primary{
+  width:100%; margin-top:22px; padding:16px; border:0; border-radius:12px;
+  background:#EDEFF4; color:#0A0B0E; font-size:16.5px; font-weight:600; letter-spacing:.04em;
+  cursor:pointer; transition:transform .15s, background .15s;
+}
+button.primary:hover{background:#fff; transform:translateY(-1px)}
+button.primary:disabled{opacity:.35; cursor:default; transform:none}
+button.ghost{
+  background:transparent; border:1px solid var(--line); color:var(--dim); border-radius:10px;
+  padding:10px 16px; font-size:14.2px; cursor:pointer; transition:.15s;
+}
+button.ghost:hover{border-color:rgba(255,255,255,.22); color:var(--txt)}
+
+/* result */
+.res{display:grid; grid-template-columns:1.1fr 1fr; gap:26px; align-items:center; margin:20px 0 6px}
+.verdict{margin:6px 0 14px;padding:15px 18px;border-left:3px solid var(--red);background:rgba(255,90,95,.055);border-radius:0 10px 10px 0;font-size:17px;line-height:1.75;color:#F5EFE7}
+.verdict span{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:var(--red);margin-bottom:6px}
+@media(max-width:820px){.res{grid-template-columns:1fr}}
+.hexbox{display:flex; gap:20px; align-items:center; border:1px solid var(--line); background:var(--panel2); border-radius:14px; padding:18px}
+.lines{display:flex; flex-direction:column; gap:6px; width:118px; flex:0 0 auto}
+.yao{display:flex; height:7px; gap:11px}
+.yao i{display:block; flex:1; background:#E9ECF2; border-radius:1px}
+.yao.yin i{background:#C9CED8}
+.yao.moving i{background:var(--red); box-shadow:0 0 12px rgba(255,90,95,.45)}
+.hn{font-size:24.8px; font-weight:600; letter-spacing:.01em}
+.ht{font-size:13.6px; color:var(--dim); margin-top:2px}
+.hv{font-size:13px; color:var(--dim2); margin-top:8px; line-height:1.65; max-width:280px}
+.bits{font-family:var(--mono); font-size:11.8px; color:var(--dim2); letter-spacing:.24em; margin-top:10px}
+.bits b{color:var(--dim); font-weight:400}
+
+.bignum{font-family:var(--mono); font-size:77.9px; font-weight:500; line-height:1; letter-spacing:-.04em}
+.bignum small{display:block; font-family:var(--sans); font-size:12.4px; color:var(--dim2); letter-spacing:.16em; margin-top:10px; font-weight:400}
+.stat-line{display:flex; justify-content:space-between; gap:12px; padding:11px 0; border-bottom:1px solid var(--line2); font-size:14.2px; color:var(--dim)}
+.stat-line:last-child{border-bottom:none}
+.stat-line b{color:var(--txt); font-weight:500; font-family:var(--mono); font-size:13.6px; text-align:right}
+
+/* curve */
+.curve{width:100%; height:auto; margin-top:8px}
+.curve .gl{stroke:rgba(255,255,255,.055); stroke-width:1}
+.curve .ax{fill:#565E6E; font-size:11.8px; font-family:var(--mono)}
+.curve .ln{fill:none; stroke:#FF6B6B; stroke-width:2; stroke-linejoin:round; transition:stroke-dashoffset .9s cubic-bezier(.3,.8,.3,1)}
+.curve .ar{fill:url(#gArea)}
+.curve .ln2{fill:none; stroke:#8B93A3; stroke-width:1.5; stroke-dasharray:4 4}
+.curve .ar2{fill:rgba(255,255,255,.022)}
+.curve .dot12{fill:#FF6B6B}
+.curve .lab12{fill:#FF9A7A; font-size:11.8px; font-family:var(--mono); letter-spacing:.06em}
+
+/* causes */
+.cause{display:grid; grid-template-columns:26px 1fr auto; gap:0 14px; padding:14px 0; border-bottom:1px solid var(--line2)}
+.cause:last-child{border-bottom:none}
+.cause .i{font-family:var(--mono); font-size:11.2px; color:var(--dim2); padding-top:3px}
+.cause .name{font-size:15.3px; color:var(--txt)}
+.cause .hint{font-size:13px; color:var(--dim2); margin-top:5px}
+.cause .pct{font-family:var(--mono); font-size:15.3px; color:var(--txt)}
+.cause .track{grid-column:1/-1; height:4px; background:rgba(255,255,255,.055); border-radius:2px; margin-top:10px; overflow:hidden}
+.cause .fill{display:block; height:100%; width:0; border-radius:2px; background:linear-gradient(90deg,var(--red),var(--red2)); transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.cause:not(:first-child) .fill{background:linear-gradient(90deg,rgba(255,255,255,.35),rgba(255,255,255,.18))}
+
+/* lever */
+.lever{border:1px solid rgba(255,90,95,.28); background:rgba(255,90,95,.05); border-radius:14px; padding:20px; margin-top:16px}
+.lever h3{margin:0 0 10px; font-family:var(--mono); font-size:11.2px; letter-spacing:.22em; color:var(--red); font-weight:400}
+.lever .big{font-size:29.5px; font-weight:600; letter-spacing:-.01em}
+.lever p{margin:8px 0 0; font-size:14.8px; color:var(--dim); line-height:1.8}
+.rank{display:flex; flex-direction:column; gap:8px; margin-top:16px}
+.rank .r{display:grid; grid-template-columns:74px 1fr 58px; gap:12px; align-items:center; font-family:var(--mono); font-size:12.4px; color:var(--dim2)}
+.rank .r .t{height:4px; background:rgba(255,255,255,.055); border-radius:2px; overflow:hidden}
+.rank .r .t i{display:block; height:100%; width:0; background:rgba(255,255,255,.28); transition:width .6s}
+.rank .r b{text-align:right; font-weight:400; color:var(--dim)}
+.rank .r.top{color:var(--txt)}
+.rank .r.top .t i{background:var(--red)}
+.rank .r.top b{color:var(--red2)}
+
+/* defy */
+.defy{display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap; margin-top:18px}
+.defy .txt{font-size:14.8px; color:var(--dim); max-width:560px; line-height:1.8}
+.defy .txt b{color:var(--txt); font-weight:500}
+.delta{display:flex; align-items:baseline; gap:10px; font-family:var(--mono); font-size:30.7px; letter-spacing:-.02em}
+.delta s{color:var(--dim2); font-size:22.4px; text-decoration:none}
+.delta .up{color:var(--red)}
+
+/* table */
+.dt{width:100%; border-collapse:collapse; margin-top:18px}
+.dt th{font-family:var(--mono); font-size:11.2px; font-weight:400; letter-spacing:.16em; color:var(--dim2); text-align:left; padding:0 16px 10px 0; border-bottom:1px solid var(--line)}
+.dt td{padding:14px 16px 14px 0; border-bottom:1px solid var(--line2); font-size:14.8px; color:var(--dim); line-height:1.7; vertical-align:top}
+.dt td:first-child{color:var(--txt)}
+.dt td .p{display:block; font-family:var(--mono); font-size:11.8px; color:var(--dim2); margin-top:3px}
+.dt td.stop{color:var(--red2)}
+.dt tr:last-child td{border-bottom:none}
+
+/* records */
+.rec{display:flex; align-items:baseline; gap:14px; padding:12px 0; border-bottom:1px solid var(--line2); font-size:14.2px}
+.rec:last-child{border-bottom:none}
+.rec .when{font-family:var(--mono); font-size:12.4px; color:var(--dim2); flex:0 0 82px}
+.rec .what{flex:1; color:var(--dim)}
+.rec .what em{font-style:normal; color:var(--txt)}
+.rec .what .p{font-family:var(--mono); color:var(--red2)}
+.rec .state{flex:0 0 auto; font-family:var(--mono); font-size:11.8px; color:var(--dim2); letter-spacing:.06em}
+.rec .state.due{color:var(--red2)}
+.empty{margin:0; font-size:14.2px; color:var(--dim2)}
+
+footer{margin-top:34px; padding-top:22px; border-top:1px solid var(--line2); font-size:13px; color:var(--dim2); line-height:1.9; display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap}
+footer .mono{font-family:var(--mono); letter-spacing:.06em}
+
+.toast{
+  position:fixed; left:50%; bottom:32px; transform:translate(-50%,16px); z-index:9;
+  background:#14171D; border:1px solid var(--line); color:var(--txt); padding:11px 20px;
+  border-radius:10px; font-size:14.8px; opacity:0; pointer-events:none; transition:.22s;
+  font-family:var(--mono); letter-spacing:.03em;
+}
+.toast.on{opacity:1; transform:translate(-50%,0)}
+.demo .fill,.demo .rank .r .t i{transition:none !important}
+
+/* veto */
+.pname{margin-top:16px}
+.pname input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--txt);font-size:14px;outline:none;font-family:var(--sans)}
+.pname input:focus{border-color:rgba(255,90,95,.45)}
+.imphint{font-size:11.5px;color:var(--dim2);margin-top:9px}
+.imphint a{color:var(--red2);text-decoration:none}
+.imphint a:hover{text-decoration:underline}
+.veto{border:1px solid rgba(255,90,95,.22);background:rgba(255,90,95,.04);border-radius:14px;padding:16px 18px;margin:18px 0 6px;transition:.2s}
+.veto.on{border-color:rgba(255,90,95,.55);background:rgba(255,90,95,.09)}
+.veto-hd{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.veto-hd span{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--red)}
+.veto-hd em{font-style:normal;font-size:11.5px;color:var(--dim2)}
+.veto-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.veto-btns button{padding:11px 8px;font-size:12px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--dim);cursor:pointer;font-family:var(--sans);transition:.15s}
+.veto-btns button:hover{color:var(--txt)}
+.veto-btns button.on{background:rgba(255,90,95,.16);border-color:var(--red);color:#FFBDB9}
+@media(max-width:760px){.veto-btns{grid-template-columns:1fr}}
+.veto-banner{border:1px solid var(--red);background:rgba(255,90,95,.08);border-radius:14px;padding:22px;margin:16px 0 6px}
+.veto-banner .k{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--red)}
+.veto-banner .t{font-size:17px;margin-top:10px;color:#FFD7D4}
+.veto-banner .s{font-size:13px;color:var(--dim);margin-top:8px;line-height:1.8}
+.actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.calib{margin-top:14px;font-size:12.5px;color:var(--dim);border:1px dashed var(--line);border-radius:10px;padding:12px 14px}
+.calib b{font-family:var(--mono);color:var(--gold2, #FFC46B);font-weight:500;font-size:15px}
+.rec-actions{display:flex;gap:6px;flex:0 0 auto}
+.rec-actions button{font-size:10.5px;padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--dim);cursor:pointer;font-family:var(--mono)}
+.rec-actions button:hover{color:var(--txt);border-color:rgba(255,255,255,.22)}
+#cardModal{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;padding:24px}
+#cardModal.on{display:flex}
+#cardModal img{max-width:100%;max-height:82vh;border-radius:12px;border:1px solid var(--line)}
+#cardModal .mbtn{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
+.daily{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;margin-top:14px}
+.daily .d-n{font-size:20px;font-weight:600}
+.daily .d-m{font-family:var(--mono);font-size:38px;color:var(--red2);letter-spacing:-.03em}
+.daily .d-c{font-size:12.5px;color:var(--dim);margin-top:6px}
+.fnav{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:11px}
+.fnav a{color:var(--dim2);text-decoration:none}
+.fnav a:hover{color:var(--txt)}
+</style>
+</head>
+<body>
+<div class="gridbg"></div>
+<div class="shell">
+
+  <div class="top">
+    <div class="logo">
+      <span class="mark"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="name">程序员逆天卦-沙盘</span> <span class="cn">DEADLAB</span>
+    </div>
+    <div class="top-right">
+      <a class="cases-link" href="import.html">导入项目</a>
+      <a class="cases-link" href="cases.html">CASE FILES →</a>
+      <div class="tag">PRE-MORTEM · v0.4</div>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="eyebrow">00 / PRE-MORTEM SANDBOX</div>
+    <h1>先算它<span class="red">怎么死</span></h1>
+    <p class="lead">再决定要不要做。
+      <span class="en">Every AI writes your plan. We kill it first.</span>
+    </p>
+    <div class="chips">
+      <span>5,000 RUNS</span><span>24 MONTHS</span><span>6 VARIABLES</span><span>NO 98% PROMISE</span>
+    </div>
+  </section>
+
+  <!-- 01 -->
+  <section class="card">
+    <div class="sec"><span class="n">01</span><h2>DIE</h2><em>六爻定体质</em><span class="rule"></span></div>
+    <p class="desc">六个变量，每爻四档（老阴 0 / 少阴 1 / 少阳 2 / 老阳 3）。阴爻越多，越容易死在那一条上。</p>
+    <div class="pname"><input id="appName" maxlength="30" placeholder="项目名（会写进报告和分享卡）"></div>
+    <div class="imphint">已经做好的项目？<a href="import.html">从 GitHub / 本地文件夹导入 →</a></div>
+    <div class="veto" id="vetoBox">
+      <div class="veto-hd"><span>三票否决 · VETO</span><em>任意一票红 → 存活率归零，不进推演</em></div>
+      <div class="veto-btns">
+        <button data-veto="copy">版权 · 我不拥有授权</button>
+        <button data-veto="lic">牌照 · 这业务需要资质</button>
+        <button data-veto="plat">平台 · 规则不允许</button>
+      </div>
+    </div>
+    <div class="rows" id="rows"></div>
+    <button class="primary" id="runBtn">推演 5,000 次 →</button>
+  </section>
+
+  <!-- 02 -->
+  <section class="card hidden" id="resultCard">
+    <div class="sec"><span class="n">02</span><h2>DIAGNOSE</h2><em>它怎么死</em><span class="rule"></span></div>
+    <p class="desc" id="subId">—</p>
+    <div class="veto-banner hidden" id="vetoBanner"></div>
+
+    <div class="res" id="resBox">
+      <div class="hexbox">
+        <div class="lines" id="lines"></div>
+        <div>
+          <div class="hn" id="hexName">—</div>
+          <div class="ht" id="hexTag">—</div>
+          <div class="hv" id="hexVerse">—</div>
+          <div class="bits"><b>初→上</b> <span id="bits">—</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="bignum"><span id="s12">—</span><small>24 个月存活率 / SURVIVAL</small></div>
+        <div class="stat-line"><span>中位死亡</span><b id="median">—</b></div>
+        <div class="stat-line"><span>活下来的最可能是</span><b id="outcome">—</b></div>
+        <div class="stat-line"><span>推演编号</span><b id="simId">—</b></div>
+      </div>
+    </div>
+
+    <div class="verdict" id="verdict"><span>一句话判词 / ONE LINE</span>—</div>
+
+    <svg class="curve" id="curve" viewBox="0 0 660 268">
+      <defs>
+        <linearGradient id="gArea" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#FF5A5F" stop-opacity=".26"/>
+          <stop offset="1" stop-color="#FF5A5F" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <g id="grid"></g>
+      <path class="ar" id="area" d=""></path>
+      <path class="ln" id="line" d="" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0"></path>
+      <path class="ar2 hidden" id="area2" d=""></path>
+      <path class="ln2 hidden" id="line2" d=""></path>
+      <circle class="dot12" id="dot12" r="3.5" opacity="0"></circle>
+      <text class="lab12" id="lab12" opacity="0"></text>
+    </svg>
+
+    <div class="sec" id="causeHead" style="margin-top:28px"><span class="n">02.1</span><h2>CAUSE OF DEATH</h2><em>死因谱</em><span class="rule"></span></div>
+    <div id="causes"></div>
+    <div class="actions" id="actionsBox">
+      <button class="ghost" id="cardBtn">生成分享卡 · 1080×1440</button>
+      <button class="ghost" id="reportBtn">生成一页纸报告 →</button>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section class="card hidden" id="leverCard">
+    <div class="sec"><span class="n">03</span><h2>DECIDE</h2><em>命门</em><span class="rule"></span></div>
+    <p class="desc">把六个爻各自 +1 档，看谁的存活率涨得最多。涨得最多的那一爻，就是命门。</p>
+    <div class="lever">
+      <h3>ONE LEVER ONLY</h3>
+      <div class="big" id="leverName">—</div>
+      <p id="leverText">—</p>
+      <div class="rank" id="rank"></div>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section class="card hidden" id="defyCard">
+    <div class="sec"><span class="n">04</span><h2>DEFY</h2><em>改一爻，重跑</em><span class="rule"></span></div>
+    <p class="desc">改完之后，卦会变。变卦不是安慰，是同一套模型在另一个输入下的结果。</p>
+    <div class="defy">
+      <div class="txt" id="defyTxt">—</div>
+      <div class="delta"><s id="dBefore">—</s><span>→</span><span class="up" id="dAfter">—</span></div>
+    </div>
+    <button class="primary" id="defyBtn">改这一爻 · 重跑</button>
+    <p class="desc" id="defyNote" style="margin-top:12px"></p>
+  </section>
+
+  <!-- 05 -->
+  <section class="card hidden" id="deathCard">
+    <div class="sec"><span class="n">05</span><h2>DEATH LIST</h2><em>死法清单</em><span class="rule"></span></div>
+    <p class="desc">不是"会不会死"，是"最先死在哪、怎么最早发现、什么时候该停"。</p>
+    <table class="dt">
+      <thead><tr><th>死法</th><th>最早的信号</th><th>止损动作</th></tr></thead>
+      <tbody id="deathBody"></tbody>
+    </table>
+  </section>
+
+  <!-- 06 -->
+  <section class="card">
+    <div class="sec"><span class="n">06</span><h2>LEDGER</h2><em>存证 · 校准</em><span class="rule"></span></div>
+    <p class="desc">每次推演都可以存下来，90 天后回来对账。我们不承诺 98%，我们公布"说 70% 的事，实际发生了多少次"。</p>
+    <div class="calib" id="calib">校准中：还没有到期的存证。</div>
+    <div id="records"><p class="empty">还没有存证。存一条，90 天后回来看它准不准。</p></div>
+    <button class="ghost hidden" id="saveBtn" style="margin-top:16px">存下这次推演</button>
+  </section>
+
+  <!-- 07 -->
+  <section class="card">
+    <div class="sec"><span class="n">07</span><h2>DAILY</h2><em>今日一卦</em><span class="rule"></span></div>
+    <p class="desc">每天一个项目类型，同一天所有人算到同一卦。</p>
+    <div class="daily" id="daily"></div>
+  </section>
+
+  <footer>
+    <div>
+      <div class="mono" style="margin-bottom:8px">程序员逆天卦-沙盘 · DEADLAB</div>
+      <div class="fnav">
+        <a href="index.html">沙盘</a><a href="import.html">导入</a><a href="cases.html">案例</a><a href="library.html">案例库</a>
+        <a href="team.html">团队</a><a href="compare.html">对比</a><a href="report.html">报告</a><a href="api.html">API</a>
+      </div>
+    </div>
+    <span style="max-width:520px">不是预测，是压力测试。绝对值别信，排序可信。<br>我们不算：命运 · 合婚 · 荐股 · 你能不能成功。只算一件事：这个项目最先死在哪、改哪一爻。</span>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="cardModal">
+  <img id="cardImg" alt="分享卡">
+  <div class="mbtn">
+    <button class="ghost" id="cardDownload">下载 PNG</button>
+    <button class="ghost" id="cardClose">关闭</button>
+  </div>
+</div>
+
+<script>
+/* ============ 六十四卦 ============ */
+const T = {乾:[1,1,1],兑:[1,1,0],离:[1,0,1],震:[1,0,0],巽:[0,1,1],坎:[0,1,0],艮:[0,0,1],坤:[0,0,0]};
+const HEX = [
+["乾","乾","乾为天","一次编译通过"],["坤","坤","坤为地","需求全接"],["坎","震","水雷屯","初始化即崩"],
+["艮","坎","山水蒙","文档缺失"],["坎","乾","水天需","等产品确认"],["乾","坎","天水讼","甩锅大会"],
+["坤","坎","地水师","全员上线"],["坎","坤","水地比","结对编程"],["巽","乾","风天小畜","攒够一次发版"],
+["乾","兑","天泽履","踩到线上"],["坤","乾","地天泰","灰度零事故"],["乾","坤","天地否","联调不通"],
+["乾","离","天火同人","开源有人 PR"],["离","乾","火天大有","一夜爆火"],["坤","艮","地山谦","没人 star"],
+["震","坤","雷地豫","提前交付"],["兑","震","泽雷随","跟着竞品改"],["艮","巽","山风蛊","祖传代码"],
+["坤","兑","地泽临","用户来了"],["巽","坤","风地观","只看不买"],["离","震","火雷噬嗑","咬咬牙重构"],
+["艮","离","山火贲","皮肤好看"],["艮","坤","山地剥","功能被砍"],["坤","震","地雷复","回滚"],
+["乾","震","天雷无妄","无妄之 bug"],["艮","乾","山天大畜","技术债到期"],["艮","震","山雷颐","自己吃自己"],
+["兑","巽","泽风大过","过度设计"],["坎","坎","坎为水","深夜宕机"],["离","离","离为火","服务器烧了"],
+["兑","艮","泽山咸","用户心动"],["震","巽","雷风恒","长期维护"],["乾","艮","天山遁","转身跑路"],
+["震","乾","雷天大壮","猛加需求"],["离","坤","火地晋","顺利晋升"],["坤","离","地火明夷","背锅"],
+["巽","离","风火家人","小团队"],["离","兑","火泽睽","前后端吵架"],["坎","艮","水山蹇","卡在支付"],
+["震","坎","雷水解","问题自解"],["艮","兑","山泽损","砍功能省钱"],["巽","震","风雷益","性能起飞"],
+["兑","乾","泽天夬","一键删除"],["乾","巽","天风姤","遇上甲方"],["兑","坤","泽地萃","用户聚集"],
+["坤","巽","地风升","稳步增长"],["兑","坎","泽水困","预算见底"],["坎","巽","水风井","共用一个 API"],
+["兑","离","泽火革","推翻重做"],["离","巽","火风鼎","立新架构"],["震","震","震为雷","半夜惊醒"],
+["艮","艮","艮为山","停止维护"],["巽","艮","风山渐","慢慢变好"],["震","兑","雷泽归妹","嫁给外包"],
+["震","离","雷火丰","流量洪峰"],["离","艮","火山旅","出差演示"],["巽","巽","巽为风","需求风吹"],
+["兑","兑","兑为泽","用户好评"],["巽","坎","风水涣","团队散了"],["坎","兑","水泽节","限流"],
+["巽","兑","风泽中孚","用户信任"],["震","艮","雷山小过","小 bug 不断"],["坎","离","水火既济","上线即完成"],
+["离","坎","火水未济","永远差一点"]
+];
+const HEXMAP = {};
+HEX.forEach((h,i)=>{ HEXMAP[[...T[h[1]],...T[h[0]]].join("")] = i; });
+
+/* ============ 六爻 ============ */
+const VARS = [
+  {k:'need', yao:'初', name:'需求', q:'有人真的痛吗', lv:['自嗨','有人问','有人付钱','供不应求'], cause:'demo'},
+  {k:'cap',  yao:'二', name:'能力', q:'智能体做得对吗', lv:['做不出','能跑但常错','基本可信','稳定可用'], cause:'trust'},
+  {k:'econ', yao:'三', name:'经济', q:'越用越赚还是越亏', lv:['越用越亏','勉强持平','有毛利','很赚'], cause:'cost'},
+  {k:'dist', yao:'四', name:'分发', q:'人从哪来', lv:['没入口','几个熟人','稳定流量','自己会涨'], cause:'dist'},
+  {k:'dep',  yao:'五', name:'依赖', q:'上游会不会吃掉你', lv:['全靠上游','单点依赖','有备选','自主'], cause:'dep'},
+  {k:'stam', yao:'上', name:'续航', q:'你还能撑多久', lv:['快撑不住','还能半年','能撑两年','长期主义'], cause:'burn'}
+];
+const CAUSES = {
+  demo:{n:'演示很酷，没人用', s:'上线 4 周，周活 < 20，且没人第二次打开', t:'停更两周，去做 10 个用户访谈'},
+  trust:{n:'准确率不够，用户不敢用', s:'每 5 次任务出 1 次明显错误，用户开始手动复核', t:'砍掉不确定场景，只留可验证的任务'},
+  cost:{n:'越用越亏，成本高于客单价', s:'单用户月成本 > 客单价 30%，且用量还在涨', t:'换小模型 / 涨价 / 加限流'},
+  dist:{n:'没人知道它存在', s:'发布 3 次，累计注册 < 100，自然流量为 0', t:'停开发，先做一条能传播的 demo'},
+  dep:{n:'被上游一口吃掉', s:'上游一次版本更新，核心能力失效 48 小时', t:'加抽象层 + 多模型路由'},
+  burn:{n:'维护不动了', s:'连续 6 周没有提交，issue 堆积 > 30', t:'砍到只剩一个功能，或找人接手'}
+};
+const CKEYS = Object.keys(CAUSES);
+const BASE = {demo:.030, trust:.024, cost:.020, dist:.030, dep:.016, burn:.022};
+const K = 0.62;
+
+/* ============ 随机 ============ */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;}}
+function fnv1a(s){let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193);}return h>>>0;}
+const $ = id=>document.getElementById(id);
+const DEMO = location.search.indexOf('demo')>=0;
+if(DEMO) document.body.classList.add('demo');
+
+/* ============ 状态 ============ */
+const state = {
+  lv:{need:1,cap:1,econ:1,dist:1,dep:1,stam:1},
+  veto:{copy:false,lic:false,plat:false}, vetoes:[],
+  result:null, lever:null, simId:0, movingYao:-1,
+  prevSeries:null, prevS12:null, prevHex:null, defyApplied:0
+};
+
+/* ============ 仿真 ============ */
+const shape = m => 1.25 - 0.018*m;
+const factor = lv => { const f=(3-lv)/3; return 0.14 + 1.7*Math.pow(f,1.7); };
+
+function runSim(lv, N, seed){
+  const rnd = mulberry32(seed);
+  const surv = new Array(25).fill(0);
+  const deaths = {}; CKEYS.forEach(k=>deaths[k]=0);
+  const outs = {'小生意':0,'被上游收编':0,'苟活':0,'开源走红':0};
+  let deadCount = 0;
+  const hs = new Array(6).fill(0);
+  for(let i=0;i<N;i++){
+    let dead = 0, cause = null;
+    for(let m=1;m<=24;m++){
+      let total = 0;
+      for(let j=0;j<6;j++){
+        const h = BASE[CKEYS[j]] * shape(m) * factor(lv[VARS[j].k]) * K;
+        hs[j] = h; total += h;
+      }
+      if(rnd() < total){
+        let r = rnd()*total, idx=5;
+        for(let j=0;j<6;j++){ r -= hs[j]; if(r<=0){ idx=j; break; } }
+        cause = CKEYS[idx]; dead = m; break;
+      }
+    }
+    for(let t=0;t<=24;t++){ if(!dead || t < dead) surv[t]++; }
+    if(dead){ deaths[cause]++; deadCount++; }
+    else {
+      const r = rnd();
+      if(lv.need>=2 && lv.dist>=2 && lv.econ>=2) outs['小生意']++;
+      else if(lv.dep<=1) outs['被上游收编']++;
+      else if(r<0.5) outs['苟活']++;
+      else outs['开源走红']++;
+    }
+  }
+  const s = surv.map(c=>c/N);
+  let median = 24;
+  for(let t=0;t<=24;t++){ if(s[t] <= 0.5){ median = t; break; } }
+  const causeShare = {};
+  CKEYS.forEach(k=>causeShare[k] = deadCount ? deaths[k]/deadCount : 0);
+  const outTop = Object.entries(outs).sort((a,b)=>b[1]-a[1])[0];
+  return {s, median, causeShare, deadCount, outTop, N, survivors:N-deadCount};
+}
+
+/* ============ 卦象 ============ */
+function bitsOf(lv){ return VARS.map(v => lv[v.k] >= 2 ? 1 : 0); }
+function hexOf(lv){ return HEX[HEXMAP[bitsOf(lv).join("")]]; }
+function verseOf(lv){
+  const weak = VARS.filter(v=>lv[v.k] <= 1);
+  const strong = VARS.filter(v=>lv[v.k] >= 2);
+  if(!weak.length) return "六爻纯阳。六个维度全在阳位——这种卦一般不是算出来的，是吹出来的。";
+  if(!strong.length) return "六爻皆阴。六个维度全空——此局从第一步就该停。";
+  return weak.length + " 爻在阴位（" + weak.map(v=>v.name).join("、") + "），" +
+         strong.length + " 爻在阳位。阴处就是最先裂开的地方。";
+}
+
+/* ============ 渲染 ============ */
+function renderInputs(){
+  $("rows").innerHTML = VARS.map((v,i)=>{
+    const seg = v.lv.map((txt,j)=>
+      `<button data-k="${v.k}" data-v="${j}" class="${state.lv[v.k]===j?'on':''}">${txt}</button>`
+    ).join("");
+    return `<div class="row">
+      <div class="lbl"><span class="idx">0${i+1} ${v.yao}爻</span><span class="n">${v.name}</span>
+        <span class="q">${v.q}</span></div>
+      <div class="seg">${seg}</div>
+    </div>`;
+  }).join("");
+}
+function drawHex(lv){
+  const b = bitsOf(lv), box = $("lines"); box.innerHTML = "";
+  for(let i=5;i>=0;i--){
+    const d = document.createElement("div");
+    d.className = "yao" + (b[i] ? "" : " yin") + (i === state.movingYao ? " moving" : "");
+    d.innerHTML = b[i] ? "<i></i>" : "<i></i><i></i>";
+    box.appendChild(d);
+  }
+}
+function X(t){ return 56 + t*(560/24); }
+function Y(s){ return 218 - s*180; }
+function pathOf(series){ return series.map((s,t)=> (t? "L":"M") + X(t).toFixed(1) + " " + Y(s).toFixed(1)).join(" "); }
+function areaOf(series){ return pathOf(series) + " L" + X(24).toFixed(1) + " 218 L" + X(0).toFixed(1) + " 218 Z"; }
+function renderGrid(){
+  let g = "";
+  [0,.25,.5,.75,1].forEach(s=>{
+    g += `<line class="gl" x1="56" y1="${Y(s)}" x2="616" y2="${Y(s)}"/>`;
+    g += `<text class="ax" x="44" y="${Y(s)+3}" text-anchor="end">${Math.round(s*100)}%</text>`;
+  });
+  [0,6,12,18,24].forEach(t=>{
+    g += `<line class="gl" x1="${X(t)}" y1="38" x2="${X(t)}" y2="218"/>`;
+    g += `<text class="ax" x="${X(t)}" y="234" text-anchor="middle">${t===0?'0':t+'M'}</text>`;
+  });
+  $("grid").innerHTML = g;
+}
+
+function verdictOf(r){
+  const p = r.s[12];
+  const top = Object.entries(r.causeShare).sort((a,b)=>b[1]-a[1])[0];
+  const cause = top ? CAUSES[top[0]].n : '—';
+  const lever = state.lever ? state.lever.name : cause;
+  if(p >= 0.7) return '能活。但「' + cause + '」会一直跟着你，别在最顺的时候松手。';
+  if(p >= 0.5) return '能活到第二年，前提是现在就把「' + lever + '」补上。';
+  if(p >= 0.3) return '大概率活不过 18 个月，最先死在「' + cause + '」。';
+  if(p >= 0.15) return '这局很难翻。先改「' + lever + '」，改不动就别做。';
+  return '别做。这不是优化能解决的问题。';
+}
+function renderResult(){
+  const r = state.result, lv = state.lv, hx = hexOf(lv);
+  $("vetoBanner").classList.add("hidden");
+  ["resBox","curve","causeHead","causes","actionsBox"].forEach(id=>$(id).classList.remove("hidden"));
+  $("subId").textContent = "RUN #" + state.simId + " · " + r.N.toLocaleString() + " 次推演 · 24 个月";
+  $("hexName").textContent = hx[2];
+  $("hexTag").textContent = hx[3];
+  $("hexVerse").textContent = verseOf(lv);
+  $("bits").textContent = bitsOf(lv).map(b=>b?"1":"0").join(" ");
+  drawHex(lv);
+
+  $("s12").textContent = Math.round(r.s[12]*100) + "%";
+  $("median").textContent = r.median >= 24 ? "活过 24 个月" : "第 " + r.median + " 个月";
+  $("outcome").textContent = r.survivors ? r.outTop[0] + " " + Math.round(r.outTop[1]/r.survivors*100) + "%" : "没有幸存者";
+  $("simId").textContent = "#" + state.simId;
+
+  renderGrid();
+  $("line").setAttribute("d", pathOf(r.s));
+  $("area").setAttribute("d", areaOf(r.s));
+  // 重绘动画
+  const ln = $("line");
+  ln.style.transition = "none";
+  ln.style.strokeDashoffset = "1";
+  void ln.getBoundingClientRect();
+  ln.style.transition = "stroke-dashoffset .9s cubic-bezier(.3,.8,.3,1)";
+  ln.style.strokeDashoffset = "0";
+
+  if(state.prevSeries){
+    $("line2").setAttribute("d", pathOf(state.prevSeries));
+    $("area2").setAttribute("d", areaOf(state.prevSeries));
+    $("line2").classList.remove("hidden");
+    $("area2").classList.remove("hidden");
+  } else {
+    $("line2").classList.add("hidden");
+    $("area2").classList.add("hidden");
+  }
+
+  const mx = X(12), my = Y(r.s[12]);
+  const dot = $("dot12"), lab = $("lab12");
+  dot.setAttribute("cx", mx); dot.setAttribute("cy", my); dot.setAttribute("opacity", 1);
+  lab.setAttribute("x", mx + 9); lab.setAttribute("y", my - 9);
+  lab.setAttribute("opacity", 1);
+  lab.textContent = "12M · " + Math.round(r.s[12]*100) + "%";
+
+  const top = Object.entries(r.causeShare).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  $("causes").innerHTML = top.map(([k,v],i)=>{
+    const c = CAUSES[k];
+    return `<div class="cause">
+      <span class="i">0${i+1}</span>
+      <span class="name">${c.n}<div class="hint">SIGNAL · ${c.s}</div></span>
+      <span class="pct">${Math.round(v*100)}%</span>
+      <span class="track"><span class="fill"></span></span>
+    </div>`;
+  }).join("");
+  requestAnimationFrame(()=>{
+    document.querySelectorAll("#causes .fill").forEach((el,i)=>{ el.style.width = top[i][1]*100 + "%"; });
+  });
+
+  renderLever();
+  drawHex(lv); // 命门那一爻标红 = 动爻
+  state.verdictText = verdictOf(r);
+  $("verdict").textContent = state.verdictText;
+  $("verdict").innerHTML = '<span>一句话判词 / ONE LINE</span>' + state.verdictText;
+
+  const cur = Math.round(r.s[12]*100);
+  if(state.prevS12 !== null){
+    $("dBefore").textContent = Math.round(state.prevS12*100) + "%";
+    $("dAfter").textContent = cur + "%";
+    $("defyTxt").innerHTML = "上一版 <b>" + state.prevHex[2] + "</b> · " + Math.round(state.prevS12*100) +
+      "%。这一版 <b>" + hx[2] + "</b> · " + cur + "%。";
+    $("defyNote").textContent = "已应用 " + state.defyApplied + " 次改动。改得越多，越要小心你在拟合模型，而不是现实。";
+  } else {
+    $("dBefore").textContent = cur + "%";
+    $("dAfter").textContent = state.lever ? Math.round(state.lever.after*100) + "%" : "—";
+    $("defyTxt").innerHTML = "现在的卦是 <b>" + hx[2] + "</b>。点下面的按钮，按命门改一爻。";
+    $("defyNote").textContent = "";
+  }
+
+  renderDeathTable();
+  ["resultCard","leverCard","defyCard","deathCard","saveBtn"].forEach(id=>$(id).classList.remove("hidden"));
+  saveLast();
+}
+
+function renderLever(){
+  const lv = state.lv, base = state.result.s[12];
+  const deltas = VARS.map(v=>{
+    if(lv[v.k] >= 3) return {v, d:null, after:null};
+    const nlv = {...lv}; nlv[v.k] = lv[v.k] + 1;
+    const r = runSim(nlv, 1400, fnv1a("lever"+state.simId+v.k));
+    return {v, d: r.s[12] - base, after: r.s[12]};
+  });
+  const valid = deltas.filter(x=>x.d!==null).sort((a,b)=>b.d-a.d);
+  const best = valid[0];
+  state.lever = best ? {k:best.v.k, name:best.v.name, after:best.after} : null;
+  state.movingYao = best ? VARS.findIndex(v=>v.k===best.v.k) : -1;
+
+  const maxD = Math.max(0.0001, ...valid.map(x=>Math.max(0,x.d)));
+  $("rank").innerHTML = deltas.map(x=>{
+    const isTop = best && x.v.k===best.v.k;
+    const w = x.d===null ? 0 : Math.max(0,x.d)/maxD*100;
+    return `<div class="r ${isTop?'top':''}">
+      <span>${x.v.name}</span>
+      <span class="t"><i style="width:${w}%"></i></span>
+      <b>${x.d===null?'MAX':(x.d>=0?'+':'')+Math.round(x.d*100)+'pt'}</b>
+    </div>`;
+  }).join("");
+
+  if(!best){
+    $("leverName").textContent = "六爻已满，此局无解";
+    $("leverText").textContent = "六个维度都在老阳位，模型给不出更好的输入了。这时候能改的只剩执行。";
+    $("defyBtn").disabled = true;
+  } else {
+    $("leverName").textContent = "改「" + best.v.name + "」";
+    $("leverText").textContent = best.v.name + " +1 档（" + best.v.lv[lv[best.v.k]] + " → " + best.v.lv[lv[best.v.k]+1] +
+      "），24 个月存活率从 " + Math.round(base*100) + "% 变成 " + Math.round(best.after*100) + "%。同一套模型，只动一个输入。";
+    $("defyBtn").disabled = false;
+  }
+}
+
+function renderDeathTable(){
+  const top = Object.entries(state.result.causeShare).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  $("deathBody").innerHTML = top.map(([k,v])=>{
+    const c = CAUSES[k];
+    return `<tr><td>${c.n}<span class="p">${Math.round(v*100)}%</span></td>
+      <td>${c.s}</td><td class="stop">${c.t}</td></tr>`;
+  }).join("");
+}
+
+/* ============ 动作 ============ */
+const VETO_NAME = {copy:'版权', lic:'牌照', plat:'平台'};
+const VETO_WHY = {
+  copy:'你把别人的作品做成衍生品，却没有版权授权。',
+  lic:'这项业务在国内需要前置资质或牌照。',
+  plat:'平台规则明确不允许这类内容或玩法。'
+};
+function renderVeto(){
+  const on = state.vetoes.map(k=>VETO_NAME[k]).join(' + ');
+  state.result = {vetoed:true};
+  $("subId").textContent = "VETO · 不进入推演";
+  const b = $("vetoBanner");
+  b.classList.remove("hidden");
+  b.innerHTML = `<div class="k">VETO / 一票否决</div>
+    <div class="t">存活率 0% —— 因为「${on}」</div>
+    <div class="s">${state.vetoes.map(k=>VETO_WHY[k]).join('<br>')}<br>解决它之前，六爻怎么填都没有意义。</div>`;
+  ["resBox","curve","causeHead","causes","actionsBox"].forEach(id=>$(id).classList.add("hidden"));
+  ["leverCard","defyCard","deathCard","saveBtn"].forEach(id=>$(id).classList.add("hidden"));
+  $("resultCard").classList.remove("hidden");
+  saveLast();
+}
+function cast(){
+  state.simId = 1000 + Math.floor(Math.random()*9000);
+  state.vetoes = Object.keys(state.veto).filter(k=>state.veto[k]);
+  state.prevSeries = null; state.prevS12 = null; state.prevHex = null; state.defyApplied = 0;
+  if(state.vetoes.length){ renderVeto(); if(!DEMO) $("resultCard").scrollIntoView({behavior:"smooth", block:"start"}); return; }
+  state.result = runSim(state.lv, 5000, fnv1a("cast" + state.simId + JSON.stringify(state.lv)));
+  renderResult();
+  if(!DEMO) $("resultCard").scrollIntoView({behavior:"smooth", block:"start"});
+}
+function defy(){
+  if(!state.lever || !state.result || state.result.vetoed) return;
+  const beforeS12 = state.result.s[12];
+  const beforeHex = hexOf(state.lv);
+  const beforeSeries = state.result.s.slice();
+  state.lv[state.lever.k] = Math.min(3, state.lv[state.lever.k] + 1);
+  state.defyApplied += 1;
+  renderInputs();
+  state.result = runSim(state.lv, 5000, fnv1a("defy" + state.simId + state.defyApplied + JSON.stringify(state.lv)));
+  state.prevSeries = beforeSeries; state.prevS12 = beforeS12; state.prevHex = beforeHex;
+  renderResult();
+  toast("已重跑 · " + Math.round(beforeS12*100) + "% → " + Math.round(state.result.s[12]*100) + "%");
+  if(!DEMO) $("resultCard").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+/* ============ 存证 · 校准 ============ */
+const LS = "ntg_deadlab_v4";
+const LAST = "deadlab_last";
+const loadRecs = ()=>{ try{ return JSON.parse(localStorage.getItem(LS)||"[]"); }catch(e){ return []; } };
+const saveRecs = r=>{ try{ localStorage.setItem(LS, JSON.stringify(r)); }catch(e){} };
+const fmt = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+
+function saveLast(){
+  if(!state.result) return;
+  const v = !!state.result.vetoed;
+  const causes = v ? [] : Object.entries(state.result.causeShare).sort((a,b)=>b[1]-a[1]).slice(0,3)
+    .map(([k,x])=>[CAUSES[k].n, Math.round(x*100)]);
+  const d = {
+    project: ($("appName") && $("appName").value) || "未命名项目",
+    id: state.simId, date: fmt(new Date()),
+    hex: v ? "—" : hexOf(state.lv)[2],
+    bits: bitsOf(state.lv).join(""),
+    lv: Object.assign({}, state.lv), vetoes: state.vetoes.slice(),
+    s12: v ? 0 : Math.round(state.result.s[12]*100),
+    verdict: v ? "法律上不成立，先别谈产品。" : (state.verdictText || ""),
+    causes,
+    lever: state.lever ? {name: state.lever.name, after: Math.round(state.lever.after*100)} : null,
+    vetoed: v
+  };
+  try{ localStorage.setItem(LAST, JSON.stringify(d)); }catch(e){}
+}
+
+function renderCalib(){
+  const rs = loadRecs().filter(r=>r.status && r.status!=='pending');
+  if(!rs.length){ $("calib").innerHTML = "校准中：还没有到期的存证。到期后点「活着 / 已死」对账。"; return; }
+  const b = rs.reduce((a,r)=>a+Math.pow(r.s12/100-(r.status==='alive'?1:0),2),0)/rs.length;
+  const score = Math.round((1-b)*100);
+  const avg = Math.round(rs.reduce((a,r)=>a+r.s12,0)/rs.length);
+  const alive = rs.filter(r=>r.status==='alive').length;
+  $("calib").innerHTML = `已对账 <b>${rs.length}</b> 条 · 校准分 <b>${score}</b>　|　平均预测 ${avg}%，实际存活 ${alive} 条（${Math.round(alive/rs.length*100)}%）`;
+}
+
+function renderRecs(){
+  const rs = loadRecs();
+  if(!rs.length){ $("records").innerHTML = '<p class="empty">还没有存证。存一条，90 天后回来看它准不准。</p>'; renderCalib(); return; }
+  const now = Date.now();
+  $("records").innerHTML = rs.slice().reverse().map(r=>{
+    const late = now > new Date(r.due).getTime();
+    const st = r.status === 'alive' ? 'ALIVE' : r.status === 'dead' ? 'DEAD' : (late ? 'DUE' : 'PENDING');
+    const btns = r.status === 'pending'
+      ? `<span class="rec-actions"><button data-id="${r.id}" data-st="alive">活着</button><button data-id="${r.id}" data-st="dead">已死</button></span>` : '';
+    return `<div class="rec"><span class="when">${r.date}</span>
+      <span class="what"><em>${r.project}</em> · ${r.hex} · 存活 <span class="p">${r.s12}%</span> · ${r.cause}</span>
+      ${btns}<span class="state ${late && r.status==='pending' ? 'due' : ''}">${st}</span></div>`;
+  }).join("");
+  renderCalib();
+}
+
+function saveProof(){
+  if(!state.result || state.result.vetoed){ toast("被否决的项目不用存证，先解决否决项"); return; }
+  try{
+    const rs = loadRecs();
+    const due = new Date(Date.now() + 90*864e5);
+    const top = Object.entries(state.result.causeShare).sort((a,b)=>b[1]-a[1])[0][0];
+    rs.push({
+      id: Date.now() + "-" + Math.floor(Math.random()*1000),
+      project: ($("appName") && $("appName").value) || "未命名项目",
+      hex: hexOf(state.lv)[2],
+      s12: Math.round(state.result.s[12]*100),
+      cause: CAUSES[top].n, date: fmt(new Date()), due: fmt(due), status: 'pending'
+    });
+    saveRecs(rs); renderRecs(); toast("已存证 · " + fmt(due) + " 回来看它准不准");
+  }catch(e){ toast("这个环境不支持本地存证"); }
+}
+
+/* ============ 分享卡 ============ */
+function makeCard(){
+  const r = state.result;
+  if(!r || r.vetoed){ toast("先解除否决，再生成分享卡"); return; }
+  const W = 1080, H = 1440;
+  const c = document.createElement("canvas"); c.width = W; c.height = H;
+  const x = c.getContext("2d");
+  x.fillStyle = "#07080B"; x.fillRect(0,0,W,H);
+  const g = x.createRadialGradient(150,-100,50,150,-100,900);
+  g.addColorStop(0,"rgba(255,90,95,.28)"); g.addColorStop(1,"rgba(255,90,95,0)");
+  x.fillStyle = g; x.fillRect(0,0,W,H);
+
+  x.fillStyle = "#565E6E"; x.font = "22px ui-monospace,monospace";
+  x.fillText("程序员逆天卦-沙盘", 72, 96);
+  x.textAlign = "right"; x.fillText("DEADLAB", 1008, 96); x.textAlign = "left";
+
+  x.fillStyle = "#8B93A3"; x.font = "26px sans-serif";
+  x.fillText(($("appName") && $("appName").value) || "未命名项目", 72, 196);
+
+  x.fillStyle = "#F1F3F7"; x.font = '600 54px "PingFang SC","Microsoft YaHei",sans-serif';
+  x.fillText("先算它怎么死", 72, 286);
+
+  x.fillStyle = "#FF5A5F"; x.font = "190px ui-monospace,monospace";
+  x.fillText(Math.round(r.s[12]*100) + "%", 64, 520);
+  x.fillStyle = "#565E6E"; x.font = "24px sans-serif";
+  x.fillText("24 个月存活率", 76, 566);
+
+  const bits = bitsOf(state.lv);
+  for(let i=0;i<6;i++){
+    const y = 350 + i*46, b = bits[5-i];
+    x.fillStyle = "#E9ECF2";
+    if(b) x.fillRect(760, y, 250, 18);
+    else { x.fillRect(760, y, 112, 18); x.fillRect(898, y, 112, 18); }
+  }
+
+  x.fillStyle = "#565E6E"; x.font = "22px ui-monospace,monospace";
+  x.fillText(hexOf(state.lv)[2] + " · " + hexOf(state.lv)[3], 72, 650);
+
+  const top = Object.entries(r.causeShare).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  x.font = '30px "PingFang SC","Microsoft YaHei",sans-serif';
+  top.forEach(([k,v],i)=>{
+    x.fillStyle = i===0 ? "#FF9A7A" : "#8B93A3";
+    x.fillText(`${i+1}. ${CAUSES[k].n}   ${Math.round(v*100)}%`, 76, 760 + i*64);
+  });
+
+  x.fillStyle = "#F1F3F7"; x.font = '600 34px "PingFang SC","Microsoft YaHei",sans-serif';
+  x.fillText("先算它怎么死，再决定要不要做。", 72, 1240);
+  x.fillStyle = "#565E6E"; x.font = "22px ui-monospace,monospace";
+  x.fillText("Every AI writes your plan. We kill it first.", 72, 1290);
+  x.fillStyle = "#FF5A5F"; x.font = "24px ui-monospace,monospace";
+  x.fillText("deadlab · 逆天卦沙盘", 72, 1350);
+
+  const data = c.toDataURL("image/png");
+  state.cardData = data;
+  $("cardImg").src = data;
+  $("cardModal").classList.add("on");
+}
+
+/* ============ 今日一卦 ============ */
+const DAILY = [
+  ["AI 记账 App", {need:2,cap:2,econ:1,dist:0,dep:2,stam:1}],
+  ["中文歌英译", {need:2,cap:1,econ:1,dist:2,dep:0,stam:1}],
+  ["外贸合规台", {need:3,cap:2,econ:3,dist:1,dep:1,stam:2}],
+  ["AI 陪伴", {need:3,cap:2,econ:1,dist:2,dep:0,stam:2}],
+  ["独立开发者导航", {need:2,cap:3,econ:1,dist:2,dep:2,stam:2}],
+  ["企业知识库 RAG", {need:3,cap:2,econ:2,dist:1,dep:1,stam:1}],
+  ["AI 简历优化", {need:2,cap:2,econ:1,dist:1,dep:1,stam:1}],
+  ["外包接单工作室", {need:2,cap:2,econ:2,dist:1,dep:1,stam:2}],
+  ["小众社区 App", {need:2,cap:2,econ:0,dist:2,dep:2,stam:1}],
+  ["B 端巡检系统", {need:3,cap:2,econ:3,dist:1,dep:1,stam:2}]
+];
+function renderDaily(){
+  const seed = fnv1a(new Date().toDateString());
+  const p = DAILY[seed % DAILY.length];
+  const r = runSim(p[1], 3000, seed);
+  const top = Object.entries(r.causeShare).sort((a,b)=>b[1]-a[1])[0];
+  const hx = hexOf(p[1]);
+  $("daily").innerHTML = `
+    <div style="min-width:220px">
+      <div class="d-n">${p[0]}</div>
+      <div class="d-c">今日卦 · ${hx[2]} · ${hx[3]}</div>
+    </div>
+    <div class="d-m">${Math.round(r.s[12]*100)}%</div>
+    <div class="d-c" style="max-width:460px">24 个月存活率，最可能死于「${CAUSES[top[0]].n}」${Math.round(top[1]*100)}%。
+      <br><span style="color:var(--dim2)">同一天，所有人算到同一卦。</span></div>`;
+}
+
+/* ============ 杂项 ============ */
+let tt;
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("on"); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove("on"),2400); }
+
+/* ============ 绑定 ============ */
+$("rows").addEventListener("click", e=>{
+  const b = e.target.closest("button[data-k]");
+  if(!b) return;
+  state.lv[b.dataset.k] = +b.dataset.v;
+  renderInputs();
+  if(state.result && !state.result.vetoed){
+    state.simId = 1000 + Math.floor(Math.random()*9000);
+    state.prevSeries = null; state.prevS12 = null; state.prevHex = null; state.defyApplied = 0;
+    state.result = runSim(state.lv, 5000, fnv1a("edit"+state.simId+JSON.stringify(state.lv)));
+    renderResult();
+  }
+});
+$("vetoBox").addEventListener("click", e=>{
+  const b = e.target.closest("button[data-veto]"); if(!b) return;
+  const k = b.dataset.veto;
+  state.veto[k] = !state.veto[k];
+  b.classList.toggle("on", state.veto[k]);
+  $("vetoBox").classList.toggle("on", Object.values(state.veto).some(Boolean));
+  if(state.result) cast();
+});
+$("records").addEventListener("click", e=>{
+  const b = e.target.closest("button[data-id]"); if(!b) return;
+  const rs = loadRecs(); const r = rs.find(x=>x.id === b.dataset.id);
+  if(r){ r.status = b.dataset.st; saveRecs(rs); renderRecs(); toast("已对账：" + (r.status === 'alive' ? '活着' : '已死')); }
+});
+$("runBtn").addEventListener("click", cast);
+$("defyBtn").addEventListener("click", defy);
+$("saveBtn").addEventListener("click", saveProof);
+$("cardBtn").addEventListener("click", makeCard);
+$("cardClose").addEventListener("click", ()=> $("cardModal").classList.remove("on"));
+$("cardDownload").addEventListener("click", ()=>{
+  const a = document.createElement("a"); a.href = state.cardData; a.download = "deadlab-card.png"; a.click();
+});
+$("reportBtn").addEventListener("click", ()=>{ saveLast(); window.open("report.html", "_blank"); });
+renderInputs();
+renderRecs();
+renderDaily();
+
+if(location.search.indexOf('imp')>=0){
+  try{
+    const d = JSON.parse(localStorage.getItem('deadlab_import')||'null');
+    if(d && d.lv){
+      Object.keys(state.lv).forEach(k=>{ if(d.lv[k]!==undefined) state.lv[k] = Math.max(0, Math.min(3, +d.lv[k])); });
+      const n = $('appName'); if(n) n.value = d.project || '';
+      renderInputs();
+      setTimeout(()=>{ cast(); toast('已导入 ' + (d.project||'') + ' · ' + (d.source||'')); }, 120);
+    }
+  }catch(e){}
+}
+
+if(DEMO){
+  setTimeout(()=>{
+    state.lv = {need:3,cap:2,econ:1,dist:1,dep:2,stam:1};
+    const n = $("appName"); if(n) n.value = "需求雷达";
+    renderInputs(); cast();
+    if(location.search.indexOf("defy")>=0) setTimeout(defy, 900);
+    if(location.search.indexOf("veto")>=0){ state.veto.copy = true; cast(); }
+    if(location.search.indexOf("scroll")>=0) setTimeout(()=>$("resultCard").scrollIntoView(), 1200);
+    if(location.search.indexOf("card")>=0) setTimeout(makeCard, 1200);
+  }, 150);
+}
+</script>
+</body>
+</html>

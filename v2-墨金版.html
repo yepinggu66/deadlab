@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>逆天卦沙盘 · DEADLAB — 先算它怎么死</title>
+<style>
+:root{
+  --bg:#08090b; --card:#101418; --line:rgba(201,163,92,.22); --line2:rgba(201,163,92,.10);
+  --gold:#c9a35c; --gold2:#ecd9a8; --red:#b83b2e; --txt:#e8e2d5;
+  --dim:#8a8478; --dim2:#5f5a51; --ok:#5a9c78;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+  line-height:1.6; -webkit-font-smoothing:antialiased; min-height:100vh; overflow-x:hidden;
+}
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:
+    radial-gradient(900px 520px at 10% -10%, rgba(201,163,92,.13), transparent 60%),
+    radial-gradient(700px 420px at 94% 2%, rgba(184,59,46,.09), transparent 62%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 1px, transparent 1px 3px);
+}
+.wrap{position:relative; z-index:1; max-width:1060px; margin:0 auto; padding:34px 22px 70px}
+.han{font-family:"Kaiti SC","STKaiti","KaiTi","Songti SC",serif}
+
+/* hero */
+.hero{padding:6px 0 26px; border-bottom:1px solid var(--line2); margin-bottom:26px}
+.kicker{font-size:12px; letter-spacing:.34em; color:var(--gold); text-transform:uppercase}
+.hero h1{
+  margin:12px 0 4px; font-size:52px; line-height:1.12; font-weight:400; letter-spacing:.04em;
+  font-family:"Kaiti SC","STKaiti","KaiTi","Songti SC",serif;
+  background:linear-gradient(180deg,#f7e8c2,#c9a35c 64%,#8f6f34);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  text-shadow:0 0 40px rgba(201,163,92,.16);
+}
+.hero h1 em{font-style:normal; color:#e0704f; -webkit-text-fill-color:#e0704f; text-shadow:0 0 24px rgba(184,59,46,.35)}
+.hero .en{margin:10px 0 0; font-size:13px; color:var(--dim); letter-spacing:.16em}
+.hero .cn{margin:2px 0 0; font-size:14px; color:#bdb5a5; letter-spacing:.08em}
+.badge{
+  display:inline-flex; align-items:center; gap:8px; margin-top:16px; padding:6px 14px;
+  border:1px solid rgba(201,163,92,.35); border-radius:999px; font-size:11px; color:var(--gold);
+  letter-spacing:.2em;
+}
+.badge i{width:6px; height:6px; border-radius:50%; background:var(--ok); box-shadow:0 0 8px var(--ok); display:block}
+
+/* cards */
+.card{
+  background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0) 140px), var(--card);
+  border:1px solid var(--line); border-radius:14px; padding:26px 28px; margin-bottom:22px;
+  box-shadow:0 20px 50px -30px rgba(0,0,0,.9);
+}
+.card h2{margin:0 0 6px; font-size:15px; font-weight:400; color:var(--gold); letter-spacing:.26em; display:flex; align-items:center; gap:12px}
+.card h2::after{content:""; flex:1; height:1px; background:linear-gradient(90deg,var(--line),transparent)}
+.card .sub{margin:0 0 18px; font-size:12px; color:var(--dim2); letter-spacing:.08em}
+.hidden{display:none !important}
+
+/* inputs */
+.rows{display:flex; flex-direction:column}
+.row{display:grid; grid-template-columns:118px 1fr; gap:18px; align-items:center; padding:11px 0; border-bottom:1px solid rgba(255,255,255,.045)}
+.row:last-child{border-bottom:none}
+.row .lbl .y{font-family:"Kaiti SC",serif; font-size:12px; color:var(--gold); letter-spacing:.2em}
+.row .lbl .n{font-size:14px; color:#d8d0c0}
+.row .lbl .q{display:block; font-size:11px; color:var(--dim2); margin-top:1px}
+.seg{display:grid; grid-template-columns:repeat(4,1fr); gap:7px}
+.seg button{
+  padding:10px 4px; font-size:12px; letter-spacing:0; border-radius:8px; color:var(--dim);
+  border:1px solid rgba(255,255,255,.08); background:#0b0f12; transition:all .18s;
+}
+.seg button:hover{border-color:rgba(201,163,92,.45); color:var(--gold2)}
+.seg button.on{
+  color:#12100b; background:linear-gradient(180deg,#f3dfb2,#c9a35c); border-color:#d8b26a; font-weight:600;
+  box-shadow:0 0 18px rgba(201,163,92,.22);
+}
+button.primary{
+  margin-top:20px; width:100%; padding:15px; font-size:15px; letter-spacing:.42em; text-indent:.42em;
+  color:#f3e2b8; border-radius:10px; border:1px solid rgba(201,163,92,.5);
+  background:linear-gradient(180deg, rgba(201,163,92,.22), rgba(201,163,92,.06));
+}
+button.primary:hover{background:linear-gradient(180deg, rgba(201,163,92,.34), rgba(201,163,92,.1))}
+button.ghost{font-size:12px; padding:10px 18px; letter-spacing:.12em}
+@media(max-width:700px){
+  .row{grid-template-columns:1fr; gap:8px}
+  .seg button{font-size:11px; padding:9px 2px}
+  .hero h1{font-size:38px}
+}
+
+/* result */
+.res{display:grid; grid-template-columns:1.15fr 1fr; gap:26px; align-items:center; margin-bottom:14px}
+@media(max-width:820px){.res{grid-template-columns:1fr}}
+.bignum{font-family:"Kaiti SC",serif; font-size:56px; line-height:1; color:var(--gold2); letter-spacing:.02em}
+.bignum small{font-size:16px; color:var(--dim); letter-spacing:.1em; margin-left:6px}
+.stat-line{display:flex; justify-content:space-between; font-size:12.5px; color:var(--dim); padding:9px 0; border-bottom:1px solid rgba(255,255,255,.05)}
+.stat-line b{color:#d9d0bd; font-weight:400}
+.hexbox{display:flex; gap:20px; align-items:center; padding:16px 18px; border:1px solid rgba(201,163,92,.18); border-radius:10px; background:rgba(201,163,92,.04)}
+.lines{display:flex; flex-direction:column; gap:6px; width:104px; flex:0 0 auto}
+.yao{display:flex; height:8px; gap:9px}
+.yao i{display:block; height:100%; flex:1; border-radius:2px; background:linear-gradient(90deg,#8f6f34,var(--gold) 40%,#f0dcae 55%,var(--gold) 70%,#8f6f34)}
+.yao.moving i{background:linear-gradient(90deg,#a3311f,#e0704f 45%,#ffc9a8 55%,#e0704f)}
+.hexbox .hn{font-family:"Kaiti SC",serif; font-size:24px; color:var(--gold2); letter-spacing:.1em}
+.hexbox .ht{font-size:12px; color:var(--dim)}
+.hexbox .hv{font-size:11.5px; color:var(--dim2); margin-top:4px; line-height:1.7}
+
+.curve{width:100%; height:auto; margin-top:6px}
+.curve .gl{stroke:rgba(255,255,255,.07); stroke-width:1}
+.curve .ax{fill:var(--dim2); font-size:10px; font-family:-apple-system,sans-serif}
+.curve .ln{fill:none; stroke:#e2c184; stroke-width:2.4; stroke-linejoin:round}
+.curve .ar{fill:rgba(201,163,92,.10)}
+.curve .ln2{fill:none; stroke:#e0704f; stroke-width:2.2; stroke-dasharray:5 4}
+.curve .ar2{fill:rgba(184,59,46,.07)}
+.curve .dot{fill:#f3dfb2}
+.curve .dot2{fill:#e0704f}
+
+/* causes */
+.cause{display:flex; flex-direction:column; gap:5px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,.05)}
+.cause:last-child{border-bottom:none}
+.cause .top{display:flex; justify-content:space-between; gap:10px; font-size:13px; align-items:baseline}
+.cause .top em{font-style:normal; color:#d6cebc}
+.cause .top b{font-weight:400; color:var(--gold2); font-variant-numeric:tabular-nums; flex:0 0 auto}
+.cause .track{height:6px; background:rgba(255,255,255,.06); border-radius:3px; overflow:hidden}
+.cause .fill{display:block; height:100%; width:0; background:linear-gradient(90deg,#8f6f34,#e2c184); border-radius:3px; transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.cause:first-child .fill{background:linear-gradient(90deg,#a3311f,#e0704f)}
+.cause .hint{font-size:11.5px; color:var(--dim2); line-height:1.7}
+
+/* lever */
+.lever{border:1px dashed rgba(184,59,46,.4); background:rgba(184,59,46,.055); border-radius:10px; padding:16px 18px}
+.lever h3{margin:0 0 6px; font-size:11.5px; color:#e08d7e; letter-spacing:.26em; font-weight:400}
+.lever .big{font-family:"Kaiti SC",serif; font-size:22px; color:#f0b7a8; letter-spacing:.06em; margin-bottom:4px}
+.lever p{margin:0; font-size:13px; color:#ddd3c2; line-height:1.85}
+.rank{margin-top:14px; display:flex; flex-direction:column; gap:7px}
+.rank .r{display:grid; grid-template-columns:74px 1fr 62px; gap:10px; align-items:center; font-size:11.5px; color:var(--dim)}
+.rank .r .t{height:5px; background:rgba(255,255,255,.06); border-radius:3px; overflow:hidden}
+.rank .r .t i{display:block; height:100%; width:0; background:rgba(201,163,92,.55)}
+.rank .r.top{color:var(--gold2)}
+.rank .r.top .t i{background:linear-gradient(90deg,#a3311f,#e0704f)}
+.rank .r b{text-align:right; font-weight:400; color:inherit; font-variant-numeric:tabular-nums}
+
+/* defy */
+.defy{display:flex; gap:14px; flex-wrap:wrap; align-items:center; justify-content:space-between}
+.defy .txt{font-size:13px; color:#c3bcac; max-width:520px}
+.defy .txt b{color:var(--gold2); font-weight:400}
+.delta{display:flex; align-items:baseline; gap:12px; font-family:"Kaiti SC",serif; font-size:30px; color:var(--gold2)}
+.delta s{color:var(--dim); font-size:20px; text-decoration:none}
+.delta .up{color:#e0704f}
+
+/* death table */
+.dt{width:100%; border-collapse:collapse; font-size:12.5px}
+.dt th{text-align:left; color:var(--dim2); font-weight:400; letter-spacing:.16em; font-size:10.5px; padding:0 12px 8px 0; border-bottom:1px solid rgba(255,255,255,.07)}
+.dt td{padding:12px 12px 12px 0; vertical-align:top; border-bottom:1px solid rgba(255,255,255,.045); color:#c6bead; line-height:1.75}
+.dt td:first-child{color:var(--gold2); white-space:nowrap}
+.dt td.stop{color:#e08d7e}
+
+/* records */
+.rec{display:flex; gap:14px; align-items:baseline; padding:11px 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:12.5px}
+.rec:last-child{border-bottom:none}
+.rec .when{color:var(--dim2); flex:0 0 84px; font-variant-numeric:tabular-nums}
+.rec .what{flex:1; color:#cfc7b6}
+.rec .what em{font-style:normal; color:var(--gold2); font-family:"Kaiti SC",serif}
+.rec .state{flex:0 0 auto; font-size:11px; color:var(--dim2)}
+.rec .state.due{color:#e0806f}
+.empty{color:var(--dim2); font-size:12.5px; margin:0}
+
+footer{margin-top:32px; text-align:center; color:var(--dim2); font-size:11.5px; line-height:2}
+footer .han{color:var(--dim); font-size:13px}
+.toast{position:fixed; left:50%; bottom:34px; transform:translate(-50%,20px); z-index:9; background:#171c21; border:1px solid var(--line); color:var(--gold2); padding:10px 20px; border-radius:999px; font-size:13px; opacity:0; pointer-events:none; transition:all .25s}
+.toast.on{opacity:1; transform:translate(-50%,0)}
+.demo .fill{transition:none !important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">逆天卦沙盘 · DEADLAB</div>
+    <h1>先算它<em>怎么死</em></h1>
+    <p class="cn">再决定要不要做。</p>
+    <p class="en">Every AI writes your plan. We kill it first.</p>
+    <div class="badge"><i></i>不预测未来 · 只做压力测试</div>
+  </header>
+
+  <!-- 一 · 死 -->
+  <section class="card">
+    <h2>一 · 死 — 六爻定体质</h2>
+    <p class="sub">六个变量，每爻四档（老阴 0 / 少阴 1 / 少阳 2 / 老阳 3）。阴爻越多，越容易死在那一条上。</p>
+    <div class="rows" id="rows"></div>
+    <button class="primary" id="runBtn">推 演 五 千 次</button>
+  </section>
+
+  <!-- 二 · 验 -->
+  <section class="card hidden" id="resultCard">
+    <h2>二 · 验 — 它怎么死</h2>
+    <p class="sub" id="subId">—</p>
+    <div class="res">
+      <div class="hexbox">
+        <div class="lines" id="lines"></div>
+        <div>
+          <div class="hn" id="hexName">—</div>
+          <div class="ht" id="hexTag">—</div>
+          <div class="hv" id="hexVerse">—</div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="bignum"><span id="s12">—</span><small>24 个月存活率</small></div>
+        <div class="stat-line"><span>中位死亡</span><b id="median">—</b></div>
+        <div class="stat-line"><span>活下来的最可能是</span><b id="outcome">—</b></div>
+        <div class="stat-line"><span>本次推演</span><b id="simId">—</b></div>
+      </div>
+    </div>
+
+    <svg class="curve" id="curve" viewBox="0 0 660 268">
+      <g id="grid"></g>
+      <path class="ar" id="area" d=""></path>
+      <path class="ln" id="line" d=""></path>
+      <path class="ar2 hidden" id="area2" d=""></path>
+      <path class="ln2 hidden" id="line2" d=""></path>
+      <g id="labels"></g>
+    </svg>
+
+    <h2 style="margin-top:26px">死 因 谱</h2>
+    <div id="causes"></div>
+  </section>
+
+  <!-- 三 · 择 -->
+  <section class="card hidden" id="leverCard">
+    <h2>三 · 择 — 命门</h2>
+    <p class="sub">把六个爻各自 +1 档，看谁的存活率涨得最多。涨得最多的那一爻，就是命门。</p>
+    <div class="lever">
+      <h3>命 门 · 只 改 一 爻</h3>
+      <div class="big" id="leverName">—</div>
+      <p id="leverText">—</p>
+      <div class="rank" id="rank"></div>
+    </div>
+  </section>
+
+  <!-- 四 · 逆 -->
+  <section class="card hidden" id="defyCard">
+    <h2>四 · 逆 — 改一爻，重跑</h2>
+    <p class="sub">改完之后，卦会变。变卦不是安慰，是同一套模型在另一个输入下的结果。</p>
+    <div class="defy">
+      <div class="txt" id="defyTxt">—</div>
+      <div class="delta"><s id="dBefore">—</s><span>→</span><span class="up" id="dAfter">—</span></div>
+    </div>
+    <button class="primary" id="defyBtn">改 这 一 爻 · 重 跑</button>
+    <p class="sub" id="defyNote" style="margin-top:12px"></p>
+  </section>
+
+  <!-- 死法清单 -->
+  <section class="card hidden" id="deathCard">
+    <h2>死 法 清 单</h2>
+    <p class="sub">不是"会不会死"，是"最先死在哪、怎么最早发现、什么时候该停"。</p>
+    <table class="dt"><thead><tr><th>死法</th><th>最早的信号</th><th>止损动作</th></tr></thead><tbody id="deathBody"></tbody></table>
+  </section>
+
+  <!-- 存证 -->
+  <section class="card">
+    <h2>存 证 · 校 准</h2>
+    <p class="sub">每次推演都可以存下来，90 天后回来对账。我们不承诺 98%，我们公布"说 70% 的事，实际发生了多少次"。</p>
+    <div id="records"><p class="empty">还没有存证。存一条，90 天后回来看它准不准。</p></div>
+    <button class="ghost hidden" id="saveBtn" style="margin-top:14px">存 下 这 次 推 演</button>
+  </section>
+
+  <footer>
+    <p class="han">「先算它怎么死，再决定要不要做。」</p>
+    <p>这不是预测，是压力测试。绝对值别信，排序可信。<br>
+    本产品不构成任何投资、经营或证券建议。</p>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ 六十四卦（只取卦名做"体质"标记） ============ */
+const T = {乾:[1,1,1],兑:[1,1,0],离:[1,0,1],震:[1,0,0],巽:[0,1,1],坎:[0,1,0],艮:[0,0,1],坤:[0,0,0]};
+const HEX = [
+["乾","乾","乾为天","一次编译通过"],["坤","坤","坤为地","需求全接"],["坎","震","水雷屯","初始化即崩"],
+["艮","坎","山水蒙","文档缺失"],["坎","乾","水天需","等产品确认"],["乾","坎","天水讼","甩锅大会"],
+["坤","坎","地水师","全员上线"],["坎","坤","水地比","结对编程"],["巽","乾","风天小畜","攒够一次发版"],
+["乾","兑","天泽履","踩到线上"],["坤","乾","地天泰","灰度零事故"],["乾","坤","天地否","联调不通"],
+["乾","离","天火同人","开源有人 PR"],["离","乾","火天大有","一夜爆火"],["坤","艮","地山谦","没人 star"],
+["震","坤","雷地豫","提前交付"],["兑","震","泽雷随","跟着竞品改"],["艮","巽","山风蛊","祖传代码"],
+["坤","兑","地泽临","用户来了"],["巽","坤","风地观","只看不买"],["离","震","火雷噬嗑","咬咬牙重构"],
+["艮","离","山火贲","皮肤好看"],["艮","坤","山地剥","功能被砍"],["坤","震","地雷复","回滚"],
+["乾","震","天雷无妄","无妄之 bug"],["艮","乾","山天大畜","技术债到期"],["艮","震","山雷颐","自己吃自己"],
+["兑","巽","泽风大过","过度设计"],["坎","坎","坎为水","深夜宕机"],["离","离","离为火","服务器烧了"],
+["兑","艮","泽山咸","用户心动"],["震","巽","雷风恒","长期维护"],["乾","艮","天山遁","转身跑路"],
+["震","乾","雷天大壮","猛加需求"],["离","坤","火地晋","顺利晋升"],["坤","离","地火明夷","背锅"],
+["巽","离","风火家人","小团队"],["离","兑","火泽睽","前后端吵架"],["坎","艮","水山蹇","卡在支付"],
+["震","坎","雷水解","问题自解"],["艮","兑","山泽损","砍功能省钱"],["巽","震","风雷益","性能起飞"],
+["兑","乾","泽天夬","一键删除"],["乾","巽","天风姤","遇上甲方"],["兑","坤","泽地萃","用户聚集"],
+["坤","巽","地风升","稳步增长"],["兑","坎","泽水困","预算见底"],["坎","巽","水风井","共用一个 API"],
+["兑","离","泽火革","推翻重做"],["离","巽","火风鼎","立新架构"],["震","震","震为雷","半夜惊醒"],
+["艮","艮","艮为山","停止维护"],["巽","艮","风山渐","慢慢变好"],["震","兑","雷泽归妹","嫁给外包"],
+["震","离","雷火丰","流量洪峰"],["离","艮","火山旅","出差演示"],["巽","巽","巽为风","需求风吹"],
+["兑","兑","兑为泽","用户好评"],["巽","坎","风水涣","团队散了"],["坎","兑","水泽节","限流"],
+["巽","兑","风泽中孚","用户信任"],["震","艮","雷山小过","小 bug 不断"],["坎","离","水火既济","上线即完成"],
+["离","坎","火水未济","永远差一点"]
+];
+const HEXMAP = {};
+HEX.forEach((h,i)=>{ HEXMAP[[...T[h[1]],...T[h[0]]].join("")] = i; });
+
+/* ============ 变量：六爻 ============ */
+const VARS = [
+  {k:'need', yao:'初', name:'需求', q:'有人真的痛吗', lv:['自嗨','有人问','有人付钱','供不应求'], cause:'demo'},
+  {k:'cap',  yao:'二', name:'能力', q:'智能体做得对吗', lv:['做不出','能跑但常错','基本可信','稳定可用'], cause:'trust'},
+  {k:'econ', yao:'三', name:'经济', q:'越用越赚还是越亏', lv:['越用越亏','勉强持平','有毛利','很赚'], cause:'cost'},
+  {k:'dist', yao:'四', name:'分发', q:'人从哪来', lv:['没入口','几个熟人','稳定流量','自己会涨'], cause:'dist'},
+  {k:'dep',  yao:'五', name:'依赖', q:'上游会不会吃掉你', lv:['全靠上游','单点依赖','有备选','自主'], cause:'dep'},
+  {k:'stam', yao:'上', name:'续航', q:'你还能撑多久', lv:['快撑不住','还能半年','能撑两年','长期主义'], cause:'burn'}
+];
+const CAUSES = {
+  demo:{n:'演示很酷，没人用', s:'上线 4 周，周活 < 20，且没人第二次打开', t:'停更两周，去做 10 个用户访谈'},
+  trust:{n:'准确率不够，用户不敢用', s:'每 5 次任务出 1 次明显错误，用户开始手动复核', t:'砍掉不确定场景，只留可验证的任务'},
+  cost:{n:'越用越亏，成本高于客单价', s:'单用户月成本 > 客单价 30%，且用量还在涨', t:'换小模型 / 涨价 / 加限流'},
+  dist:{n:'没人知道它存在', s:'发布 3 次，累计注册 < 100，自然流量为 0', t:'停开发，先做一条能传播的 demo'},
+  dep:{n:'被上游一口吃掉', s:'上游一次版本更新，核心能力失效 48 小时', t:'加抽象层 + 多模型路由'},
+  burn:{n:'维护不动了', s:'连续 6 周没有提交，issue 堆积 > 30', t:'砍到只剩一个功能，或找人接手'}
+};
+const CKEYS = Object.keys(CAUSES);
+const BASE = {demo:.030, trust:.024, cost:.020, dist:.030, dep:.016, burn:.022};
+const K = 0.62;
+
+/* ============ 随机 ============ */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;}}
+function fnv1a(s){let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193);}return h>>>0;}
+const $ = id=>document.getElementById(id);
+const DEMO = location.search.indexOf('demo')>=0;
+if(DEMO) document.body.classList.add('demo');
+
+/* ============ 状态 ============ */
+const state = {
+  lv:{need:1,cap:1,econ:1,dist:1,dep:1,stam:1},
+  result:null, lever:null, simId:0,
+  prevSeries:null, prevS12:null, prevHex:null, defyApplied:0
+};
+
+/* ============ 仿真 ============ */
+const shape = m => 1.25 - 0.018*m;
+const factor = lv => { const f=(3-lv)/3; return 0.14 + 1.7*Math.pow(f,1.7); };
+
+function runSim(lv, N, seed){
+  const rnd = mulberry32(seed);
+  const surv = new Array(25).fill(0);
+  const deaths = {}; CKEYS.forEach(k=>deaths[k]=0);
+  const outs = {'小生意':0,'被上游收编':0,'苟活':0,'开源走红':0};
+  let deadCount = 0;
+  const hs = new Array(6).fill(0);
+  for(let i=0;i<N;i++){
+    let dead = 0, cause = null;
+    for(let m=1;m<=24;m++){
+      let total = 0;
+      for(let j=0;j<6;j++){
+        const h = BASE[CKEYS[j]] * shape(m) * factor(lv[VARS[j].k]) * K;
+        hs[j] = h; total += h;
+      }
+      if(rnd() < total){
+        let r = rnd()*total, idx=5;
+        for(let j=0;j<6;j++){ r -= hs[j]; if(r<=0){ idx=j; break; } }
+        cause = CKEYS[idx]; dead = m; break;
+      }
+    }
+    for(let t=0;t<=24;t++){ if(!dead || t < dead) surv[t]++; }
+    if(dead){ deaths[cause]++; deadCount++; }
+    else {
+      // 活下来的形态
+      const r = rnd();
+      if(lv.need>=2 && lv.dist>=2 && lv.econ>=2) outs['小生意']++;
+      else if(lv.dep<=1) outs['被上游收编']++;
+      else if(r<0.5) outs['苟活']++;
+      else outs['开源走红']++;
+    }
+  }
+  const s = surv.map(c=>c/N);
+  let median = 24;
+  for(let t=0;t<=24;t++){ if(s[t] <= 0.5){ median = t; break; } }
+  const causeShare = {};
+  CKEYS.forEach(k=>causeShare[k] = deadCount ? deaths[k]/deadCount : 0);
+  const outTop = Object.entries(outs).sort((a,b)=>b[1]-a[1])[0];
+  return {s, median, causeShare, deadCount, outTop, N, survivors:N-deadCount};
+}
+
+/* ============ 卦象 ============ */
+function bitsOf(lv){ return VARS.map(v => lv[v.k] >= 2 ? 1 : 0); } // 自下而上
+function hexOf(lv){
+  const b = bitsOf(lv);
+  return HEX[HEXMAP[b.join("")]];
+}
+function verseOf(lv){
+  const weak = VARS.filter(v=>lv[v.k] <= 1);
+  const strong = VARS.filter(v=>lv[v.k] >= 2);
+  if(!weak.length) return "六爻纯阳。六个维度全在阳位——这种卦一般不是算出来的，是吹出来的。";
+  if(!strong.length) return "六爻皆阴。六个维度全空——此局从第一步就该停。";
+  return weak.length + " 爻在阴位（" + weak.map(v=>v.name).join("、") + "），" +
+         strong.length + " 爻在阳位。阴处就是最先裂开的地方。";
+}
+
+/* ============ 渲染 ============ */
+function renderInputs(){
+  const box = $("rows");
+  box.innerHTML = VARS.map(v=>{
+    const seg = v.lv.map((txt,i)=>
+      `<button data-k="${v.k}" data-v="${i}" class="${state.lv[v.k]===i?'on':''}">${txt}</button>`
+    ).join("");
+    return `<div class="row">
+      <div class="lbl"><span class="y">${v.yao}爻</span> <span class="n">${v.name}</span>
+        <span class="q">${v.q}</span></div>
+      <div class="seg">${seg}</div>
+    </div>`;
+  }).join("");
+}
+function drawHex(lv){
+  const b = bitsOf(lv);
+  const box = $("lines"); box.innerHTML = "";
+  for(let i=5;i>=0;i--){
+    const d = document.createElement("div");
+    d.className = "yao" + (b[i] ? "" : " yin");
+    d.innerHTML = b[i] ? "<i></i>" : "<i></i><i></i>";
+    box.appendChild(d);
+  }
+}
+function X(t){ return 56 + t*(560/24); }
+function Y(s){ return 218 - s*180; }
+function pathOf(series){
+  return series.map((s,t)=> (t? "L":"M") + X(t).toFixed(1) + " " + Y(s).toFixed(1)).join(" ");
+}
+function areaOf(series){
+  return pathOf(series) + " L" + X(24).toFixed(1) + " 218 L" + X(0).toFixed(1) + " 218 Z";
+}
+function renderGrid(){
+  let g = "";
+  [0,.25,.5,.75,1].forEach(s=>{
+    g += `<line class="gl" x1="56" y1="${Y(s)}" x2="616" y2="${Y(s)}"/>`;
+    g += `<text class="ax" x="44" y="${Y(s)+3}" text-anchor="end">${Math.round(s*100)}%</text>`;
+  });
+  [0,6,12,18,24].forEach(t=>{
+    g += `<line class="gl" x1="${X(t)}" y1="38" x2="${X(t)}" y2="218"/>`;
+    g += `<text class="ax" x="${X(t)}" y="234" text-anchor="middle">${t===0?'0':t+'月'}</text>`;
+  });
+  $("grid").innerHTML = g;
+}
+function renderResult(){
+  const r = state.result, lv = state.lv;
+  const hx = hexOf(lv);
+  $("subId").textContent = "推演 #" + state.simId + " · " + r.N.toLocaleString() + " 次 · 24 个月";
+  $("hexName").textContent = hx[2];
+  $("hexTag").textContent = hx[3];
+  $("hexVerse").textContent = verseOf(lv);
+  drawHex(lv);
+
+  $("s12").textContent = Math.round(r.s[12]*100) + "%";
+  $("median").textContent = r.median >= 24 ? "活过 24 个月（" + Math.round(r.s[24]*100) + "%）" : "第 " + r.median + " 个月";
+  $("outcome").textContent = r.survivors ? r.outTop[0] + "（" + Math.round(r.outTop[1]/r.survivors*100) + "%）" : "没有幸存者";
+  $("simId").textContent = "#" + state.simId;
+
+  renderGrid();
+  $("line").setAttribute("d", pathOf(r.s));
+  $("area").setAttribute("d", areaOf(r.s));
+  if(state.prevSeries){
+    $("line2").setAttribute("d", pathOf(state.prevSeries));
+    $("area2").setAttribute("d", areaOf(state.prevSeries));
+    $("line2").classList.remove("hidden");
+    $("area2").classList.remove("hidden");
+  } else {
+    $("line2").classList.add("hidden");
+    $("area2").classList.add("hidden");
+  }
+
+  const top = Object.entries(r.causeShare).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  $("causes").innerHTML = top.map(([k,v],i)=>{
+    const c = CAUSES[k];
+    return `<div class="cause">
+      <div class="top"><em style="${i===0?'color:#e0704f':''}">${c.n}</em><b>${Math.round(v*100)}%</b></div>
+      <div class="track"><span class="fill" style="width:0"></span></div>
+      <div class="hint">信号：${c.s}</div>
+    </div>`;
+  }).join("");
+  requestAnimationFrame(()=>{
+    document.querySelectorAll("#causes .fill").forEach((el,i)=>{ el.style.width = top[i][1]*100 + "%"; });
+  });
+
+  renderLever();
+
+  const cur = Math.round(r.s[12]*100);
+  if(state.prevS12 !== null){
+    $("dBefore").textContent = Math.round(state.prevS12*100) + "%";
+    $("dAfter").textContent = cur + "%";
+    $("defyTxt").innerHTML = "上一版：<b>" + state.prevHex[2] + "</b> · " + Math.round(state.prevS12*100) +
+      "%。这一版：<b>" + hx[2] + "</b> · " + cur + "%。";
+    $("defyNote").textContent = "已应用 " + state.defyApplied + " 次改动。改得越多，越要小心你在拟合模型，而不是现实。";
+  } else {
+    $("dBefore").textContent = cur + "%";
+    $("dAfter").textContent = state.lever ? Math.round(state.lever.after*100) + "%" : "—";
+    $("defyTxt").innerHTML = "现在的卦是 <b>" + hx[2] + "</b>。点下面的按钮，按命门改一爻，看它变成什么卦。";
+    $("defyNote").textContent = "";
+  }
+
+  renderDeathTable();
+  $("resultCard").classList.remove("hidden");
+  $("leverCard").classList.remove("hidden");
+  $("defyCard").classList.remove("hidden");
+  $("deathCard").classList.remove("hidden");
+  $("saveBtn").classList.remove("hidden");
+  state.saved = false;
+}
+
+function renderLever(){
+  const lv = state.lv;
+  const base = state.result.s[12];
+  const deltas = VARS.map(v=>{
+    if(lv[v.k] >= 3) return {v, d:null, after:null};
+    const nlv = {...lv}; nlv[v.k] = lv[v.k] + 1;
+    const r = runSim(nlv, 1400, fnv1a("lever"+state.simId+v.k));
+    return {v, d: r.s[12] - base, after: r.s[12]};
+  });
+  const valid = deltas.filter(x=>x.d!==null).sort((a,b)=>b.d-a.d);
+  const best = valid[0];
+  state.lever = best ? {k:best.v.k, name:best.v.name, after:best.after} : null;
+
+  const maxD = Math.max(0.0001, ...valid.map(x=>Math.max(0,x.d)));
+  $("rank").innerHTML = deltas.map(x=>{
+    const isTop = best && x.v.k===best.v.k;
+    const w = x.d===null ? 0 : Math.max(0,x.d)/maxD*100;
+    return `<div class="r ${isTop?'top':''}">
+      <span>${x.v.name}</span>
+      <span class="t"><i style="width:${w}%"></i></span>
+      <b>${x.d===null?'已满':(x.d>=0?'+':'')+Math.round(x.d*100)+'pt'}</b>
+    </div>`;
+  }).join("");
+
+  if(!best){
+    $("leverName").textContent = "六爻已满，此局无解";
+    $("leverText").textContent = "六个维度都在老阳位，模型给不出更好的输入了。这时候能改的只剩执行。";
+    $("defyBtn").disabled = true;
+  } else {
+    $("leverName").textContent = "改「" + best.v.name + "」";
+    $("leverText").textContent = best.v.name + " +1 档（" + best.v.lv[lv[best.v.k]] + " → " + best.v.lv[lv[best.v.k]+1] +
+      "），24 个月存活率从 " + Math.round(base*100) + "% 变成 " + Math.round(best.after*100) + "%。同一套模型，只动一个输入。";
+    $("defyBtn").disabled = false;
+  }
+}
+
+function renderDeathTable(){
+  const top = Object.entries(state.result.causeShare).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  $("deathBody").innerHTML = top.map(([k,v])=>{
+    const c = CAUSES[k];
+    return `<tr><td>${c.n}<br><span style="color:#5f5a51;font-size:11px">${Math.round(v*100)}%</span></td>
+      <td>${c.s}</td><td class="stop">${c.t}</td></tr>`;
+  }).join("");
+}
+
+/* ============ 动作 ============ */
+function cast(){
+  state.simId = 1000 + Math.floor(Math.random()*9000);
+  const seed = fnv1a("cast" + state.simId + JSON.stringify(state.lv));
+  state.result = runSim(state.lv, 5000, seed);
+  state.prevSeries = null; state.prevS12 = null; state.prevHex = null; state.defyApplied = 0;
+  renderResult();
+  if(!DEMO) $("resultCard").scrollIntoView({behavior:"smooth", block:"start"});
+}
+function defy(){
+  if(!state.lever || !state.result) return;
+  const beforeS12 = state.result.s[12];
+  const beforeHex = hexOf(state.lv);
+  const beforeSeries = state.result.s.slice();
+  state.lv[state.lever.k] = Math.min(3, state.lv[state.lever.k] + 1);
+  state.defyApplied += 1;
+  renderInputs();
+  state.result = runSim(state.lv, 5000, fnv1a("defy" + state.simId + state.defyApplied + JSON.stringify(state.lv)));
+  state.prevSeries = beforeSeries;
+  state.prevS12 = beforeS12;
+  state.prevHex = beforeHex;
+  renderResult();
+  toast("已重跑 · " + Math.round(beforeS12*100) + "% → " + Math.round(state.result.s[12]*100) + "%");
+  if(!DEMO) $("resultCard").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+/* ============ 存证 ============ */
+const LS = "ntg_deadlab_v2";
+const loadRecs = ()=>{ try{ return JSON.parse(localStorage.getItem(LS)||"[]"); }catch(e){ return []; } };
+const saveRecs = r=>{ try{ localStorage.setItem(LS, JSON.stringify(r)); }catch(e){} };
+const fmt = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+function renderRecs(){
+  const rs = loadRecs(), box = $("records");
+  if(!rs.length){ box.innerHTML = '<p class="empty">还没有存证。存一条，90 天后回来看它准不准。</p>'; return; }
+  const now = Date.now();
+  box.innerHTML = rs.slice().reverse().map(r=>{
+    const late = now > new Date(r.due).getTime();
+    return `<div class="rec"><span class="when">${r.date}</span>
+      <span class="what"><em>${r.project}</em> · ${r.hex} · 存活 <span style="color:#e0a06f">${r.s12}%</span> · 最可能死于 ${r.cause}</span>
+      <span class="state ${late?'due':''}">${late?'已到期 · 待对账':'待对账 · '+r.due}</span></div>`;
+  }).join("");
+}
+function saveProof(){
+  if(!state.result) return;
+  try{
+    const rs = loadRecs();
+    const due = new Date(Date.now() + 90*864e5);
+    const top = Object.entries(state.result.causeShare).sort((a,b)=>b[1]-a[1])[0][0];
+    rs.push({
+      project: "未命名项目", hex: hexOf(state.lv)[2],
+      s12: Math.round(state.result.s[12]*100),
+      cause: CAUSES[top].n, date: fmt(new Date()), due: fmt(due)
+    });
+    saveRecs(rs); renderRecs(); toast("已存证 · " + fmt(due) + " 回来看它准不准");
+  }catch(e){ toast("这个环境不支持本地存证"); }
+}
+
+/* ============ 杂项 ============ */
+let tt;
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("on"); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove("on"),2400); }
+
+/* ============ 绑定 ============ */
+$("rows").addEventListener("click", e=>{
+  const b = e.target.closest("button[data-k]");
+  if(!b) return;
+  state.lv[b.dataset.k] = +b.dataset.v;
+  renderInputs();
+  if(state.result){
+    state.simId = 1000 + Math.floor(Math.random()*9000);
+    state.prevSeries = null; state.prevS12 = null; state.prevHex = null; state.defyApplied = 0;
+    state.result = runSim(state.lv, 5000, fnv1a("edit"+state.simId+JSON.stringify(state.lv)));
+    renderResult();
+  }
+});
+$("runBtn").addEventListener("click", cast);
+$("defyBtn").addEventListener("click", defy);
+$("saveBtn").addEventListener("click", saveProof);
+renderInputs();
+renderRecs();
+
+if(DEMO){
+  setTimeout(()=>{
+    state.lv = {need:3,cap:2,econ:1,dist:1,dep:2,stam:1};
+    renderInputs(); cast();
+    if(location.search.indexOf("defy")>=0) setTimeout(defy, 900);
+  }, 150);
+}
+</script>
+</body>
+</html>

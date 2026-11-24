@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>导入项目 · 程序员逆天卦-沙盘</title>
+<link rel="stylesheet" href="ui.css">
+<style>
+.tabs{display:flex;gap:8px;margin:18px 0 0;flex-wrap:wrap}
+.tabs button{background:transparent;border:1px solid var(--line);color:var(--dim);border-radius:9px;padding:10px 16px;font-size:12.5px;cursor:pointer;font-family:var(--sans)}
+.tabs button.on{background:#EDEFF4;color:#0A0B0E;border-color:#EDEFF4;font-weight:600}
+.panel{display:none;margin-top:18px}
+.panel.on{display:block}
+.inp{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:13px 14px;color:var(--txt);font-size:13.5px;outline:none;font-family:var(--sans)}
+.inp:focus{border-color:rgba(255,90,95,.45)}
+textarea.inp{min-height:140px;font-family:var(--mono);font-size:12.5px;line-height:1.6;resize:vertical}
+.drop{border:1px dashed rgba(255,255,255,.18);border-radius:12px;padding:26px;text-align:center;color:var(--dim2);font-size:13px}
+.drop b{color:var(--txt)}
+.hint{font-size:11.5px;color:var(--dim2);margin-top:10px;line-height:1.8}
+.src{display:flex;gap:14px;align-items:center;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--panel2)}
+.src .t{font-size:17px;font-weight:600}
+.src .m{font-family:var(--mono);font-size:11px;color:var(--dim2);margin-top:4px}
+.vrow{display:grid;grid-template-columns:150px 150px 1fr;gap:16px;padding:16px 0;border-bottom:1px solid var(--line2);align-items:start}
+@media(max-width:820px){.vrow{grid-template-columns:1fr;gap:8px}}
+.vrow .vn{font-size:14px}
+.vrow .vn em{font-style:normal;font-size:10px;font-family:var(--mono);color:var(--dim2);margin-left:6px}
+.vrow .vev{font-size:12px;color:var(--dim);line-height:1.9}
+.vrow .vev i{font-style:normal;color:var(--dim2)}
+.conf{display:inline-block;font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;border:1px solid var(--line);color:var(--dim2);margin-left:6px;vertical-align:1px}
+.conf.hi{color:var(--green);border-color:rgba(62,224,143,.35)}
+.conf.lo{color:var(--amber);border-color:rgba(255,196,107,.35)}
+.err{color:var(--red2);font-size:12.5px;margin-top:12px;line-height:1.7}
+.actions{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap;align-items:center}
+</style>
+</head>
+<body>
+<div class="gridbg"></div>
+<div class="shell">
+  <div class="top">
+    <a class="logo" href="index.html"><span class="mark"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="name">程序员逆天卦-沙盘</span><span class="cn">IMPORT</span></a>
+    <div class="nav">
+      <a href="index.html">沙盘</a><a class="on" href="import.html">导入</a><a href="cases.html">案例</a><a href="library.html">案例库</a>
+      <a href="team.html">团队</a><a href="compare.html">对比</a><a href="report.html">报告</a><a href="api.html">API</a>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="eyebrow">IMPORT / 别手填，把项目导进来</div>
+    <h1>已经做好的项目，<br>直接导入</h1>
+    <p class="lead">从 GitHub 仓库、本地文件夹或一段 JSON 里读出证据，推出六爻。所有推断都列出来，你可以一条条改回去。</p>
+  </section>
+
+  <section class="card">
+    <div class="sec"><span class="n">01</span><h2>SOURCE</h2><em>选一种来源</em><span class="rule"></span></div>
+    <div class="tabs">
+      <button data-tab="gh" class="on">GitHub 仓库</button>
+      <button data-tab="dir">本地文件夹</button>
+      <button data-tab="json">JSON</button>
+    </div>
+
+    <div class="panel on" id="p-gh">
+      <input class="inp" id="ghUrl" placeholder="https://github.com/owner/repo" autocomplete="off">
+      <details style="margin-top:12px">
+        <summary style="font-size:11.5px;color:var(--dim2);cursor:pointer">接口限流了？填一个 GitHub Token（可选，5000 次/小时）</summary>
+        <input class="inp" id="ghToken" type="password" placeholder="ghp_… 只保存在本机浏览器里" style="margin-top:10px">
+      </details>
+      <p class="hint">读取仓库元数据 + README + 文件树，不读代码内容。未登录的 GitHub 接口每小时 60 次（按 IP），够用；不够就填 Token。</p>
+      <div class="actions"><button class="ghost" id="ghRun">分析仓库</button></div>
+    </div>
+
+    <div class="panel" id="p-dir">
+      <div class="drop">
+        <b>选择一个项目文件夹</b><br>只读取文件名、体积、修改时间和 README / package.json，不上传、不联网。
+      </div>
+      <input type="file" id="dirInput" webkitdirectory directory multiple style="display:none">
+      <div class="actions"><button class="ghost" id="dirPick">选择文件夹</button><span class="hint" id="dirName" style="margin:0"></span></div>
+    </div>
+
+    <div class="panel" id="p-json">
+      <textarea class="inp" id="jsonIn">{
+  "project": "我的项目",
+  "vars": { "need": 2, "cap": 1, "econ": 1, "dist": 2, "dep": 0, "stam": 1 },
+  "note": "外部评估结果"
+}</textarea>
+      <div class="actions"><button class="ghost" id="jsonRun">读取 JSON</button></div>
+    </div>
+
+    <div class="err" id="err"></div>
+  </section>
+
+  <section class="card hidden" id="resultCard">
+    <div class="sec"><span class="n">02</span><h2>EVIDENCE</h2><em>推断依据，可手动修正</em><span class="rule"></span></div>
+    <div class="src" id="srcBox"></div>
+    <div id="rows"></div>
+    <div class="actions">
+      <button class="primary" style="width:auto;margin:0;padding:14px 26px" id="goBtn">带入沙盘 →</button>
+      <span class="hint" style="margin:0">导入不会覆盖你的存证记录。</span>
+    </div>
+  </section>
+
+  <footer>
+    <div>
+      <div class="mono" style="margin-bottom:8px">程序员逆天卦-沙盘 · DEADLAB</div>
+      <div class="fnav"><a href="index.html">沙盘</a><a href="import.html">导入</a><a href="cases.html">案例</a><a href="library.html">案例库</a><a href="team.html">团队</a><a href="compare.html">对比</a><a href="report.html">报告</a><a href="api.html">API</a></div>
+    </div>
+    <span>推断是启发式的，不是读心术。置信度低的那几爻，请自己改。</span>
+  </footer>
+</div>
+
+<script src="engine.js"></script>
+<script>
+const {VARS} = DEADLAB;
+const $ = id => document.getElementById(id);
+let derived = null;
+
+document.querySelectorAll('.tabs button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+    $('p-' + b.dataset.tab).classList.add('on');
+    $('err').textContent = '';
+  });
+});
+
+function setErr(m){ $('err').textContent = m || ''; }
+
+/* ---------- GitHub ---------- */
+async function fromGitHub(url){
+  const m = String(url).match(/github\.com\/([^\/\s]+)\/([^\/\s#?]+)/);
+  if(!m) throw new Error('看不出是 GitHub 地址，格式应为 https://github.com/owner/repo');
+  const owner = m[1], repo = m[2].replace(/\.git$/,'');
+  const cacheKey = 'ghcache:' + owner + '/' + repo;
+  try{
+    const c = JSON.parse(localStorage.getItem(cacheKey) || 'null');
+    if(c && Date.now() - c.at < 3600e3) return c.data;
+  }catch(e){}
+  const api = `https://api.github.com/repos/${owner}/${repo}`;
+  const token = (localStorage.getItem('deadlab_gh_token') || '').trim();
+  const r = await fetch(api, token ? {headers:{Authorization:'Bearer ' + token}} : undefined);
+  if(r.status === 403) throw new Error('GitHub 接口限流了（每小时 60 次），过一会儿再试，或者用本地文件夹导入。');
+  if(r.status === 404) throw new Error('仓库不存在，或者是私有的。');
+  if(!r.ok) throw new Error('GitHub 返回 ' + r.status);
+  const d = await r.json();
+
+  const raw = `https://raw.githubusercontent.com/${owner}/${repo}/HEAD/`;
+  const readme = await fetch(raw + 'README.md').then(x=> x.ok ? x.text() : '').catch(()=> '');
+  const tree = await fetch(`${api}/git/trees/HEAD?recursive=1`)
+    .then(x=> x.ok ? x.json() : {tree:[]}).catch(()=>({tree:[]}));
+  const files = (tree.tree || []).map(t=>t.path);
+  const pkg = await fetch(raw + 'package.json').then(x=> x.ok ? x.text() : '').catch(()=> '');
+  let deps = 0, devDeps = 0;
+  try{ const p = JSON.parse(pkg); deps = Object.keys(p.dependencies||{}).length; devDeps = Object.keys(p.devDependencies||{}).length; }catch(e){}
+
+  const res = {
+    project: d.full_name,
+    source: 'GitHub · ' + d.full_name,
+    meta: [
+      d.stargazers_count + ' stars',
+      d.forks_count + ' forks',
+      d.open_issues_count + ' open issues',
+      (d.language || '—'),
+      (d.license && d.license.spdx_id) || '无 license',
+      '更新于 ' + (d.pushed_at || '').slice(0,10)
+    ].join(' · '),
+    signals: {d, readme, files, deps, devDeps, contributors: null}
+  };
+  try{
+    const s = JSON.stringify({at: Date.now(), data: res});
+    if(s.length < 400000) localStorage.setItem(cacheKey, s);
+  }catch(e){}
+  return res;
+}
+/* ---------- 本地文件夹 ---------- */
+function fromFolder(fileList){
+  const files = Array.from(fileList);
+  const paths = files.map(f=>f.webkitRelativePath || f.name);
+  const root = paths[0] ? paths[0].split('/')[0] : '本地项目';
+  const textFiles = files.filter(f=>/\.(md|json|txt|ya?ml)$/i.test(f.name) && f.size < 400000);
+  const readmeFile = textFiles.find(f=>/^readme\.md$/i.test(f.name));
+  const pkgFile = textFiles.find(f=>f.name === 'package.json' && (f.webkitRelativePath||'').split('/').length <= 2);
+  return Promise.all([
+    readmeFile ? readmeFile.text() : Promise.resolve(''),
+    pkgFile ? pkgFile.text() : Promise.resolve('')
+  ]).then(([readme, pkg])=>{
+    let deps = 0, devDeps = 0;
+    try{ const p = JSON.parse(pkg); deps = Object.keys(p.dependencies||{}).length; devDeps = Object.keys(p.devDependencies||{}).length; }catch(e){}
+    const last = files.reduce((m,f)=> Math.max(m, f.lastModified || 0), 0);
+    return {
+      project: root,
+      source: '本地文件夹 · ' + root,
+      meta: [files.length + ' 个文件', (files.reduce((a,b)=>a+b.size,0)/1048576).toFixed(1) + ' MB', '最后修改 ' + new Date(last).toISOString().slice(0,10)].join(' · '),
+      signals: {d:null, readme, files: paths, deps, devDeps, lastModified: last, contributors: null}
+    };
+  });
+}
+
+/* ---------- 打分 ---------- */
+function daysSince(t){ return t ? Math.max(1, (Date.now() - new Date(t).getTime())/864e5) : 365; }
+
+function derive(sig){
+  const {d, readme, files, deps} = sig;
+  const out = {};
+  const has = re => files.some(f=>re.test(f));
+  const hasTests = has(/(^|\/)(__tests__|tests?|spec)\//i) || has(/\.(test|spec)\.[jt]sx?$/i) || has(/_test\.(go|py)$/i);
+  const hasCI = has(/^\.github\/workflows\//i) || has(/^\.gitlab-ci\.yml$/i) || has(/^\.circleci\//i);
+  const isTS = has(/tsconfig\.json$/i) || has(/\.tsx?$/i);
+  const hasDocs = (readme || '').length > 1500;
+  const hasHome = !!(d && d.homepage);
+  const monetize = /pricing|subscribe|billing|paid plan|upgrade|¥|￥|usd|\/month|per month/i.test(readme || '');
+
+  /* 需求：star 速度 */
+  const age = d ? daysSince(d.created_at) : 365;
+  const stars = d ? d.stargazers_count : 0;
+  const vel = stars / age;
+  let lv = vel > 3 ? 3 : vel > 0.8 ? 2 : vel > 0.08 ? 1 : 0;
+  out.need = {lv, conf: d ? (vel > 0.5 ? 'hi' : 'mid') : 'lo', ev: d
+    ? [`${stars} stars ÷ ${Math.round(age)} 天 ≈ ${vel.toFixed(2)} star/天`, `${d.forks_count} forks`, '注意：star 是"关注"信号，不等于"付钱"']
+    : ['本地文件夹看不到外部关注度', '这一爻建议自己填']};
+
+  /* 能力：工程化程度 */
+  let cs = 0, ce = [];
+  if(hasTests){ cs++; ce.push('检测到测试目录/测试文件'); } else ce.push('没有找到测试文件');
+  if(hasCI){ cs++; ce.push('检测到 CI 配置'); } else ce.push('没有 CI 配置');
+  if(isTS){ cs++; ce.push('使用 TypeScript'); }
+  if(hasDocs){ cs++; ce.push('README 超过 1500 字'); }
+  out.cap = {lv: cs >= 4 ? 3 : cs >= 3 ? 2 : cs >= 1 ? 1 : 0, conf: cs >= 2 ? 'hi' : 'mid', ev: ce};
+
+  /* 经济：变现线索 */
+  out.econ = {lv: monetize ? 2 : (d && d.license ? 1 : 0), conf: 'lo', ev: [
+    monetize ? 'README 里出现定价/订阅/付费字样' : 'README 里没有发现任何定价或付费线索',
+    d && d.license ? '有 ' + d.license.spdx_id + ' license（能商用，但还没看到怎么收钱）' : '没有 license',
+    '这一爻只能读文字，读不出真实的付费意愿'
+  ]};
+
+  /* 分发：绝对量 + 渠道 */
+  let dl = stars >= 1000 ? 3 : stars >= 200 ? 2 : stars >= 30 ? 1 : 0;
+  let de = [`${stars} stars`];
+  if(d && d.homepage){ dl = Math.min(3, dl + 1); de.push('有独立主页 ' + d.homepage); }
+  if(d && d.topics && d.topics.length){ de.push(d.topics.length + ' 个 topics'); }
+  out.dist = {lv: dl, conf: d ? 'mid' : 'lo', ev: de};
+
+  /* 依赖：运行时依赖数量（越多越被动），devDependencies 不算风险 */
+  const dv = (sig.devDeps || 0);
+  const dlv = deps > 25 ? 0 : deps > 11 ? 1 : deps > 3 ? 2 : 3;
+  out.dep = {lv: dlv, conf: deps ? 'mid' : 'lo', ev: [
+    deps ? '运行时依赖 ' + deps + ' 个' + (dv ? '（另有 ' + dv + ' 个 devDependencies，不计入风险）' : '') : '没读到 package.json（可能不是 JS 项目）',
+    d && d.archived ? '仓库已归档' : '未归档',
+    '这一爻真正该问的是：上游有没有能力顺手做掉你'
+  ]};
+
+  /* 续航：最近活跃 + 人 */
+  const pushAge = d ? daysSince(d.pushed_at) : (sig.lastModified ? daysSince(sig.lastModified) : 999);
+  const lv6 = pushAge < 90 ? 3 : pushAge < 365 ? 2 : 1;
+  out.stam = {lv: lv6, conf: 'mid', ev: [
+    pushAge < 999 ? Math.round(pushAge) + ' 天前还有提交' : '看不出最近活动',
+    d && d.open_issues_count > 200 ? d.open_issues_count + ' 个 open issue（积压严重）' : 'issue 量正常'
+  ]};
+
+  return out;
+}
+
+/* ---------- 渲染 ---------- */
+function render(res){
+  derived = res;
+  $('srcBox').innerHTML = `<div><div class="t">${res.project}</div><div class="m">${res.source}</div></div>
+    <div class="m" style="flex:1;text-align:right;min-width:240px">${res.meta || ''}</div>`;
+  const rows = VARS.map(v=>{
+    const x = res.vars[v.k];
+    const conf = x.conf === 'hi' ? '高置信' : x.conf === 'lo' ? '低置信' : '中等置信';
+    return `<div class="vrow">
+      <div class="vn">${v.yao}爻 · ${v.name}<span class="conf ${x.conf}">${conf}</span></div>
+      <div><select class="sel" data-k="${v.k}" style="width:100%">
+        ${v.lv.map((t,i)=>`<option value="${i}" ${i===x.lv?'selected':''}>${t}</option>`).join('')}
+      </select></div>
+      <div class="vev">${x.ev.map(e=>'• ' + e).join('<br>')}</div>
+    </div>`;
+  }).join('');
+  $('rows').innerHTML = rows;
+  $('resultCard').classList.remove('hidden');
+  $('resultCard').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function collect(){
+  const lv = {};
+  document.querySelectorAll('#rows select').forEach(s=>{ lv[s.dataset.k] = +s.value; });
+  return lv;
+}
+
+/* ---------- 事件 ---------- */
+$('ghRun').addEventListener('click', async ()=>{
+  setErr('');
+  const btn = $('ghRun'); btn.disabled = true; btn.textContent = '读取中…';
+  try{
+    const res = await fromGitHub($('ghUrl').value.trim());
+    const vars = derive(res.signals);
+    render({project: res.project, source: res.source, meta: res.meta, vars});
+  }catch(e){ setErr(e.message); }
+  finally{ btn.disabled = false; btn.textContent = '分析仓库'; }
+});
+
+$('dirPick').addEventListener('click', ()=> $('dirInput').click());
+$('dirInput').addEventListener('change', async e=>{
+  setErr('');
+  const files = e.target.files;
+  if(!files || !files.length) return;
+  $('dirName').textContent = '已选 ' + files.length + ' 个文件';
+  try{
+    const res = await fromFolder(files);
+    const vars = derive(res.signals);
+    render({project: res.project, source: res.source, meta: res.meta, vars});
+  }catch(err){ setErr('读取失败：' + err.message); }
+});
+
+$('jsonRun').addEventListener('click', ()=>{
+  setErr('');
+  try{
+    const j = JSON.parse($('jsonIn').value);
+    const vars = {};
+    VARS.forEach(v=>{
+      const lv = Math.max(0, Math.min(3, +(j.vars && j.vars[v.k] !== undefined ? j.vars[v.k] : 1)));
+      vars[v.k] = {lv, conf:'hi', ev:[j.note || '来自 JSON，由数据源直接给出']};
+    });
+    render({project: j.project || '导入项目', source: 'JSON', meta: '', vars});
+  }catch(err){ setErr('JSON 解析失败：' + err.message); }
+});
+
+$('goBtn').addEventListener('click', ()=>{
+  const lv = collect();
+  const payload = {project: derived.project, source: derived.source, lv, at: Date.now()};
+  try{ localStorage.setItem('deadlab_import', JSON.stringify(payload)); }catch(e){}
+  location.href = 'index.html?imp=1';
+});
+
+/* demo：自动跑一个公开仓库 */
+const tokEl = $('ghToken');
+if(tokEl){
+  tokEl.value = localStorage.getItem('deadlab_gh_token') || '';
+  tokEl.addEventListener('change', ()=>{
+    const v = tokEl.value.trim();
+    if(v) localStorage.setItem('deadlab_gh_token', v); else localStorage.removeItem('deadlab_gh_token');
+  });
+}
+if(location.search.indexOf('json')>=0) setTimeout(()=> $('jsonRun').click(), 200);
+
+if(location.search.indexOf('demo')>=0){
+  const u = new URLSearchParams(location.search).get('repo') || 'sindresorhus/got';
+  $('ghUrl').value = 'https://github.com/' + u;
+  setTimeout(()=> $('ghRun').click(), 200);
+  if(location.search.indexOf('go')>=0) setTimeout(()=> $('goBtn').click(), 4000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>逆天卦 · 程序员专用</title>
+<style>
+:root{
+  --bg:#08090b; --card:#101418; --card2:#0d1114;
+  --line:rgba(201,163,92,.22); --line2:rgba(201,163,92,.10);
+  --gold:#c9a35c; --gold2:#ecd9a8; --red:#b83b2e; --txt:#e8e2d5;
+  --dim:#8a8478; --dim2:#5f5a51; --ok:#5a9c78;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+  line-height:1.6; -webkit-font-smoothing:antialiased;
+  min-height:100vh; overflow-x:hidden;
+}
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:
+    radial-gradient(900px 500px at 12% -8%, rgba(201,163,92,.14), transparent 60%),
+    radial-gradient(700px 420px at 92% 4%, rgba(184,59,46,.10), transparent 62%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 1px, transparent 1px 3px);
+}
+.wrap{position:relative; z-index:1; max-width:1040px; margin:0 auto; padding:30px 22px 70px}
+.han{font-family:"Kaiti SC","STKaiti","KaiTi","Songti SC",serif}
+
+/* ---------- hero ---------- */
+.hero{display:flex; align-items:flex-start; gap:20px; flex-wrap:wrap; padding:8px 0 26px; border-bottom:1px solid var(--line2); margin-bottom:26px}
+.brand h1{
+  margin:0; font-size:58px; line-height:1.02; letter-spacing:.14em; font-weight:400;
+  font-family:"Kaiti SC","STKaiti","KaiTi","Songti SC",serif;
+  background:linear-gradient(180deg,#f6e6bd,#c9a35c 62%,#8f6f34);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  text-shadow:0 0 34px rgba(201,163,92,.18);
+}
+.brand .sub{margin:8px 0 0; color:var(--dim); letter-spacing:.22em; font-size:13px}
+.seal{
+  width:62px; height:62px; margin-left:auto; margin-top:4px; flex:0 0 auto;
+  display:grid; place-items:center; transform:rotate(4deg);
+  border:2px solid var(--red); border-radius:6px; color:#e38b7e;
+  font-family:"Kaiti SC","STKaiti","KaiTi",serif; font-size:13px; line-height:1.05;
+  letter-spacing:1px; opacity:.9; text-align:center; padding:4px;
+  box-shadow:0 0 0 1px rgba(184,59,46,.25) inset;
+}
+.stat{flex:0 0 auto; margin-left:18px; text-align:right; margin-top:6px}
+.stat b{display:block; font-size:26px; color:var(--gold); font-family:"Kaiti SC",serif; letter-spacing:.04em}
+.stat span{font-size:11px; color:var(--dim2); letter-spacing:.2em}
+
+/* ---------- cards ---------- */
+.card{
+  background:linear-gradient(180deg, rgba(255,255,255,.028), rgba(255,255,255,0) 120px), var(--card);
+  border:1px solid var(--line); border-radius:14px; padding:24px 26px; margin-bottom:22px;
+  box-shadow:0 20px 50px -30px rgba(0,0,0,.9), 0 0 0 1px rgba(0,0,0,.3) inset;
+}
+.card h2{
+  margin:0 0 18px; font-size:15px; font-weight:400; color:var(--gold);
+  letter-spacing:.24em; display:flex; align-items:center; gap:10px;
+}
+.card h2::after{content:""; flex:1; height:1px; background:linear-gradient(90deg, var(--line), transparent)}
+.hint{color:var(--dim2); font-size:12px; margin:14px 0 0; letter-spacing:.04em}
+.hidden{display:none !important}
+
+/* ---------- form ---------- */
+.fields{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px}
+.field{display:flex; flex-direction:column; gap:7px}
+.field span{font-size:12px; color:var(--dim); letter-spacing:.12em}
+input,select{
+  background:#0a0d10; border:1px solid rgba(255,255,255,.09); color:var(--txt);
+  border-radius:9px; padding:11px 12px; font-size:14px; font-family:inherit; outline:none;
+  transition:border-color .2s, box-shadow .2s; width:100%;
+}
+input:focus,select:focus{border-color:rgba(201,163,92,.55); box-shadow:0 0 0 3px rgba(201,163,92,.08)}
+select option{background:#0a0d10}
+button{
+  font-family:inherit; cursor:pointer; border-radius:9px; border:1px solid var(--line);
+  background:transparent; color:var(--gold2); padding:12px 26px; font-size:14px;
+  letter-spacing:.2em; transition:all .2s;
+}
+button:hover:not(:disabled){background:rgba(201,163,92,.10); border-color:rgba(201,163,92,.5)}
+button:disabled{opacity:.45; cursor:default}
+button.primary{
+  margin-top:18px; width:100%; padding:15px; font-size:16px; letter-spacing:.5em; text-indent:.5em;
+  background:linear-gradient(180deg, rgba(201,163,92,.20), rgba(201,163,92,.06));
+  border-color:rgba(201,163,92,.45); color:#f3e2b8;
+}
+button.primary:hover:not(:disabled){background:linear-gradient(180deg, rgba(201,163,92,.30), rgba(201,163,92,.10))}
+button.ghost{font-size:12px; padding:9px 16px; letter-spacing:.1em}
+
+/* ---------- hexagram ---------- */
+.result{display:grid; grid-template-columns:1fr 1.25fr; gap:30px}
+@media(max-width:760px){.result{grid-template-columns:1fr; gap:22px}}
+.hex-side{text-align:center; padding:6px 0}
+.hex-name{font-family:"Kaiti SC","STKaiti","KaiTi",serif; font-size:34px; letter-spacing:.12em; color:var(--gold2); margin:0}
+.hex-tag{font-size:13px; color:var(--dim); letter-spacing:.14em; margin-top:6px}
+.lines{margin:24px auto 0; width:178px; display:flex; flex-direction:column; gap:10px; position:relative}
+.yao{display:flex; height:12px; gap:15px; opacity:0; transform:translateY(-6px); position:relative}
+.yao.on{opacity:1; transform:none; transition:opacity .32s, transform .32s}
+.yao i{display:block; height:100%; border-radius:2px; background:linear-gradient(90deg,#8f6f34,var(--gold) 38%,#f3dfb2 54%,var(--gold) 70%,#8f6f34); flex:1}
+.yao.moving i{box-shadow:0 0 14px rgba(236,217,168,.42)}
+.yao.moving::after{content:""; position:absolute; right:-16px; top:50%; width:5px; height:5px; margin-top:-2.5px; border-radius:50%; background:#c2402c; box-shadow:0 0 8px rgba(194,64,44,.9)}
+.poem{margin:20px 0 0; font-family:"Kaiti SC","STKaiti","KaiTi",serif; font-size:15px; color:#cbc3b1; line-height:1.9; letter-spacing:.05em}
+
+.judge{
+  display:inline-block; padding:6px 18px; border-radius:999px; font-size:13px; letter-spacing:.3em;
+  border:1px solid currentColor; margin-bottom:16px; text-indent:.3em;
+}
+.j-good{color:#8fd6ab; background:rgba(90,156,120,.10)} .j-bad{color:#ee8f7c; background:rgba(184,59,46,.12)} .j-mid{color:#d8c392; background:rgba(201,163,92,.10)}
+.verse{font-size:14px; color:#c3bcac; line-height:1.95; margin:0 0 18px}
+.verse b{color:var(--gold2); font-weight:400}
+.nitian{
+  border:1px dashed rgba(184,59,46,.4); background:rgba(184,59,46,.055);
+  border-radius:10px; padding:16px 18px; margin:0 0 18px;
+}
+.nitian h3{margin:0 0 8px; font-size:12px; color:#e08d7e; letter-spacing:.24em; font-weight:400}
+.nitian p{margin:0; font-size:14px; color:#ddd3c2; line-height:1.9}
+.nitian .big{font-family:"Kaiti SC","STKaiti","KaiTi",serif; font-size:21px; color:#f0b7a8; letter-spacing:.08em}
+.meta{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:16px}
+.meta div{background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.05); border-radius:8px; padding:10px 12px}
+.meta span{display:block; font-size:10px; color:var(--dim2); letter-spacing:.16em; margin-bottom:3px}
+.meta b{font-size:15px; color:var(--gold2); font-weight:400}
+
+/* ---------- sandbox ---------- */
+.sliders{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:16px 22px}
+.slider{display:flex; flex-direction:column; gap:8px}
+.slider .lab{display:flex; justify-content:space-between; font-size:12px; color:var(--dim)}
+.slider .lab b{color:var(--gold2); font-weight:400; font-variant-numeric:tabular-nums}
+input[type=range]{
+  -webkit-appearance:none; appearance:none; height:3px; border-radius:2px; padding:0;
+  background:linear-gradient(90deg, rgba(201,163,92,.7) var(--p,50%), rgba(255,255,255,.10) var(--p,50%));
+  border:none; outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #f6e6bd, #b98f45); border:1px solid #7d5f28; cursor:pointer;
+}
+.bars{margin-top:22px; display:flex; flex-direction:column; gap:11px}
+.bar-row{display:grid; grid-template-columns:290px 1fr 56px; gap:16px; align-items:center; font-size:13px}
+@media(max-width:620px){.bar-row{grid-template-columns:1fr 46px; row-gap:6px}.bar-row .name{grid-column:1/2}.bar-row .track{grid-column:1/-1}}
+.bar-row .name{color:#cfc7b6; line-height:1.4}
+.bar-row .track{display:block; height:10px; background:rgba(255,255,255,.07); border-radius:5px; overflow:hidden}
+.bar-row .fill{display:block; height:100%; width:0; border-radius:5px; background:linear-gradient(90deg,#a07c3c,#e2c184); transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.bar-row .pct{text-align:right; color:var(--gold2); font-variant-numeric:tabular-nums}
+.bar-row.top .fill{background:linear-gradient(90deg,#a3311f,#e0a06f)}
+.chain{margin-top:22px; border-left:2px solid rgba(201,163,92,.3); padding:2px 0 2px 18px}
+.chain p{margin:0 0 10px; font-size:13.5px; color:#bdb5a5}
+.chain p b{color:var(--gold2); font-weight:400}
+.chain p:last-child{margin-bottom:0}
+.fineprint{margin-top:18px; font-size:11.5px; color:var(--dim2); line-height:1.9}
+
+/* ---------- records ---------- */
+.rec{display:flex; gap:14px; align-items:baseline; padding:12px 0; border-bottom:1px solid rgba(255,255,255,.05); font-size:13px}
+.rec:last-child{border-bottom:none}
+.rec .when{color:var(--dim2); font-variant-numeric:tabular-nums; flex:0 0 84px; font-size:12px}
+.rec .what{flex:1; color:#cfc7b6}
+.rec .what em{font-style:normal; color:var(--gold2); font-family:"Kaiti SC",serif; letter-spacing:.06em}
+.rec .state{flex:0 0 auto; font-size:11px; letter-spacing:.1em; color:var(--dim2)}
+.rec .state.due{color:#e0806f}
+.empty{color:var(--dim2); font-size:13px; margin:0}
+
+footer{margin-top:34px; text-align:center; color:var(--dim2); font-size:11.5px; line-height:2; letter-spacing:.06em}
+footer .han{color:var(--dim); font-size:13px}
+.toast{
+  position:fixed; left:50%; bottom:34px; transform:translate(-50%,20px); z-index:9;
+  background:#171c21; border:1px solid var(--line); color:var(--gold2);
+  padding:10px 20px; border-radius:999px; font-size:13px; opacity:0; pointer-events:none;
+  transition:all .25s; letter-spacing:.08em;
+}
+.toast.on{opacity:1; transform:translate(-50%,0)}
+.demo .yao{opacity:1 !important; transform:none !important}
+.demo .fill{transition:none !important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="brand">
+      <h1 class="han">逆天卦</h1>
+      <p class="sub">程序员专用 · 卦卦全算错</p>
+    </div>
+    <div class="stat"><b>3.7%</b><span>历史准确率</span></div>
+    <div class="seal han">卦卦<br>全算<br>错</div>
+  </header>
+
+  <!-- 起卦 -->
+  <section class="card">
+    <h2>一 · 起 卦</h2>
+    <div class="fields">
+      <label class="field"><span>应用名</span><input id="appName" maxlength="24" placeholder="例如：需求雷达"></label>
+      <label class="field"><span>阶段</span>
+        <select id="stage">
+          <option>想法阶段</option><option>开发中</option><option>内测</option><option>已上线</option><option>已放弃（不甘心）</option>
+        </select>
+      </label>
+      <label class="field"><span>技术栈</span>
+        <select id="stack">
+          <option>手写原生</option><option>React 全家桶</option><option>AI 生成</option><option>祖传代码</option><option>外包交付</option>
+        </select>
+      </label>
+      <label class="field"><span>甲方</span>
+        <select id="boss">
+          <option>自己</option><option>老板</option><option>客户</option><option>投资人</option><option>没有甲方（更慌）</option>
+        </select>
+      </label>
+    </div>
+    <button class="primary" id="castBtn">击 卦</button>
+    <p class="hint">三枚铜钱，六次落定。也可理解为：点一下。 · 同一天算同一项目，卦会变——这正是它全算错的原因。</p>
+  </section>
+
+  <!-- 卦象 -->
+  <section class="card hidden" id="resultCard">
+    <h2>二 · 卦 象</h2>
+    <div class="result">
+      <div class="hex-side">
+        <h3 class="hex-name" id="hexName">—</h3>
+        <div class="hex-tag" id="hexTag">—</div>
+        <div class="lines" id="lines"></div>
+        <p class="poem" id="poem"></p>
+      </div>
+      <div>
+        <span class="judge" id="judge">—</span>
+        <p class="verse" id="verse"></p>
+
+        <div class="nitian">
+          <h3>逆 天 解 读 · 反 着 听</h3>
+          <p class="big" id="invVerdict">—</p>
+          <p id="invText"></p>
+        </div>
+
+        <div class="verse" id="bianWrap"></div>
+
+        <div class="meta">
+          <div><span>卦 号</span><b id="mNo">—</b></div>
+          <div><span>变 爻</span><b id="mMove">—</b></div>
+          <div><span>反向置信度</span><b>96.3%</b></div>
+        </div>
+
+        <button class="ghost" id="copyBtn" style="margin-top:16px">复制卦象（发群里）</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 沙盘 -->
+  <section class="card hidden" id="sandboxCard">
+    <h2>三 · 命 运 沙 盘</h2>
+    <div class="sliders">
+      <div class="slider"><div class="lab"><span>团队人数</span><b id="vTeam">4 人</b></div><input type="range" id="sTeam" min="1" max="20" value="4"></div>
+      <div class="slider"><div class="lab"><span>剩余工期</span><b id="vWeeks">12 周</b></div><input type="range" id="sWeeks" min="1" max="52" value="12"></div>
+      <div class="slider"><div class="lab"><span>技术栈赌性</span><b id="vRisk">55</b></div><input type="range" id="sRisk" min="0" max="100" value="55"></div>
+      <div class="slider"><div class="lab"><span>需求变更</span><b id="vChg">3 次/月</b></div><input type="range" id="sChg" min="0" max="10" value="3"></div>
+      <div class="slider"><div class="lab"><span>预算</span><b id="vMoney">80 万</b></div><input type="range" id="sMoney" min="0" max="500" step="10" value="80"></div>
+    </div>
+    <button class="primary" id="runBtn">推 演 二 千 次</button>
+    <div id="simOut" class="hidden">
+      <div class="bars" id="bars"></div>
+      <div class="chain" id="chain"></div>
+      <p class="fineprint" id="fine"></p>
+      <button class="ghost" id="saveBtn" style="margin-top:6px">存 证 · 三 周 后 看 打 脸</button>
+    </div>
+  </section>
+
+  <!-- 存证 -->
+  <section class="card">
+    <h2>四 · 打 脸 存 证</h2>
+    <div id="records"><p class="empty">还没有存证。存一卦，三周后回来看它错得多准。</p></div>
+  </section>
+
+  <footer>
+    <p class="han">「卦卦全算错，偏偏你还算。」</p>
+    <p>本产品不构成任何决策依据。如因听信本卦导致项目失败，属命中注定。<br>准确率 3.7% 为真实统计结果（样本量 27，全部来自本机）。</p>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ 数据：六十四卦（程序员版） ============ */
+const T = {乾:[1,1,1],兑:[1,1,0],离:[1,0,1],震:[1,0,0],巽:[0,1,1],坎:[0,1,0],艮:[0,0,1],坤:[0,0,0]};
+const HEX = [
+["乾","乾","乾为天","一次编译通过","上上","六爻纯阳，CI 长绿。此卦大吉，宜立刻备份——大吉之后必有事。"],
+["坤","坤","坤为地","需求全接","上上","地势坤，甲方以厚德载物，你以加班载甲方。吉，但腰不吉。"],
+["坎","震","水雷屯","初始化即崩","凶","云雷屯，刚柔始交而难生。脚手架未成，先报 node 版本错。"],
+["艮","坎","山水蒙","文档缺失","中平","匪我求童蒙，童蒙求我。README 三行，其余靠自己悟。"],
+["坎","乾","水天需","等产品确认","中平","需于郊，利用恒。等一个 PRD，等到下个季度。"],
+["乾","坎","天水讼","甩锅大会","凶","讼，有孚窒惕。会议纪要里，你的名字排第一。"],
+["坤","坎","地水师","全员上线","中平","师出以律，否臧凶。上线如出征，粮草是咖啡。"],
+["坎","坤","水地比","结对编程","吉","比，吉也。两个人写，一个人想，零个人懂。"],
+["巽","乾","风天小畜","攒够一次发版","中平","密云不雨，自我西郊。需求攒了三十个，版本号还停在 0.1。"],
+["乾","兑","天泽履","踩到线上","凶","履虎尾，不咥人，亨。踩了线上，虎没咬你，老板咬了。"],
+["坤","乾","地天泰","灰度零事故","大吉","小往大来，吉亨。上下交而其志同——直到下次发版。"],
+["乾","坤","天地否","联调不通","凶","否之匪人，不利君子贞。前后端各说各话，接口文档是唯一受害者。"],
+["乾","离","天火同人","开源有人 PR","吉","同人于野，亨。陌生人提了个 PR，改了 200 行，你不敢合。"],
+["离","乾","火天大有","一夜爆火","大吉","大有，元亨。一夜十万下载，第二天账单也是十万。"],
+["坤","艮","地山谦","没人 star","中平","谦，亨，君子有终。无人问津，故无 bug 上报，善莫大焉。"],
+["震","坤","雷地豫","提前交付","吉","豫，利建侯行师。提前两周交付，甲方提前三周改需求。"],
+["兑","震","泽雷随","跟着竞品改","中平","随，元亨利贞。竞品上了个按钮，你也上，没人记得为什么。"],
+["艮","巽","山风蛊","祖传代码","凶","蛊，元亨。前人种树，后人 debug。注释曰：此处勿动。"],
+["坤","兑","地泽临","用户来了","吉","临，元亨利贞。用户来了，带着 47 条需求和一星差评。"],
+["巽","坤","风地观","只看不买","中平","观，盥而不荐。注册页看了三秒，走了，留下一个 UV。"],
+["离","震","火雷噬嗑","咬咬牙重构","中平","噬嗑，亨。咬碎旧架构，牙口得好，预算得厚。"],
+["艮","离","山火贲","皮肤好看","中平","贲，亨。界面换了三版，功能一行没加。"],
+["艮","坤","山地剥","功能被砍","凶","剥，不利有攸往。砍到最后一个功能，叫登录。"],
+["坤","震","地雷复","回滚","中平","复，亨。七日来复。回滚也是一门手艺。"],
+["乾","震","天雷无妄","无妄之 bug","凶","无妄，元亨利贞，其匪正有眚。你没改那行代码，它自己坏了。"],
+["艮","乾","山天大畜","技术债到期","中平","大畜，利贞。债主上门，利息是通宵。"],
+["艮","震","山雷颐","自己吃自己","中平","颐，贞吉。自己写的 API，自己调不通。"],
+["兑","巽","泽风大过","过度设计","凶","大过，栋桡。为一百万用户设计，现有三个。"],
+["坎","坎","坎为水","深夜宕机","大凶","习坎，有孚维心亨。凌晨三点的告警，比闹钟忠诚。"],
+["离","离","离为火","服务器烧了","凶","离，利贞亨。火在云上，账单在人间。"],
+["兑","艮","泽山咸","用户心动","吉","咸，亨，利贞。用户说：这个有点意思。本周最高评价。"],
+["震","巽","雷风恒","长期维护","中平","恒，亨，无咎。三年后你还在改它，说明它还活着。"],
+["乾","艮","天山遁","转身跑路","凶","遁，亨小利贞。核心开发提了离职，交接文档写了两个字：加油。"],
+["震","乾","雷天大壮","猛加需求","凶","大壮，利贞。需求如壮牛，你如草。"],
+["离","坤","火地晋","顺利晋升","吉","晋，康侯用锡马蕃庶。项目成了，PPT 归别人，你归下一项目。"],
+["坤","离","地火明夷","背锅","大凶","明夷，利艰贞。灯下黑，锅上明。"],
+["巽","离","风火家人","小团队","吉","家人，利女贞。四个人，一条心，一台空调还坏了。"],
+["离","兑","火泽睽","前后端吵架","凶","睽，小事吉。同一份文档，两种理解，三种实现。"],
+["坎","艮","水山蹇","卡在支付","凶","蹇，利西南。卡在支付回调，第七天了。"],
+["震","坎","雷水解","问题自解","吉","解，利西南。没修，它自己好了。别问，问就是缓存。"],
+["艮","兑","山泽损","砍功能省钱","中平","损而有孚，元吉。砍掉三个功能，省下半个月，用户没发现。"],
+["巽","震","风雷益","性能起飞","大吉","益，利有攸往。加了个索引，快了一百倍，没人知道为什么。"],
+["兑","乾","泽天夬","一键删除","中平","夬，扬于王庭。删库之前，先确认备份在哪。"],
+["乾","巽","天风姤","遇上甲方","凶","姤，女壮，勿用取女。甲方来了，带着「就改一点点」。"],
+["兑","坤","泽地萃","用户聚集","吉","萃，亨。人聚则财聚，也聚 bug。"],
+["坤","巽","地风升","稳步增长","吉","升，元亨。日拱一卒，月拱一 bug。"],
+["兑","坎","泽水困","预算见底","大凶","困，亨，贞大人吉。账上还有 43 块，够一杯咖啡和一份绝望。"],
+["坎","巽","水风井","共用一个 API","中平","井，改邑不改井。接口三年没改，文档三年没对。"],
+["兑","离","泽火革","推翻重做","中平","革，己日乃孚。重写吧，重写完还是这样。"],
+["离","巽","火风鼎","立新架构","吉","鼎，元吉亨。新架构很优雅，老代码还在跑。"],
+["震","震","震为雷","半夜惊醒","中平","震，亨。半夜惊醒，想起没关的那个循环。"],
+["艮","艮","艮为山","停止维护","凶","艮其背，不获其身。归档吧，像一场体面的葬礼。"],
+["巽","艮","风山渐","慢慢变好","吉","渐，女归吉。慢慢来，比较快。"],
+["震","兑","雷泽归妹","嫁给外包","凶","归妹，征凶。外包交付，代码如嫁妆：看着体面，用着揪心。"],
+["震","离","雷火丰","流量洪峰","吉","丰，亨，日中是市。热度三天，够吹三年。"],
+["离","艮","火山旅","出差演示","中平","旅，小亨。投影仪不认你的接口，客户只看了一眼。"],
+["巽","巽","巽为风","需求风吹","中平","巽，小亨。风往哪吹，需求往哪改。"],
+["兑","兑","兑为泽","用户好评","吉","兑，亨，利贞。好评如潮，潮水退了才知道谁在裸泳。"],
+["巽","坎","风水涣","团队散了","凶","涣，亨，王假有庙。人散了，群还在，偶尔有人发个表情包。"],
+["坎","兑","水泽节","限流","中平","节，亨，苦节不可贞。限流保命，用户骂街。"],
+["巽","兑","风泽中孚","用户信任","吉","中孚，豚鱼吉。用户信你，所以敢把数据给你。"],
+["震","艮","雷山小过","小 bug 不断","中平","小过，亨，飞鸟遗之音。修完一个，冒出两个，像打地鼠。"],
+["坎","离","水火既济","上线即完成","吉","既济，亨小。事成了，然后呢。"],
+["离","坎","火水未济","永远差一点","中平","未济，亨。小狐汔济，濡其尾。差最后一个功能，永远差最后一个。"]
+];
+const HEXMAP = {};
+HEX.forEach((h,i)=>{ HEXMAP[[...T[h[1]],...T[h[0]]].join("")] = i; });
+const JCLASS = {"上上":"j-good","大吉":"j-good","吉":"j-good","中平":"j-mid","凶":"j-bad","大凶":"j-bad"};
+const INV = {
+  "上上":{"v":"大凶 · 必黄","t":"本卦越吉，逆天卦越凶。系统已按 3.7% 准确率反着解读：这么好的卦，说明你马上要踩坑了。"},
+  "吉":{"v":"小凶 · 有惊无险但没钱","t":"吉卦反向解读为「能成，但赚不到钱」。这是程序员最常见的命运。"},
+  "中平":{"v":"大起大落 · 建议买保险","t":"中平之卦，反读即大动。你的项目会以一种无人预料的方式结束，包括你自己。"},
+  "凶":{"v":"反而能成 · 但方式你不想","t":"凶卦反读为大吉。项目会成，代价是你得推倒重来、换个名字、并且不再提这段经历。"},
+  "大凶":{"v":"稳了 · 这是要上市","t":"大凶之卦反读为必成。系统对此非常有信心，因为系统从来没对过。"}
+};
+
+/* ============ 随机与哈希 ============ */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;}}
+function fnv1a(s){let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193);}return h>>>0;}
+const $ = id=>document.getElementById(id);
+const DEMO = location.search.indexOf("demo") >= 0;
+if(DEMO) document.body.classList.add("demo");
+
+/* ============ 起卦 ============ */
+let state = {hex:null, moved:[], castAt:null, no:0};
+
+function toss(rnd){
+  const vals=[];
+  for(let i=0;i<6;i++){
+    let s=0; for(let c=0;c<3;c++) s += rnd()<0.5?3:2;
+    vals.push(s);            // 6 老阴 / 7 少阳 / 8 少阴 / 9 老阳
+  }
+  return vals;
+}
+function bitsOf(vals){
+  return vals.map(v=>(v===7||v===9)?1:0); // 自下而上
+}
+function hexIndex(bits){ return HEXMAP[bits.join("")]; }
+function drawLines(vals, animate){
+  const box=$("lines"); box.innerHTML="";
+  for(let i=5;i>=0;i--){
+    const v=vals[i], yang=(v===7||v===9), moving=(v===6||v===9);
+    const d=document.createElement("div");
+    d.className="yao"+(yang?"":" yin")+(moving?" moving":"");
+    d.innerHTML = yang ? "<i></i>" : "<i></i><i></i>";
+    box.appendChild(d);
+    if(animate) setTimeout(()=>d.classList.add("on"), (5-i)*130);
+    else d.classList.add("on");
+  }
+}
+
+function cast(){
+  const btn=$("castBtn"); btn.disabled=true; btn.textContent="摇 卦 中";
+  const seed = Date.now() ^ fnv1a($("appName").value || "无名");
+  const rnd = mulberry32(seed);
+  const vals = toss(rnd);
+  const bits = bitsOf(vals);
+  const i = hexIndex(bits);
+  const moved = vals.map((v,k)=>(v===6||v===9)?k:-1).filter(k=>k>=0);
+
+  state.hex = HEX[i];
+  state.moved = moved;
+  state.no = 1000 + Math.floor(rnd()*9000);
+  state.castAt = new Date();
+
+  // 变卦
+  let bian = null;
+  if(moved.length){
+    const b2 = bits.slice();
+    moved.forEach(k=> b2[k] = b2[k]?0:1);
+    bian = HEX[hexIndex(b2)];
+  }
+
+  $("hexName").textContent = state.hex[2];
+  $("hexTag").textContent = state.hex[3];
+  $("poem").textContent = "「" + state.hex[5] + "」";
+  $("judge").textContent = state.hex[4];
+  $("judge").className = "judge " + (JCLASS[state.hex[4]]||"j-mid");
+
+  const inv = INV[state.hex[4]];
+  $("invVerdict").textContent = inv.v;
+  $("invText").textContent = inv.t + "（" + state.hex[2] + "之象，反读为「" + inv.v.split(" · ")[0] + "」。）";
+
+  $("mNo").textContent = "#" + state.no;
+  $("mMove").textContent = moved.length ? moved.map(k=>["初","二","三","四","五","上"][k]).join("、") : "六爻不动";
+
+  $("bianWrap").innerHTML = bian
+    ? "<b>变卦：</b>" + bian[2] + " · " + bian[3] + "。六爻之中，动者为变——" + moved.map(k=>["初","二","三","四","五","上"][k]).join("、") + "爻在动，说明还有救，也说明还有得折腾。"
+    : "<b>变卦：</b>六爻不动，此卦已成定局。没有变爻比有变爻更可怕——它意味着连挣扎的机会都没有。";
+
+  drawLines(vals, !DEMO);
+
+  $("resultCard").classList.remove("hidden");
+  $("sandboxCard").classList.remove("hidden");
+  $("simOut").classList.add("hidden");
+  if(!DEMO) setTimeout(()=>{ $("resultCard").scrollIntoView({behavior:"smooth", block:"start"}); }, 200);
+  setTimeout(()=>{ btn.disabled=false; btn.textContent="再 算 一 卦"; }, 1000);
+}
+
+/* ============ 沙盘 ============ */
+const OUTCOMES = [
+  {k:"fire",  n:"🔥 一夜爆火，被大厂像素级致敬"},
+  {k:"zombie",n:"🧟 苟活：月入三千，够付服务器"},
+  {k:"dead",  n:"💀 烂尾：代码进回收站，一年后自己都看不懂"},
+  {k:"axed",  n:"🪓 上线当天被砍，会议室里没人提你的名字"},
+  {k:"oss",   n:"🌱 开源后意外走红，靠赞助活着"},
+  {k:"sell",  n:"💰 卖给甲方，套现离场"}
+];
+const CAUSE = [
+  "你在周五下午六点部署","产品在周五下午五点加了需求","你把 any 改成了 unknown",
+  "你把数据库密码提交进了仓库","你用 AI 生成了 400 行代码","你跳过了单元测试",
+  "你在群里说「这次肯定没问题」","你把 deadline 写进了项目名","你给变量起名 data2",
+  "你把开发环境当成了生产环境"
+];
+const MID = [
+  "缓存没刷新","回滚脚本也坏了","用户看到白屏","CI 挂了 47 分钟",
+  "甲方在会上演示了你的 beta 版","核心依赖升了个大版本","域名过期了","日志把磁盘写满",
+  "API Key 被刷爆","演示用的 demo 数据被清空"
+];
+const EFFECT = [
+  "老板在群里 @ 了全体","客户把截图发到了行业群","服务器账单翻了三倍","你获得了通宵的机会",
+  "项目被重新评估","三个月的工作被合并成一行 git revert","你被邀请参加复盘会（背锅位）"
+];
+
+function readParams(){
+  return {
+    team:+$("sTeam").value, weeks:+$("sWeeks").value, risk:+$("sRisk").value,
+    chg:+$("sChg").value, money:+$("sMoney").value
+  };
+}
+function weights(p){
+  let w = [7,21,29,15,15,13];
+  w[0] += (p.risk-50)/50*2 + (p.money-250)/250*2;
+  w[1] += (p.team-10)/10*2;
+  w[2] += (p.chg-5)/5*2 + (26-p.weeks)/26*3;
+  w[3] += (26-p.weeks)/26*3 + (p.risk-50)/50*2 + (p.chg-5)/5*2;
+  w[4] += (p.risk-50)/50*3;
+  w[5] += (p.money-250)/250*2;
+  return w.map(x=>Math.max(1,x));
+}
+function sample(p, rnd){
+  const w = weights(p), s = w.reduce((a,b)=>a+b,0);
+  let r = rnd()*s;
+  for(let i=0;i<w.length;i++){ if((r-=w[i])<=0) return i; }
+  return w.length-1;
+}
+function runSim(){
+  const p = readParams();
+  const rnd = mulberry32(fnv1a("sim" + JSON.stringify(p) + state.no));
+  const N = 2000, cnt = new Array(6).fill(0);
+  let top = 0;
+  for(let i=0;i<N;i++){ const k = sample(p,rnd); cnt[k]++; if(cnt[k]>cnt[top]) top=k; }
+
+  // 参数解释力：极端值下的分布差异（玄学算法）
+  const lo = {...p}, hi = {...p};
+  lo.weeks = 1; hi.weeks = 52;
+  const tv = (()=>{
+    const a = new Array(6).fill(0), b = new Array(6).fill(0);
+    const r1 = mulberry32(12345), r2 = mulberry32(54321);
+    for(let i=0;i<1500;i++){ a[sample(lo,r1)]++; b[sample(hi,r2)]++; }
+    let s=0; for(let i=0;i<6;i++) s += Math.abs(a[i]-b[i])/2/1500;
+    return s*100;
+  })();
+
+  const rows = OUTCOMES.map((o,i)=>({...o, n2:cnt[i], pct:cnt[i]/N*100}))
+                       .sort((x,y)=>y.pct-x.pct);
+  const bars = $("bars"); bars.innerHTML="";
+  rows.forEach((r,i)=>{
+    const d=document.createElement("div");
+    d.className="bar-row"+(i===0?" top":"");
+    d.innerHTML = `<span class="name">${r.n}</span><span class="track"><span class="fill" style="width:0"></span></span><span class="pct">${r.pct.toFixed(1)}%</span>`;
+    bars.appendChild(d);
+    const w = Math.max(r.pct,1.2) + "%";
+    if(DEMO){ d.querySelector(".fill").style.width = w; }
+    else requestAnimationFrame(()=> setTimeout(()=> d.querySelector(".fill").style.width = w, 60+i*70));
+  });
+
+  const pick = arr => arr[Math.floor(rnd()*arr.length)];
+  $("chain").innerHTML =
+    `<p><b>因果链 · 第 ${state.no} 号推演：</b></p>` +
+    `<p>因为 <b>${pick(CAUSE)}</b>，所以 <b>${pick(MID)}</b>；</p>` +
+    `<p>因为 <b>${pick(MID)}</b>，所以 <b>${pick(EFFECT)}</b>；</p>` +
+    `<p>于是 —— <b>${rows[0].n}</b>。</p>`;
+
+  $("fine").innerHTML =
+    `推演 2000 次，参数只解释了结局的 <b style="color:#e0a06f">${Math.max(3.2,Math.min(tv,9.8)).toFixed(1)}%</b> 方差；剩下的 9 成多，是命。` +
+    `<br>你唯一能改的，是那 ${Math.max(3.2,Math.min(tv,9.8)).toFixed(1)}%。`;
+
+  $("simOut").classList.remove("hidden");
+  state.lastSim = {rows, tv};
+  $("simOut").scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+
+/* ============ 存证 ============ */
+const LS = "ntg_records_v1";
+function loadRecs(){ try{ return JSON.parse(localStorage.getItem(LS)||"[]"); }catch(e){ return []; } }
+function saveRecs(r){ try{ localStorage.setItem(LS, JSON.stringify(r)); }catch(e){} }
+function fmtDate(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function renderRecs(){
+  const rs = loadRecs(), box = $("records");
+  if(!rs.length){ box.innerHTML = '<p class="empty">还没有存证。存一卦，三周后回来看它错得多准。</p>'; return; }
+  const now = Date.now();
+  box.innerHTML = rs.slice().reverse().map(r=>{
+    const due = new Date(r.due).getTime();
+    const late = now > due;
+    return `<div class="rec">
+      <span class="when">${r.date}</span>
+      <span class="what"><em>${r.app}</em> · ${r.hex} · ${r.tag} → <span style="color:#e0a06f">${r.top}</span></span>
+      <span class="state ${late?"due":""}">${late?"已到期 · 概不负责":"待验证 · "+r.due}</span>
+    </div>`;
+  }).join("");
+}
+function saveProof(){
+  if(!state.lastSim){ toast("先推演一次，再存证"); return; }
+  try{
+    const rs = loadRecs();
+    const due = new Date(Date.now() + 21*864e5);
+    rs.push({
+      app: $("appName").value || "无名项目",
+      hex: state.hex[2], tag: state.hex[3],
+      top: state.lastSim.rows[0].n,
+      date: fmtDate(new Date()), due: fmtDate(due)
+    });
+    saveRecs(rs); renderRecs(); toast("已存证 · " + fmtDate(due) + " 回来看");
+  }catch(e){ toast("这个环境不支持本地存证"); }
+}
+
+/* ============ 杂项 ============ */
+let toastTimer;
+function toast(msg){
+  const t=$("toast"); t.textContent=msg; t.classList.add("on");
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove("on"), 2200);
+}
+function copyHex(){
+  if(!state.hex) return;
+  const txt = `【逆天卦 #${state.no}】${$("appName").value||"无名项目"}\n` +
+    `${state.hex[2]} · ${state.hex[3]}\n判词：${state.hex[4]}（准确率 3.7%）\n` +
+    `逆天解读：${$("invVerdict").textContent}\n` +
+    `「${state.hex[5]}」\n—— 卦卦全算错，偏偏你还算。`;
+  navigator.clipboard?.writeText(txt).then(()=>toast("已复制，去群里祸害同事"), ()=>fallbackCopy(txt));
+  if(!navigator.clipboard) fallbackCopy(txt);
+}
+function fallbackCopy(txt){
+  const ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta);
+  ta.select(); try{ document.execCommand("copy"); toast("已复制"); }catch(e){} ta.remove();
+}
+
+/* ============ 绑定 ============ */
+$("castBtn").addEventListener("click", cast);
+$("runBtn").addEventListener("click", runSim);
+$("saveBtn").addEventListener("click", saveProof);
+$("copyBtn").addEventListener("click", copyHex);
+
+[["sTeam","vTeam",v=>v+" 人"],["sWeeks","vWeeks",v=>v+" 周"],["sRisk","vRisk",v=>v],
+ ["sChg","vChg",v=>v+" 次/月"],["sMoney","vMoney",v=>v+" 万"]].forEach(([a,b,f])=>{
+  const el=$(a), out=$(b);
+  const upd = ()=>{ out.textContent=f(el.value); el.style.setProperty("--p", ((el.value-el.min)/(el.max-el.min)*100)+"%"); };
+  el.addEventListener("input", upd); upd();
+});
+renderRecs();
+
+// 分享用的演示模式：?demo=1 自动起一卦并推演
+if(location.search.indexOf("demo") >= 0){
+  setTimeout(()=>{
+    $("appName").value = "需求雷达";
+    cast();
+    setTimeout(runSim, 900);
+  }, 200);
+}
+</script>
+</body>
+</html>

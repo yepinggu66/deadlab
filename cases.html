@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>案例档案 · 程序员逆天卦-沙盘</title>
+<style>
+:root{
+  --bg:#07080B; --panel:#0D0F14; --panel2:#090B0F;
+  --line:rgba(255,255,255,.075); --line2:rgba(255,255,255,.045);
+  --txt:#F1F3F7; --dim:#8B93A3; --dim2:#565E6E;
+  --red:#FF5A5F; --red2:#FF9A7A; --green:#3EE08F;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg); color:var(--txt); font-family:var(--sans); line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden}
+body::before{content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(760px 420px at 18% -6%, rgba(255,90,95,.12), transparent 62%),
+             radial-gradient(620px 380px at 88% 0%, rgba(80,120,255,.07), transparent 60%);}
+.gridbg{position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px); background-size:26px 26px;
+  -webkit-mask-image:radial-gradient(ellipse 75% 50% at 50% 0%, #000 10%, transparent 78%);
+  mask-image:radial-gradient(ellipse 75% 50% at 50% 0%, #000 10%, transparent 78%);}
+.shell{position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:0 24px 80px}
+
+.top{display:flex; align-items:center; justify-content:space-between; padding:22px 0; border-bottom:1px solid var(--line2); gap:16px}
+.logo{display:flex; align-items:center; gap:11px; font-size:17px; color:var(--txt)}
+.logo .name{font-weight:600}
+.logo .cn{font-family:var(--mono); font-size:12.5px; letter-spacing:.18em; color:var(--dim2); border-left:1px solid var(--line); padding-left:12px}
+.mark{display:grid; grid-template-columns:repeat(3,4px); gap:2px}
+.mark i{width:4px; height:4px; display:block; border-radius:1px; background:var(--red)}
+.mark i:nth-child(2n){background:rgba(255,255,255,.32)}
+a.back{font-family:var(--mono); font-size:12.5px; color:var(--dim); text-decoration:none; border:1px solid var(--line); padding:7px 12px; border-radius:8px; white-space:nowrap}
+a.back:hover{color:var(--txt); border-color:rgba(255,255,255,.22)}
+
+.hero{padding:52px 0 38px}
+.eyebrow{display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12px; letter-spacing:.22em; color:var(--red)}
+.eyebrow::before{content:""; width:24px; height:1px; background:var(--red)}
+.hero h1{margin:16px 0 0; font-size:56px; line-height:1.06; letter-spacing:-.02em; font-weight:600}
+.lead{margin:16px 0 0; font-size:17px; color:var(--dim); max-width:680px}
+
+.case{background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:26px 28px; margin-bottom:16px}
+.case-head{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap}
+.case-no{font-family:var(--mono); font-size:12px; color:var(--red); letter-spacing:.16em}
+.case-head h2{margin:0; font-size:23px; font-weight:600}
+.case-sub{font-size:13.5px; color:var(--dim2)}
+.case-grid{display:grid; grid-template-columns:250px 1fr; gap:26px; margin-top:20px; align-items:center}
+@media(max-width:760px){.case-grid{grid-template-columns:1fr}}
+.hexbox{display:flex; gap:16px; align-items:center; border:1px solid var(--line); background:var(--panel2); border-radius:14px; padding:16px}
+.lines{display:flex; flex-direction:column; gap:7px; width:88px; flex:0 0 auto}
+.yao{display:flex; height:6px; gap:9px}
+.yao i{display:block; flex:1; background:#E9ECF2; border-radius:1px}
+.hn{font-size:19px; font-weight:600; white-space:nowrap}
+.ht{font-family:var(--mono); font-size:10.5px; color:var(--dim2); margin-top:4px; letter-spacing:.2em}
+.metrics{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
+.metric b{display:block; font-family:var(--mono); font-size:31px; font-weight:500; letter-spacing:-.02em}
+.metric b.red{color:var(--red)}
+.metric span{display:block; font-size:11.5px; color:var(--dim2); margin-top:5px}
+.causes{display:flex; gap:10px; flex-wrap:wrap; margin-top:20px}
+.pill{font-family:var(--mono); font-size:11.5px; color:var(--dim); border:1px solid var(--line); border-radius:999px; padding:5px 11px}
+.pill b{color:var(--txt); font-weight:400}
+.line{margin-top:18px; padding:14px 16px; border-left:2px solid var(--red); background:rgba(255,90,95,.05); font-size:13.5px; color:#EAD9D7; line-height:1.75}
+.line.fix{border-left-color:var(--green); background:rgba(62,224,143,.05); color:#CFE9DC; margin-top:10px}
+.line .k{font-family:var(--mono); font-size:10.5px; letter-spacing:.18em; display:block; margin-bottom:4px; color:var(--dim2)}
+.line.fix .k{color:#6FBF95}
+
+.cta{border:1px solid var(--line); border-radius:18px; padding:34px 28px; text-align:center; margin-top:26px; background:linear-gradient(180deg, rgba(255,90,95,.05), transparent)}
+.cta h2{margin:0; font-size:30px; font-weight:600}
+.cta p{margin:10px 0 22px; color:var(--dim); font-size:14.5px}
+a.btn{display:inline-block; background:#EDEFF4; color:#0A0B0E; text-decoration:none; font-weight:600; font-size:15px; padding:14px 28px; border-radius:12px}
+a.btn:hover{background:#fff}
+
+footer{margin-top:32px; padding-top:22px; border-top:1px solid var(--line2); font-size:12px; color:var(--dim2); display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap}
+footer .mono{font-family:var(--mono)}
+</style>
+</head>
+<body>
+<div class="gridbg"></div>
+<div class="shell">
+
+  <div class="top">
+    <div class="logo">
+      <span class="mark"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="name">程序员逆天卦-沙盘</span> <span class="cn">CASE FILES</span>
+    </div>
+    <a class="back" href="index.html">← 回到沙盘</a>
+  </div>
+
+  <section class="hero">
+    <div class="eyebrow">CASE FILES / 01—04</div>
+    <h1>四个项目，四种死法</h1>
+    <p class="lead">全部由同一套六爻模型跑出来，5,000 次推演。数字别当真，排序可以当真。</p>
+  </section>
+
+  <!-- CASE 01 -->
+  <article class="case">
+    <div class="case-head">
+      <span class="case-no">CASE 01</span>
+      <h2>AI 音乐本地化</h2>
+      <span class="case-sub">中文歌 → 英文版，旋律不变</span>
+    </div>
+    <div class="case-grid">
+      <div class="hexbox">
+        <div class="lines">
+          <div class="yao"><i></i><i></i></div>
+          <div class="yao"><i></i><i></i></div>
+          <div class="yao"><i></i></div>
+          <div class="yao"><i></i><i></i></div>
+          <div class="yao"><i></i><i></i></div>
+          <div class="yao"><i></i></div>
+        </div>
+        <div><div class="hn">震为雷</div><div class="ht">1 0 0 1 0 0</div></div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><b>36%</b><span>24 个月存活率</span></div>
+        <div class="metric"><b>第 8 个月</b><span>中位死亡</span></div>
+        <div class="metric"><b class="red">25%</b><span>最可能死于：被上游吃掉</span></div>
+      </div>
+    </div>
+    <div class="causes">
+      <span class="pill">被上游吃掉 <b>25%</b></span>
+      <span class="pill">唱得不够好 <b>21%</b></span>
+      <span class="pill">维护不动 <b>19%</b></span>
+      <span class="pill">六爻：2 / 1 / 1 / 2 / 0 / 1</span>
+    </div>
+    <div class="line">
+      <span class="k">VERDICT</span>
+      法务只看一眼：没有词曲授权，把别人的歌翻成英文并发布，这叫衍生作品。存活率不是 36%，是 <b style="color:#FF9A7A">0</b>。
+    </div>
+    <div class="line fix">
+      <span class="k">FIX</span>
+      换客户：C 端 → B 端（短剧出海、厂牌、游戏本地化，自带版权）。存活率回到 <b>52%</b>，中位死亡推到第 13 个月，命门从「依赖」变成「能力」——唱得好不好，直接决定复购。
+    </div>
+  </article>
+
+  <!-- CASE 02 -->
+  <article class="case">
+    <div class="case-head">
+      <span class="case-no">CASE 02</span>
+      <h2>一个人的 AI 记账 App</h2>
+      <span class="case-sub">消费级工具，单干</span>
+    </div>
+    <div class="case-grid">
+      <div class="hexbox">
+        <div class="lines">
+          <div class="yao"><i></i><i></i></div>
+          <div class="yao"><i></i></div>
+          <div class="yao"><i></i><i></i></div>
+          <div class="yao"><i></i><i></i></div>
+          <div class="yao"><i></i></div>
+          <div class="yao"><i></i></div>
+        </div>
+        <div><div class="hn">水泽节</div><div class="ht">1 1 0 0 1 0</div></div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><b>34%</b><span>24 个月存活率</span></div>
+        <div class="metric"><b>第 8 个月</b><span>中位死亡</span></div>
+        <div class="metric"><b class="red">43%</b><span>最可能死于：没人知道</span></div>
+      </div>
+    </div>
+    <div class="causes">
+      <span class="pill">没人知道 <b>43%</b></span>
+      <span class="pill">维护不动 <b>18%</b></span>
+      <span class="pill">越用越亏 <b>16%</b></span>
+      <span class="pill">六爻：2 / 2 / 1 / 0 / 2 / 1</span>
+    </div>
+    <div class="line">
+      <span class="k">VERDICT</span>
+      功能全做完了，也真的好用。但分发是 0，所以其他都是 0——这是独立开发者最常见的死法，死的时候产品还是好的。
+    </div>
+    <div class="line fix">
+      <span class="k">FIX</span>
+      命门是分发 +1 档：存活率 34% → <b>42%</b>。先别做第三个功能，先做一条能被转发的 demo。
+    </div>
+  </article>
+
+  <!-- CASE 03 -->
+  <article class="case">
+    <div class="case-head">
+      <span class="case-no">CASE 03</span>
+      <h2>外贸合规台</h2>
+      <span class="case-sub">B2B，认证查询 + 单证校验</span>
+    </div>
+    <div class="case-grid">
+      <div class="hexbox">
+        <div class="lines">
+          <div class="yao"><i></i></div>
+          <div class="yao"><i></i><i></i></div>
+          <div class="yao"><i></i><i></i></div>
+          <div class="yao"><i></i></div>
+          <div class="yao"><i></i></div>
+          <div class="yao"><i></i></div>
+        </div>
+        <div><div class="hn">山天大畜</div><div class="ht">1 1 1 0 0 1</div></div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><b>54%</b><span>24 个月存活率</span></div>
+        <div class="metric"><b>第 14 个月</b><span>中位死亡</span></div>
+        <div class="metric"><b class="red">40%</b><span>最可能死于：没人知道</span></div>
+      </div>
+    </div>
+    <div class="causes">
+      <span class="pill">没人知道 <b>40%</b></span>
+      <span class="pill">被上游吃掉 <b>23%</b></span>
+      <span class="pill">准确率不够 <b>15%</b></span>
+      <span class="pill">六爻：3 / 2 / 3 / 1 / 1 / 2</span>
+    </div>
+    <div class="line">
+      <span class="k">VERDICT</span>
+      需求真、毛利高、客户是公司——它最大的风险不是产品，是找不到第二个客户。B2B 的分发不是流量，是销售。
+    </div>
+    <div class="line fix">
+      <span class="k">FIX</span>
+      分发 +1 档（行业渠道 / 展会 / 名单）：存活率 54% → <b>64%</b>，六个爻里最值钱的一爻。
+    </div>
+  </article>
+
+  <!-- CASE 04 -->
+  <article class="case">
+    <div class="case-head">
+      <span class="case-no">CASE 04</span>
+      <h2>AI 陪伴 / 角色应用</h2>
+      <span class="case-sub">C 端，人格化对话</span>
+    </div>
+    <div class="case-grid">
+      <div class="hexbox">
+        <div class="lines">
+          <div class="yao"><i></i></div>
+          <div class="yao"><i></i><i></i></div>
+          <div class="yao"><i></i></div>
+          <div class="yao"><i></i></div>
+          <div class="yao"><i></i><i></i></div>
+          <div class="yao"><i></i></div>
+        </div>
+        <div><div class="hn">火泽睽</div><div class="ht">1 1 0 1 0 1</div></div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><b>49%</b><span>24 个月存活率</span></div>
+        <div class="metric"><b>第 12 个月</b><span>中位死亡</span></div>
+        <div class="metric"><b class="red">35%</b><span>最可能死于：被上游吃掉</span></div>
+      </div>
+    </div>
+    <div class="causes">
+      <span class="pill">被上游吃掉 <b>35%</b></span>
+      <span class="pill">越用越亏 <b>23%</b></span>
+      <span class="pill">没人知道 <b>13%</b></span>
+      <span class="pill">六爻：3 / 2 / 1 / 2 / 0 / 2</span>
+    </div>
+    <div class="line">
+      <span class="k">VERDICT</span>
+      火得越快，死得越快——模型一升级，你的人设就崩；平台一封，你就没了。它死于「太依赖上游」，不是死于「不够好」。
+    </div>
+    <div class="line fix">
+      <span class="k">FIX</span>
+      依赖 +1 档（多模型路由）：存活率 49% → <b>54%</b>；同时把推理成本压到客单价 20% 以下，否则越用越亏。
+    </div>
+  </article>
+
+  <!-- CASE 05 -->
+  <article class="case">
+    <div class="case-head">
+      <span class="case-no">CASE 05</span>
+      <h2>程序员逆天卦-沙盘（我们自己）</h2>
+      <span class="case-sub">九项功能做完之后的自算</span>
+    </div>
+    <div class="case-grid">
+      <div class="hexbox">
+        <div class="lines">
+          <div class="yao"><i></i></div>
+          <div class="yao"><i></i><i></i></div>
+          <div class="yao"><i></i></div>
+          <div class="yao"><i></i></div>
+          <div class="yao"><i></i></div>
+          <div class="yao"><i></i></div>
+        </div>
+        <div><div class="hn">火天大有</div><div class="ht">1 1 1 1 0 1</div></div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><b>67%</b><span>24 个月存活率</span></div>
+        <div class="metric"><b>第 23 个月</b><span>中位死亡</span></div>
+        <div class="metric"><b class="red">34%</b><span>最可能死于：被上游吃掉</span></div>
+      </div>
+    </div>
+    <div class="causes">
+      <span class="pill">被上游吃掉 <b>34%</b></span>
+      <span class="pill">演示很酷没人用 <b>25%</b></span>
+      <span class="pill">维护不动 <b>19%</b></span>
+      <span class="pill">六爻：2 / 3 / 3 / 3 / 1 / 2</span>
+    </div>
+    <div class="line">
+      <span class="k">VERDICT</span>
+      九项做完，存活率从 56% 涨到 67%，中位死亡从第 15 个月推到第 23 个月。但死因更集中了：<b style="color:#FF9A7A">67% 的力气花在补短板，最后剩下的问题只有一个——凭什么不是别人。</b>
+    </div>
+    <div class="line fix">
+      <span class="k">FIX</span>
+      补第五爻（校准数据 + 案例所有权 + 品牌）：存活率 73%。但下一个死因立刻换成「没人真的需要」<b>32%</b>——防抄袭是第二优先级，第一优先级是有人愿意用。
+    </div>
+  </article>
+
+  <section class="cta">
+    <h2>你的项目会怎么死？</h2>
+    <p>六个变量，五千次推演，三条结论：死法、死期、命门。</p>
+    <a class="btn" href="index.html">去跑一次 →</a>
+  </section>
+
+  <footer>
+    <div>
+      <div class="mono" style="margin-bottom:8px">程序员逆天卦-沙盘 · DEADLAB</div>
+      <div class="fnav" style="display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
+        <a href="index.html" style="color:#565E6E;text-decoration:none">沙盘</a>
+        <a href="import.html" style="color:#565E6E;text-decoration:none">导入</a>
+        <a href="cases.html" style="color:#565E6E;text-decoration:none">案例</a>
+        <a href="library.html" style="color:#565E6E;text-decoration:none">案例库</a>
+        <a href="team.html" style="color:#565E6E;text-decoration:none">团队</a>
+        <a href="compare.html" style="color:#565E6E;text-decoration:none">对比</a>
+        <a href="report.html" style="color:#565E6E;text-decoration:none">报告</a>
+        <a href="api.html" style="color:#565E6E;text-decoration:none">API</a>
+      </div>
+    </div>
+    <span>案例为演示用途，数字来自模型推演，不代表真实预测。不构成任何投资或经营建议。</span>
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>一页纸报告 · 程序员逆天卦-沙盘</title>
+<style>
+:root{
+  --red:#D8383F; --ink:#14161A; --mute:#6B7280; --line:#E4E6EB; --paper:#FFFFFF;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#0B0C10;font-family:var(--sans);color:var(--ink);padding:32px 16px}
+.toolbar{max-width:820px;margin:0 auto 16px;display:flex;justify-content:space-between;align-items:center;color:#8B93A3;font-size:12px;gap:12px;flex-wrap:wrap}
+.toolbar a{color:#8B93A3;text-decoration:none;border:1px solid #2A2E38;padding:7px 12px;border-radius:7px;font-family:var(--mono);font-size:11px}
+.toolbar button{background:#EDEFF4;color:#0A0B0E;border:0;padding:9px 18px;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px}
+
+.page{width:820px;max-width:100%;margin:0 auto;background:var(--paper);padding:56px 60px 44px;box-shadow:0 30px 80px rgba(0,0,0,.55)}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--ink);padding-bottom:14px}
+.hd .l{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--mute)}
+.hd h1{margin:8px 0 0;font-size:26px;letter-spacing:-.01em}
+.hd .r{text-align:right;font-family:var(--mono);font-size:11px;color:var(--mute);line-height:1.8}
+.meta{display:flex;gap:24px;margin-top:18px;flex-wrap:wrap;font-size:12px;color:var(--mute)}
+.meta b{color:var(--ink);font-weight:600}
+
+.big{display:flex;align-items:flex-end;gap:26px;margin-top:26px;flex-wrap:wrap}
+.big .n{font-family:var(--mono);font-size:92px;line-height:.9;letter-spacing:-.05em;color:var(--red)}
+.big .lab{font-size:12px;color:var(--mute);line-height:1.7;padding-bottom:8px}
+.big .lab b{display:block;color:var(--ink);font-size:15px}
+.vline{margin-top:20px;border-left:3px solid var(--red);background:#FBF3F3;padding:12px 16px;font-size:14.5px;line-height:1.8;color:#3A2A2A}
+
+.sec{margin-top:30px}
+.sec h2{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;color:var(--mute);margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line);font-weight:500}
+table{width:100%;border-collapse:collapse}
+td,th{padding:9px 10px 9px 0;font-size:12.5px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--mute);font-weight:400}
+td.k{color:var(--mute);width:110px}
+.bar{height:6px;background:#EEF0F4;border-radius:3px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--red);border-radius:3px}
+
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.box{border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.box .t{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:var(--mute)}
+.box .v{font-size:15px;font-weight:600;margin-top:6px}
+.box .d{font-size:12px;color:var(--mute);margin-top:6px;line-height:1.7}
+
+.foot{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);font-size:10.5px;color:var(--mute);line-height:1.9;display:flex;justify-content:space-between;gap:20px}
+.empty{text-align:center;padding:80px 20px;color:var(--mute)}
+.empty a{color:var(--red)}
+
+@media print{
+  body{background:#fff;padding:0}
+  .toolbar{display:none}
+  .page{box-shadow:none;width:auto;max-width:none;padding:16mm 16mm 10mm}
+  @page{size:A4;margin:0}
+}
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <a href="index.html">← 回到沙盘</a>
+  <button onclick="window.print()">打印 / 存为 PDF</button>
+</div>
+
+<div class="page" id="page">
+  <div class="empty" id="empty">还没有推演记录。<br><br><a href="index.html">先去跑一次 →</a></div>
+</div>
+
+<script src="engine.js"></script>
+<script>
+const {VARS, CAUSES, bitsOf, hexOf} = DEADLAB;
+let d = null;
+try{ d = JSON.parse(localStorage.getItem("deadlab_last") || "null"); }catch(e){}
+
+if(d){
+  document.getElementById('empty').remove();
+  const page = document.getElementById('page');
+  const lv = d.lv || {};
+  const causes = d.causes || [];
+  const date = d.date || '';
+  const vetoed = !!d.vetoed;
+
+  const hexLines = (bits) => {
+    let html = '';
+    for(let i=5;i>=0;i--){
+      const b = bits[i] === '1';
+      html += `<div style="display:flex;gap:8px;height:6px;margin-bottom:5px;width:96px">
+        ${b?'<i style="flex:1;background:#14161A;border-radius:1px"></i>':'<i style="flex:1;background:#14161A;border-radius:1px"></i><i style="flex:1;background:#14161A;border-radius:1px"></i>'}
+      </div>`;
+    }
+    return `<div style="display:flex;flex-direction:column">${html}</div>`;
+  };
+
+  const deathRows = causes.map(([name,pct])=>{
+    const key = Object.keys(CAUSES).find(k=>CAUSES[k].n===name);
+    const c = key ? CAUSES[key] : {s:'—', t:'—'};
+    return `<tr><td><b>${name}</b><div class="bar"><i style="width:${pct}%"></i></div></td>
+      <td>${c.s}</td><td>${c.t}</td></tr>`;
+  }).join('');
+
+  page.innerHTML = `
+  <div class="hd">
+    <div class="l">PRE-MORTEM REPORT · 程序员逆天卦-沙盘
+      <h1>${d.project || '未命名项目'}</h1>
+    </div>
+    <div class="r">RUN #${d.id || '—'}<br>${date}<br>DEADLAB / v0.4</div>
+  </div>
+
+  <div class="meta">
+    <span>卦象 <b>${d.hex || '—'}</b></span>
+    <span>六爻 <b>${(d.bits||'------').split('').join(' ')}</b></span>
+    <span>推演 <b>5,000 次 / 24 个月</b></span>
+  </div>
+
+  ${vetoed ? `
+    <div class="big"><div class="n">0%</div>
+      <div class="lab"><b>被一票否决</b>${(d.vetoes||[]).join('、')}<br>解决否决项之前，六爻没有意义。</div></div>
+  ` : `
+    <div class="big">
+      <div class="n">${d.s12}%</div>
+      <div class="lab"><b>24 个月存活率</b>5,000 次蒙特卡洛推演的相对值<br>绝对值别信，排序可信。</div>
+      ${hexLines(d.bits || '000000')}
+    </div>
+    ${d.verdict ? `<div class="vline">${d.verdict}</div>` : ''}
+  `}
+
+  <div class="sec">
+    <h2>六爻 · 六个变量</h2>
+    <table><tbody>
+      ${VARS.map(v=>`<tr><td class="k">${v.yao}爻 · ${v.name}</td>
+        <td>${v.lv[(lv[v.k]!==undefined?lv[v.k]:1)]}</td>
+        <td style="color:#6B7280">${v.q}</td></tr>`).join('')}
+    </tbody></table>
+  </div>
+
+  ${!vetoed ? `
+  <div class="sec">
+    <h2>阻力 · RESISTANCE / 最先死在哪</h2>
+    <table><thead><tr><th>死法</th><th>最早的信号</th><th>止损动作</th></tr></thead>
+    <tbody>${deathRows}</tbody></table>
+  </div>
+
+  <div class="sec">
+    <h2>动作 · ONE ACTION / 只改一爻</h2>
+    <div class="cards">
+      <div class="box"><div class="t">ONE LEVER</div>
+        <div class="v">改「${(d.lever && d.lever.name) || '—'}」</div>
+        <div class="d">${d.lever ? `+1 档后，24 个月存活率到 ${d.lever.after}%。` : '六爻已满，没有更好的输入。'}</div></div>
+      <div class="box"><div class="t">NEXT</div>
+        <div class="v">先做这一件</div>
+        <div class="d">${(causes[0] && (Object.values(CAUSES).find(c=>c.n===causes[0][0])||{}).t) || '—'}</div></div>
+    </div>
+  </div>` : ''}
+
+  <div class="foot">
+    <span>这不是预测，是压力测试。<br>数字来自模型推演，不构成投资或经营建议。</span>
+    <span style="text-align:right">程序员逆天卦-沙盘 · DEADLAB<br>Every AI writes your plan. We kill it first.</span>
+  </div>`;
+}
+</script>
+</body>
+</html>

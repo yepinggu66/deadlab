@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>案例库 · 程序员逆天卦-沙盘</title>
+<link rel="stylesheet" href="ui.css">
+<style>
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 6px}
+.tools input{flex:1;min-width:200px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px 14px;color:var(--txt);font-size:13.5px;outline:none}
+.tools input:focus{border-color:rgba(255,90,95,.45)}
+.tools select{width:200px}
+.tb-wrap{max-height:640px;overflow:auto;border:1px solid var(--line2);border-radius:12px;margin-top:12px}
+.tb-wrap table{margin:0}
+.tb-wrap thead th{position:sticky;top:0;background:var(--panel);z-index:2;padding-top:12px}
+.tb-wrap td{font-size:12.5px}
+.pct{font-family:var(--mono)}
+.pct.hi{color:var(--green)} .pct.mid{color:var(--amber)} .pct.lo{color:var(--red2)}
+.count{font-family:var(--mono);font-size:11px;color:var(--dim2);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="gridbg"></div>
+<div class="shell">
+  <div class="top">
+    <a class="logo" href="index.html"><span class="mark"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="name">程序员逆天卦-沙盘</span><span class="cn">LIBRARY</span></a>
+    <div class="nav">
+      <a href="index.html">沙盘</a><a href="import.html">导入</a><a href="cases.html">案例</a><a class="on" href="library.html">案例库</a>
+      <a href="team.html">团队</a><a href="compare.html">对比</a><a href="report.html">报告</a><a href="api.html">API</a>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="eyebrow">LIBRARY / 100 ARCHETYPES</div>
+    <h1>一百个项目，一百种死法</h1>
+    <p class="lead">按行业和类型归类的项目原型，同一套六爻模型跑出来的存活率。找和你最像的那一个。</p>
+  </section>
+
+  <section class="card">
+    <div class="sec"><span class="n">01</span><h2>INDEX</h2><em>检索</em><span class="rule"></span></div>
+    <div class="tools">
+      <input id="q" placeholder="搜名称或行业，例如：记账 / 外贸 / AI">
+      <select class="sel" id="sector"></select>
+      <select class="sel" id="sort">
+        <option value="s">按存活率排序</option>
+        <option value="n">按名称排序</option>
+      </select>
+    </div>
+    <div class="count" id="count"></div>
+    <div class="tb-wrap"><table class="tb" id="tb"></table></div>
+  </section>
+
+  <footer>
+    <div>
+      <div class="mono" style="margin-bottom:8px">程序员逆天卦-沙盘 · DEADLAB</div>
+      <div class="fnav"><a href="index.html">沙盘</a><a href="import.html">导入</a><a href="cases.html">案例</a><a href="library.html">案例库</a><a href="team.html">团队</a><a href="compare.html">对比</a><a href="report.html">报告</a><a href="api.html">API</a></div>
+    </div>
+    <span>100 个示例档案，用于对照，不是真实公司数据。</span>
+  </footer>
+</div>
+
+<script src="engine.js"></script>
+<script>
+const {runSim, CAUSES} = DEADLAB;
+const RAW = [
+["AI 代码审查","开发者工具",3,2,2,1,2,2],["终端 AI 助手","开发者工具",3,2,1,1,1,2],
+["日志聚合","开发者工具",2,3,2,1,2,2],["API 调试器","开发者工具",2,3,2,1,2,3],
+["数据库 GUI","开发者工具",2,3,3,1,2,3],["低代码表单","开发者工具",2,2,2,1,1,2],
+["一键部署平台","开发者工具",3,2,1,1,0,2],["监控告警","开发者工具",3,3,3,1,1,2],
+["测试用例生成","开发者工具",2,2,1,1,2,1],["Git 可视化","开发者工具",2,3,2,2,3,3],
+["文档站生成","开发者工具",2,3,2,2,3,2],["内网穿透","开发者工具",2,3,2,1,1,2],
+["AI 简历优化","AI 应用",2,2,1,1,1,1],["AI 面试模拟","AI 应用",2,2,1,1,1,1],
+["AI 论文润色","AI 应用",3,2,1,2,1,2],["AI 翻译插件","AI 应用",2,2,1,2,0,1],
+["AI 播客生成","AI 应用",2,1,1,1,0,1],["AI 视频剪辑","AI 应用",3,1,1,2,0,2],
+["AI 数字人口播","AI 应用",3,1,1,2,0,1],["AI 客服机器人","AI 应用",3,2,2,1,1,2],
+["AI 法律咨询","AI 应用",3,1,2,1,1,2],["AI 心理陪伴","AI 应用",3,2,1,2,0,2],
+["AI 健身教练","AI 应用",2,2,1,1,1,1],["AI 菜谱","AI 应用",2,3,0,1,2,1],
+["AI 旅行规划","AI 应用",2,2,0,1,1,1],["AI 取名","AI 应用",1,3,0,2,3,2],
+["AI 塔罗","AI 应用",1,3,1,2,2,1],["AI 占卜沙盘","AI 应用",1,3,2,2,3,2],
+["外贸单证校验","B2B SaaS",3,2,3,1,1,2],["认证查询","B2B SaaS",3,2,2,1,1,2],
+["HS 编码归类","B2B SaaS",3,2,3,1,2,2],["供应商验厂","B2B SaaS",3,2,3,1,1,2],
+["设备点检","B2B SaaS",3,2,3,1,2,2],["食品厂受控文件","B2B SaaS",3,2,3,1,3,2],
+["门店巡检","B2B SaaS",3,2,2,1,2,2],["排班系统","B2B SaaS",3,3,2,1,2,2],
+["报销审批","B2B SaaS",3,3,1,1,1,2],["合同审查","B2B SaaS",3,2,2,1,1,2],
+["电子签","B2B SaaS",3,3,2,1,0,3],["发票识别","B2B SaaS",3,3,2,1,1,3],
+["库存管理","B2B SaaS",3,3,2,1,2,2],["工单系统","B2B SaaS",3,3,2,1,2,2],
+["轻量 CRM","B2B SaaS",2,3,2,1,2,2],["招聘 ATS","B2B SaaS",2,3,2,1,1,2],
+["薪酬核算","B2B SaaS",3,2,3,1,2,2],["合规培训","B2B SaaS",3,2,2,1,2,1],
+["碳排核算","B2B SaaS",2,2,2,1,2,1],["ESG 报告","B2B SaaS",2,2,3,1,2,1],
+["记账 App","消费",2,2,1,0,2,1],["习惯打卡","消费",1,3,1,1,3,1],
+["冥想","消费",2,3,1,1,2,1],["睡眠监测","消费",2,2,0,1,1,1],
+["经期记录","消费",2,3,0,1,2,2],["宠物健康","消费",2,2,1,1,2,1],
+["宠物殡葬","消费",2,2,3,1,2,2],["二手书交易","消费",1,2,0,1,1,1],
+["校园二手","消费",1,3,0,1,2,1],["同城活动","消费",1,2,0,1,1,1],
+["拼车","消费",1,2,1,1,0,1],["租房找房","消费",2,2,1,1,1,2],
+["装修报价","消费",2,2,2,1,2,2],["婚礼策划","消费",2,2,2,1,2,2],
+["摄影约拍","消费",2,3,2,1,3,2],
+["少儿编程","教育",2,3,2,1,2,2],["考研刷题","教育",3,3,1,1,2,1],
+["雅思口语","教育",3,2,2,1,1,2],["钢琴陪练","教育",2,2,2,1,2,2],
+["作业批改","教育",3,1,1,1,1,2],["错题本","教育",2,3,0,1,2,1],
+["留学文书","教育",2,2,2,1,1,2],["职业技能","教育",2,3,2,1,1,2],
+["企业内训","教育",3,2,2,1,2,2],["汉字识字","教育",2,3,1,1,3,2],
+["古诗文","教育",2,3,1,1,3,2],["科学实验","教育",2,3,1,1,2,1],
+["慢病管理","医疗健康",3,2,2,1,1,2],["用药提醒","医疗健康",2,3,1,1,2,2],
+["康复训练","医疗健康",3,2,2,1,1,2],["心理咨询预约","医疗健康",3,2,2,1,2,2],
+["体检报告解读","医疗健康",2,2,1,1,1,1],["中医体质","医疗健康",2,3,1,1,2,1],
+["牙科预约","医疗健康",3,3,3,1,2,2],["运动康复","医疗健康",2,2,2,1,2,2],
+["记账理财","金融",2,3,1,1,1,2],["保险对比","金融",2,2,2,1,1,2],
+["信用卡管理","金融",2,3,1,1,1,2],["小微企业记账","金融",3,2,3,1,2,2],
+["发票贷","金融",2,2,3,1,0,2],["催收系统","金融",3,2,3,1,2,2],
+["反欺诈","金融",3,2,3,1,1,2],
+["短剧出海","内容/游戏",3,2,2,2,0,2],["网文翻译","内容/游戏",3,2,2,1,0,2],
+["有声书","内容/游戏",2,2,1,1,1,2],["播客托管","内容/游戏",2,3,1,1,2,2],
+["独立游戏","内容/游戏",2,1,1,2,3,1],["剧本杀","内容/游戏",2,3,2,1,3,2],
+["桌游约局","内容/游戏",1,2,0,1,2,1],["音乐教学","内容/游戏",2,3,2,1,2,2],
+["乐谱识别","内容/游戏",2,3,1,1,2,1],["翻唱社区","内容/游戏",2,2,1,2,0,1]
+];
+
+const rows = RAW.map(r=>{
+  const lv = {need:r[2], cap:r[3], econ:r[4], dist:r[5], dep:r[6], stam:r[7]};
+  const s = runSim(lv, 600, 1234);
+  const top = Object.entries(s.causeShare).sort((a,b)=>b[1]-a[1])[0];
+  return {name:r[0], sector:r[1], pct:Math.round(s.s12*100), cause:CAUSES[top[0]].n, c:Math.round(top[1]*100)};
+});
+
+const sectors = [...new Set(rows.map(r=>r.sector))];
+const sel = document.getElementById('sector');
+sel.innerHTML = '<option value="">全部行业</option>' + sectors.map(s=>`<option>${s}</option>`).join('');
+
+let sortKey = 's';
+function draw(){
+  const q = document.getElementById('q').value.trim();
+  const sec = sel.value;
+  let list = rows.filter(r=> (!q || r.name.includes(q) || r.sector.includes(q)) && (!sec || r.sector===sec));
+  list.sort(sortKey==='s' ? (a,b)=>b.pct-a.pct : (a,b)=>a.name.localeCompare(b.name,'zh'));
+  const cls = p => p>=55?'hi':p>=40?'mid':'lo';
+  document.getElementById('count').textContent = `${list.length} / ${rows.length} 条`;
+  document.getElementById('tb').innerHTML =
+    `<thead><tr><th>#</th><th>项目</th><th>行业</th><th>24 个月存活率</th><th>最可能死于</th></tr></thead><tbody>`+
+    list.map((r,i)=>`<tr><td>${String(i+1).padStart(3,'0')}</td><td>${r.name}</td><td>${r.sector}</td>
+      <td class="pct ${cls(r.pct)}">${r.pct}%</td><td>${r.cause} <span style="color:var(--dim2)">${r.c}%</span></td></tr>`).join('')+
+    `</tbody>`;
+}
+['q','sector','sort'].forEach(id=>document.getElementById(id).addEventListener('input', e=>{
+  if(id==='sort') sortKey = e.target.value;
+  draw();
+}));
+draw();
+</script>
+</body>
+</html>
