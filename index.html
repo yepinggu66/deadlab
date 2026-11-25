@@ -96,13 +96,17 @@ a.cases-link:hover{color:var(--txt); border-color:rgba(255,255,255,.22)}
 .lbl .idx{font-family:var(--mono); font-size:11.2px; color:var(--dim2); letter-spacing:.12em}
 .lbl .n{font-size:16.5px; margin-left:7px; color:var(--txt)}
 .lbl .q{display:block; font-size:13px; color:var(--dim2); margin-top:1px}
-.seg{display:grid; grid-template-columns:repeat(4,1fr); gap:4px; padding:4px; background:var(--panel2); border:1px solid var(--line2); border-radius:12px}
+.seg{display:grid; grid-template-columns:repeat(5,1fr); gap:4px; padding:4px; background:var(--panel2); border:1px solid var(--line2); border-radius:12px}
 .seg button{border:0; background:transparent; color:var(--dim); font-family:var(--sans); font-size:14.2px; padding:9px 3px; border-radius:8px; cursor:pointer; transition:background .15s,color .15s}
 .seg button:hover{background:rgba(255,255,255,.045); color:var(--txt)}
 .seg button.on{background:#EDEFF4; color:#0A0B0E; font-weight:600}
+.seg button.unknown.on{background:rgba(255,196,107,.16); color:#FFC46B; border:1px solid rgba(255,196,107,.28)}
+.answer-state{margin-top:12px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.answer-state span{font-family:var(--mono);font-size:11.5px;color:var(--dim2)}
+.answer-state b{color:var(--txt);font-weight:500}
 @media(max-width:760px){
   .row{grid-template-columns:1fr; gap:8px}
-  .seg button{font-size:13px; padding:8px 2px}
+  .seg button{font-size:11.5px; padding:8px 1px}
 }
 
 /* buttons */
@@ -268,6 +272,23 @@ footer .mono{font-family:var(--mono); letter-spacing:.06em}
 .pbtn{display:inline-block;text-align:center;border:1px solid var(--line);border-radius:9px;padding:10px;color:var(--txt);text-decoration:none;font-size:12.5px}
 .pbtn:hover{border-color:rgba(255,255,255,.25)}
 .pv.hot .pbtn{background:#EDEFF4;color:#0A0B0E;border-color:#EDEFF4;font-weight:600}
+
+/* projects */
+.project-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.project-tools button{font-size:12px;padding:8px 12px}
+.project-list{display:flex;flex-direction:column;margin-top:12px}
+.project-row{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line2)}
+.project-row:last-child{border-bottom:none}
+.project-main{min-width:0}
+.project-name{font-size:14.5px;color:var(--txt);overflow-wrap:anywhere}
+.project-meta{font-family:var(--mono);font-size:10.5px;color:var(--dim2);margin-top:5px;line-height:1.7;overflow-wrap:anywhere}
+.project-score{font-family:var(--mono);font-size:18px;color:var(--red2);margin-right:6px}
+.project-btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.project-btns button{font-size:10.5px;padding:5px 8px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--dim);cursor:pointer;font-family:var(--mono)}
+.project-btns button:hover{color:var(--txt);border-color:rgba(255,255,255,.24)}
+.project-btns button:disabled{opacity:.35;cursor:default}
+.project-empty{font-size:13px;color:var(--dim2);padding:10px 0}
+@media(max-width:760px){.project-row{grid-template-columns:1fr}.project-btns{justify-content:flex-start}}
 </style>
 </head>
 <body>
@@ -283,7 +304,7 @@ footer .mono{font-family:var(--mono); letter-spacing:.06em}
       <a class="cases-link" href="import.html">导入项目</a>
       <a class="cases-link" href="cases.html">CASE FILES →</a>
       <a class="cases-link" href="en/index.html" style="border:1px solid rgba(255,255,255,.25);padding:3px 9px;border-radius:4px;color:#EDEFF4;font-weight:600">🌐 EN</a>
-      <div class="tag">PRE-MORTEM · v0.4</div>
+      <div class="tag">PRE-MORTEM · v0.5</div>
     </div>
   </div>
 
@@ -313,6 +334,10 @@ footer .mono{font-family:var(--mono); letter-spacing:.06em}
       </div>
     </div>
     <div class="rows" id="rows"></div>
+    <div class="answer-state">
+      <span>已判断 <b id="answerCount">0</b> / 6 · 每一爻都要做选择，不确定也可明确标记</span>
+      <span id="answerHint">还差 6 爻</span>
+    </div>
     <button class="primary" id="runBtn">推演 5,000 次 →</button>
   </section>
 
@@ -401,24 +426,38 @@ footer .mono{font-family:var(--mono); letter-spacing:.06em}
   </section>
 
   <!-- 06 -->
+  <section class="card" id="projectsCard">
+    <div class="sec"><span class="n">06</span><h2>PROJECTS</h2><em>项目档案</em><span class="rule"></span></div>
+    <p class="desc">保存多个方案；打开、对比或生成报告都从同一个项目记录出发。</p>
+    <div class="project-tools">
+      <button class="ghost" id="newProjectBtn">新建项目</button>
+      <button class="ghost" id="saveProjectBtn">保存当前项目</button>
+      <button class="ghost" id="exportProjectsBtn">导出全部 JSON</button>
+      <button class="ghost" id="importProjectsBtn">导入 JSON</button>
+      <input type="file" id="projectsInput" accept=".json,application/json" hidden>
+    </div>
+    <div class="project-list" id="projectList"></div>
+  </section>
+
+  <!-- 07 -->
   <section class="card">
-    <div class="sec"><span class="n">06</span><h2>LEDGER</h2><em>存证 · 校准</em><span class="rule"></span></div>
+    <div class="sec"><span class="n">07</span><h2>LEDGER</h2><em>存证 · 校准</em><span class="rule"></span></div>
     <p class="desc">每次推演都可以存下来，90 天后回来对账。我们不承诺 98%，我们公布"说 70% 的事，实际发生了多少次"。</p>
     <div class="calib" id="calib">校准中：还没有到期的存证。</div>
     <div id="records"><p class="empty">还没有存证。存一条，90 天后回来看它准不准。</p></div>
     <button class="ghost hidden" id="saveBtn" style="margin-top:16px">存下这次推演</button>
   </section>
 
-  <!-- 07 -->
+  <!-- 08 -->
   <section class="card">
-    <div class="sec"><span class="n">07</span><h2>DAILY</h2><em>今日一卦</em><span class="rule"></span></div>
+    <div class="sec"><span class="n">08</span><h2>DAILY</h2><em>今日一卦</em><span class="rule"></span></div>
     <p class="desc">每天一个项目类型，同一天所有人算到同一卦。</p>
     <div class="daily" id="daily"></div>
   </section>
 
-  <!-- 08 -->
+  <!-- 09 -->
   <section class="card">
-    <div class="sec"><span class="n">08</span><h2>PRICING</h2><em>定价</em><span class="rule"></span></div>
+    <div class="sec"><span class="n">09</span><h2>PRICING</h2><em>定价</em><span class="rule"></span></div>
     <p class="desc">先卖单次，再谈订阅。¥9.9 不是收入，是一道测试题：有没有人愿意为一份报告掏钱。</p>
     <div class="price">
       <div class="pv"><div class="k">FREE</div><div class="v">¥0</div>
@@ -454,140 +493,64 @@ footer .mono{font-family:var(--mono); letter-spacing:.06em}
   </div>
 </div>
 
+<script src="store.js"></script>
+<script src="engine.js"></script>
 <script>
-/* ============ 六十四卦 ============ */
-const T = {乾:[1,1,1],兑:[1,1,0],离:[1,0,1],震:[1,0,0],巽:[0,1,1],坎:[0,1,0],艮:[0,0,1],坤:[0,0,0]};
-const HEX = [
-["乾","乾","乾为天","一次编译通过"],["坤","坤","坤为地","需求全接"],["坎","震","水雷屯","初始化即崩"],
-["艮","坎","山水蒙","文档缺失"],["坎","乾","水天需","等产品确认"],["乾","坎","天水讼","甩锅大会"],
-["坤","坎","地水师","全员上线"],["坎","坤","水地比","结对编程"],["巽","乾","风天小畜","攒够一次发版"],
-["乾","兑","天泽履","踩到线上"],["坤","乾","地天泰","灰度零事故"],["乾","坤","天地否","联调不通"],
-["乾","离","天火同人","开源有人 PR"],["离","乾","火天大有","一夜爆火"],["坤","艮","地山谦","没人 star"],
-["震","坤","雷地豫","提前交付"],["兑","震","泽雷随","跟着竞品改"],["艮","巽","山风蛊","祖传代码"],
-["坤","兑","地泽临","用户来了"],["巽","坤","风地观","只看不买"],["离","震","火雷噬嗑","咬咬牙重构"],
-["艮","离","山火贲","皮肤好看"],["艮","坤","山地剥","功能被砍"],["坤","震","地雷复","回滚"],
-["乾","震","天雷无妄","无妄之 bug"],["艮","乾","山天大畜","技术债到期"],["艮","震","山雷颐","自己吃自己"],
-["兑","巽","泽风大过","过度设计"],["坎","坎","坎为水","深夜宕机"],["离","离","离为火","服务器烧了"],
-["兑","艮","泽山咸","用户心动"],["震","巽","雷风恒","长期维护"],["乾","艮","天山遁","转身跑路"],
-["震","乾","雷天大壮","猛加需求"],["离","坤","火地晋","顺利晋升"],["坤","离","地火明夷","背锅"],
-["巽","离","风火家人","小团队"],["离","兑","火泽睽","前后端吵架"],["坎","艮","水山蹇","卡在支付"],
-["震","坎","雷水解","问题自解"],["艮","兑","山泽损","砍功能省钱"],["巽","震","风雷益","性能起飞"],
-["兑","乾","泽天夬","一键删除"],["乾","巽","天风姤","遇上甲方"],["兑","坤","泽地萃","用户聚集"],
-["坤","巽","地风升","稳步增长"],["兑","坎","泽水困","预算见底"],["坎","巽","水风井","共用一个 API"],
-["兑","离","泽火革","推翻重做"],["离","巽","火风鼎","立新架构"],["震","震","震为雷","半夜惊醒"],
-["艮","艮","艮为山","停止维护"],["巽","艮","风山渐","慢慢变好"],["震","兑","雷泽归妹","嫁给外包"],
-["震","离","雷火丰","流量洪峰"],["离","艮","火山旅","出差演示"],["巽","巽","巽为风","需求风吹"],
-["兑","兑","兑为泽","用户好评"],["巽","坎","风水涣","团队散了"],["坎","兑","水泽节","限流"],
-["巽","兑","风泽中孚","用户信任"],["震","艮","雷山小过","小 bug 不断"],["坎","离","水火既济","上线即完成"],
-["离","坎","火水未济","永远差一点"]
-];
-const HEXMAP = {};
-HEX.forEach((h,i)=>{ HEXMAP[[...T[h[1]],...T[h[0]]].join("")] = i; });
-
-/* ============ 六爻 ============ */
-const VARS = [
-  {k:'need', yao:'初', name:'需求', q:'有人真的痛吗', lv:['自嗨','有人问','有人付钱','供不应求'], cause:'demo'},
-  {k:'cap',  yao:'二', name:'能力', q:'智能体做得对吗', lv:['做不出','能跑但常错','基本可信','稳定可用'], cause:'trust'},
-  {k:'econ', yao:'三', name:'经济', q:'越用越赚还是越亏', lv:['越用越亏','勉强持平','有毛利','很赚'], cause:'cost'},
-  {k:'dist', yao:'四', name:'分发', q:'人从哪来', lv:['没入口','几个熟人','稳定流量','自己会涨'], cause:'dist'},
-  {k:'dep',  yao:'五', name:'依赖', q:'上游会不会吃掉你', lv:['全靠上游','单点依赖','有备选','自主'], cause:'dep'},
-  {k:'stam', yao:'上', name:'续航', q:'你还能撑多久', lv:['快撑不住','还能半年','能撑两年','长期主义'], cause:'burn'}
-];
-const CAUSES = {
-  demo:{n:'演示很酷，没人用', s:'上线 4 周，周活 < 20，且没人第二次打开', t:'停更两周，去做 10 个用户访谈'},
-  trust:{n:'准确率不够，用户不敢用', s:'每 5 次任务出 1 次明显错误，用户开始手动复核', t:'砍掉不确定场景，只留可验证的任务'},
-  cost:{n:'越用越亏，成本高于客单价', s:'单用户月成本 > 客单价 30%，且用量还在涨', t:'换小模型 / 涨价 / 加限流'},
-  dist:{n:'没人知道它存在', s:'发布 3 次，累计注册 < 100，自然流量为 0', t:'停开发，先做一条能传播的 demo'},
-  dep:{n:'被上游一口吃掉', s:'上游一次版本更新，核心能力失效 48 小时', t:'加抽象层 + 多模型路由'},
-  burn:{n:'维护不动了', s:'连续 6 周没有提交，issue 堆积 > 30', t:'砍到只剩一个功能，或找人接手'}
-};
-const CKEYS = Object.keys(CAUSES);
-const BASE = {demo:.030, trust:.024, cost:.020, dist:.030, dep:.016, burn:.022};
-const K = 0.62;
-
-/* ============ 随机 ============ */
-function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;}}
-function fnv1a(s){let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193);}return h>>>0;}
+const {VARS, CAUSES, CKEYS, BASE, K, runSim, bitsOf, hexOf, verseOf, fnv1a} = DEADLAB;
+const {escapeHTML:esc} = DEADLAB_STORE;
 const $ = id=>document.getElementById(id);
 const DEMO = location.search.indexOf('demo')>=0;
 if(DEMO) document.body.classList.add('demo');
 
 /* ============ 状态 ============ */
 const state = {
-  lv:{need:1,cap:1,econ:1,dist:1,dep:1,stam:1},
+  projectId:DEADLAB_STORE.uid(),
+  projectCreatedAt:Date.now(),
+  projectSource:'', projectMeta:'',
+  lv:{need:null,cap:null,econ:null,dist:null,dep:null,stam:null},
+  unknown:{need:false,cap:false,econ:false,dist:false,dep:false,stam:false},
   veto:{copy:false,lic:false,plat:false}, vetoes:[],
   result:null, lever:null, simId:0, movingYao:-1,
   prevSeries:null, prevS12:null, prevHex:null, defyApplied:0
 };
 
-/* ============ 仿真 ============ */
-const shape = m => 1.25 - 0.018*m;
-const factor = lv => { const f=(3-lv)/3; return 0.14 + 1.7*Math.pow(f,1.7); };
-
-function runSim(lv, N, seed){
-  const rnd = mulberry32(seed);
-  const surv = new Array(25).fill(0);
-  const deaths = {}; CKEYS.forEach(k=>deaths[k]=0);
-  const outs = {'小生意':0,'被上游收编':0,'苟活':0,'开源走红':0};
-  let deadCount = 0;
-  const hs = new Array(6).fill(0);
-  for(let i=0;i<N;i++){
-    let dead = 0, cause = null;
-    for(let m=1;m<=24;m++){
-      let total = 0;
-      for(let j=0;j<6;j++){
-        const h = BASE[CKEYS[j]] * shape(m) * factor(lv[VARS[j].k]) * K;
-        hs[j] = h; total += h;
-      }
-      if(rnd() < total){
-        let r = rnd()*total, idx=5;
-        for(let j=0;j<6;j++){ r -= hs[j]; if(r<=0){ idx=j; break; } }
-        cause = CKEYS[idx]; dead = m; break;
-      }
-    }
-    for(let t=0;t<=24;t++){ if(!dead || t < dead) surv[t]++; }
-    if(dead){ deaths[cause]++; deadCount++; }
-    else {
-      const r = rnd();
-      if(lv.need>=2 && lv.dist>=2 && lv.econ>=2) outs['小生意']++;
-      else if(lv.dep<=1) outs['被上游收编']++;
-      else if(r<0.5) outs['苟活']++;
-      else outs['开源走红']++;
-    }
-  }
-  const s = surv.map(c=>c/N);
-  let median = 24;
-  for(let t=0;t<=24;t++){ if(s[t] <= 0.5){ median = t; break; } }
-  const causeShare = {};
-  CKEYS.forEach(k=>causeShare[k] = deadCount ? deaths[k]/deadCount : 0);
-  const outTop = Object.entries(outs).sort((a,b)=>b[1]-a[1])[0];
-  return {s, median, causeShare, deadCount, outTop, N, survivors:N-deadCount};
-}
-
-/* ============ 卦象 ============ */
-function bitsOf(lv){ return VARS.map(v => lv[v.k] >= 2 ? 1 : 0); }
-function hexOf(lv){ return HEX[HEXMAP[bitsOf(lv).join("")]]; }
-function verseOf(lv){
-  const weak = VARS.filter(v=>lv[v.k] <= 1);
-  const strong = VARS.filter(v=>lv[v.k] >= 2);
-  if(!weak.length) return "六爻纯阳。六个维度全在阳位——这种卦一般不是算出来的，是吹出来的。";
-  if(!strong.length) return "六爻皆阴。六个维度全空——此局从第一步就该停。";
-  return weak.length + " 爻在阴位（" + weak.map(v=>v.name).join("、") + "），" +
-         strong.length + " 爻在阳位。阴处就是最先裂开的地方。";
-}
-
 /* ============ 渲染 ============ */
+function isComplete(){
+  return VARS.every(v=>Number.isInteger(state.lv[v.k]) && state.lv[v.k]>=0 && state.lv[v.k]<=3);
+}
+function hasVeto(){
+  return Object.values(state.veto).some(Boolean);
+}
+function canCast(){
+  return isComplete() || hasVeto();
+}
+function syncGate(){
+  const count = VARS.filter(v=>Number.isInteger(state.lv[v.k])).length;
+  $("answerCount").textContent = count;
+  $("answerHint").textContent = count===6 ? (Object.values(state.unknown).some(Boolean) ? "可以推演，含明确标记的不确定项" : "6 爻已确认") : "还差 " + (6-count) + " 爻";
+  $("runBtn").disabled = !canCast();
+  $("runBtn").textContent = count===6 || hasVeto() ? "推演 5,000 次 →" : "先判断完 6 爻";
+}
+function hideResultCards(){
+  ["resultCard","leverCard","defyCard","deathCard","saveBtn"].forEach(id=>$(id).classList.add("hidden"));
+}
+function stableSimId(){
+  const lv = VARS.reduce((o,v)=>{ o[v.k]=state.lv[v.k]; return o; },{});
+  return 1000 + (fnv1a(state.projectId + JSON.stringify(lv)) % 9000);
+}
 function renderInputs(){
   $("rows").innerHTML = VARS.map((v,i)=>{
+    const value = state.lv[v.k], unknown = !!state.unknown[v.k];
     const seg = v.lv.map((txt,j)=>
-      `<button data-k="${v.k}" data-v="${j}" class="${state.lv[v.k]===j?'on':''}">${txt}</button>`
-    ).join("");
+      `<button data-k="${v.k}" data-v="${j}" class="${!unknown && value===j?'on':''}">${txt}</button>`
+    ).join("") + `<button data-k="${v.k}" data-v="?" class="unknown ${unknown?'on':''}">不确定</button>`;
     return `<div class="row">
       <div class="lbl"><span class="idx">0${i+1} ${v.yao}爻</span><span class="n">${v.name}</span>
         <span class="q">${v.q}</span></div>
       <div class="seg">${seg}</div>
     </div>`;
   }).join("");
+  syncGate();
 }
 function drawHex(lv){
   const b = bitsOf(lv), box = $("lines"); box.innerHTML = "";
@@ -763,7 +726,10 @@ const VETO_WHY = {
 };
 function renderVeto(){
   const on = state.vetoes.map(k=>VETO_NAME[k]).join(' + ');
-  state.result = {vetoed:true};
+  state.result = {
+    vetoed:true, vetoes:state.vetoes.slice(), s:new Array(25).fill(0), s12:0, s24:0,
+    median:0, causeShare:{}, deadCount:5000, survivors:0, outTop:['—',0], N:5000, simId:state.simId
+  };
   $("subId").textContent = "VETO · 不进入推演";
   const b = $("vetoBanner");
   b.classList.remove("hidden");
@@ -776,11 +742,15 @@ function renderVeto(){
   saveLast();
 }
 function cast(){
-  state.simId = 1000 + Math.floor(Math.random()*9000);
+  if(!canCast()){
+    toast("先完成六爻判断，或明确触发一票否决");
+    return;
+  }
+  state.simId = stableSimId();
   state.vetoes = Object.keys(state.veto).filter(k=>state.veto[k]);
   state.prevSeries = null; state.prevS12 = null; state.prevHex = null; state.defyApplied = 0;
   if(state.vetoes.length){ renderVeto(); if(!DEMO) $("resultCard").scrollIntoView({behavior:"smooth", block:"start"}); return; }
-  state.result = runSim(state.lv, 5000, fnv1a("cast" + state.simId + JSON.stringify(state.lv)));
+  state.result = runSim(state.lv, 5000, fnv1a("cast" + state.projectId + JSON.stringify(state.lv)));
   renderResult();
   if(!DEMO) $("resultCard").scrollIntoView({behavior:"smooth", block:"start"});
 }
@@ -806,17 +776,48 @@ const loadRecs = ()=>{ try{ return JSON.parse(localStorage.getItem(LS)||"[]"); }
 const saveRecs = r=>{ try{ localStorage.setItem(LS, JSON.stringify(r)); }catch(e){} };
 const fmt = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 
+function projectName(){
+  return (($("appName") && $("appName").value.trim()) || "未命名项目").slice(0,80);
+}
+
+function buildProject(){
+  let result = null;
+  if(state.result){
+    result = JSON.parse(JSON.stringify(state.result));
+    result.simId = state.simId;
+    result.verdict = state.result.vetoed ? "法律上不成立，先别谈产品。" : (state.verdictText || "");
+    result.vetoes = state.vetoes.slice();
+    result.causes = state.result.vetoed ? [] : Object.entries(state.result.causeShare||{}).sort((a,b)=>b[1]-a[1]).slice(0,3)
+      .map(([k,x])=>[CAUSES[k].n, Math.round(x*100)]);
+    result.lever = state.lever ? {name:state.lever.name, after:Math.round(state.lever.after*100)} : null;
+  }
+  return DEADLAB_STORE.normalizeProject({
+    id:state.projectId,
+    name:projectName(),
+    source:state.projectSource,
+    sourceMeta:state.projectMeta,
+    lv:Object.assign({},state.lv),
+    unknown:Object.assign({},state.unknown),
+    veto:Object.assign({},state.veto),
+    result:result,
+    createdAt:state.projectCreatedAt
+  });
+}
+
 function saveLast(){
   if(!state.result) return;
   const v = !!state.result.vetoed;
   const causes = v ? [] : Object.entries(state.result.causeShare).sort((a,b)=>b[1]-a[1]).slice(0,3)
     .map(([k,x])=>[CAUSES[k].n, Math.round(x*100)]);
   const d = {
-    project: ($("appName") && $("appName").value) || "未命名项目",
+    project: projectName(),
+    projectId: state.projectId,
+    source: state.projectSource,
+    sourceMeta: state.projectMeta,
     id: state.simId, date: fmt(new Date()),
     hex: v ? "—" : hexOf(state.lv)[2],
     bits: bitsOf(state.lv).join(""),
-    lv: Object.assign({}, state.lv), vetoes: state.vetoes.slice(),
+    lv: Object.assign({}, state.lv), unknown:Object.assign({},state.unknown), vetoes: state.vetoes.slice(),
     s12: v ? 0 : Math.round(state.result.s[12]*100),
     verdict: v ? "法律上不成立，先别谈产品。" : (state.verdictText || ""),
     causes,
@@ -824,6 +825,88 @@ function saveLast(){
     vetoed: v
   };
   try{ localStorage.setItem(LAST, JSON.stringify(d)); }catch(e){}
+  DEADLAB_STORE.save(buildProject());
+  renderProjects();
+}
+
+function renderProjects(){
+  const projects = DEADLAB_STORE.list();
+  if(!projects.length){
+    $("projectList").innerHTML = '<p class="project-empty">还没有项目。完成六爻判断并推演，或从导入页带入一个项目。</p>';
+    return;
+  }
+  $("projectList").innerHTML = projects.map(p=>{
+    const r = p.result || {};
+    const dirty = Object.values(p.lv||{}).some(v=>v===null || v===undefined);
+    const score = r.vetoed ? "VETO" : (Number.isFinite(r.s12) ? Math.round(r.s12*100)+"%" : "未推演");
+    const hex = r.vetoed ? "被否决" : (r.s && r.s.length ? hexOf(p.lv)[2] : "草稿");
+    const when = new Date(p.updatedAt).toLocaleDateString("zh-CN");
+    const source = p.source ? " · " + esc(p.source) : "";
+    return `<div class="project-row">
+      <div class="project-main">
+        <div class="project-name">${esc(p.name)}</div>
+        <div class="project-meta"><span class="project-score">${score}</span>${esc(hex)} · ${when}${dirty?' · 未完成':''}${source}</div>
+      </div>
+      <div class="project-btns">
+        <button data-act="open" data-id="${esc(p.id)}">打开</button>
+        <button data-act="compare" data-id="${esc(p.id)}">对比</button>
+        <button data-act="report" data-id="${esc(p.id)}" ${p.result?'':'disabled'}>报告</button>
+        <button data-act="export" data-id="${esc(p.id)}">导出</button>
+        <button data-act="delete" data-id="${esc(p.id)}">删除</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function resetProject(){
+  state.projectId = DEADLAB_STORE.uid();
+  state.projectCreatedAt = Date.now();
+  state.projectSource = '';
+  state.projectMeta = '';
+  state.lv = {need:null,cap:null,econ:null,dist:null,dep:null,stam:null};
+  state.unknown = {need:false,cap:false,econ:false,dist:false,dep:false,stam:false};
+  state.veto = {copy:false,lic:false,plat:false};
+  state.vetoes = [];
+  state.result = null;
+  state.lever = null;
+  state.simId = 0;
+  state.prevSeries = null; state.prevS12 = null; state.prevHex = null; state.defyApplied = 0;
+  $("appName").value = "";
+  document.querySelectorAll("[data-veto]").forEach(b=>b.classList.remove("on"));
+  $("vetoBox").classList.remove("on");
+  hideResultCards();
+  renderInputs();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function loadProject(project){
+  if(!project) return;
+  state.projectId = project.id;
+  state.projectCreatedAt = project.createdAt;
+  state.projectSource = project.source;
+  state.projectMeta = project.sourceMeta;
+  state.lv = Object.assign({need:null,cap:null,econ:null,dist:null,dep:null,stam:null}, project.lv);
+  state.unknown = Object.assign({need:false,cap:false,econ:false,dist:false,dep:false,stam:false}, project.unknown);
+  state.veto = Object.assign({copy:false,lic:false,plat:false}, project.veto);
+  state.vetoes = Object.keys(state.veto).filter(k=>state.veto[k]);
+  state.result = null;
+  state.lever = null;
+  state.prevSeries = null; state.prevS12 = null; state.prevHex = null; state.defyApplied = 0;
+  $("appName").value = project.name === "未命名项目" ? "" : project.name;
+  document.querySelectorAll("[data-veto]").forEach(b=>b.classList.toggle("on", !!state.veto[b.dataset.veto]));
+  $("vetoBox").classList.toggle("on", state.vetoes.length>0);
+  renderInputs();
+  if(project.result && (project.result.vetoed || project.result.s)){
+    state.simId = project.result.simId || stableSimId();
+    if(project.result.vetoed) renderVeto();
+    else {
+      state.result = project.result;
+      renderResult();
+    }
+    if(!DEMO) $("resultCard").scrollIntoView({behavior:"smooth", block:"start"});
+  }else{
+    hideResultCards();
+  }
 }
 
 function renderCalib(){
@@ -845,8 +928,8 @@ function renderRecs(){
     const st = r.status === 'alive' ? 'ALIVE' : r.status === 'dead' ? 'DEAD' : (late ? 'DUE' : 'PENDING');
     const btns = r.status === 'pending'
       ? `<span class="rec-actions"><button data-id="${r.id}" data-st="alive">活着</button><button data-id="${r.id}" data-st="dead">已死</button></span>` : '';
-    return `<div class="rec"><span class="when">${r.date}</span>
-      <span class="what"><em>${r.project}</em> · ${r.hex} · 存活 <span class="p">${r.s12}%</span> · ${r.cause}</span>
+    return `<div class="rec"><span class="when">${esc(r.date)}</span>
+      <span class="what"><em>${esc(r.project)}</em> · ${esc(r.hex)} · 存活 <span class="p">${esc(r.s12)}%</span> · ${esc(r.cause)}</span>
       ${btns}<span class="state ${late && r.status==='pending' ? 'due' : ''}">${st}</span></div>`;
   }).join("");
   renderCalib();
@@ -964,13 +1047,24 @@ function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("on"); c
 $("rows").addEventListener("click", e=>{
   const b = e.target.closest("button[data-k]");
   if(!b) return;
-  state.lv[b.dataset.k] = +b.dataset.v;
+  if(b.dataset.v === "?"){
+    state.lv[b.dataset.k] = 1;
+    state.unknown[b.dataset.k] = true;
+  }else{
+    state.lv[b.dataset.k] = +b.dataset.v;
+    state.unknown[b.dataset.k] = false;
+  }
   renderInputs();
   if(state.result && !state.result.vetoed){
-    state.simId = 1000 + Math.floor(Math.random()*9000);
-    state.prevSeries = null; state.prevS12 = null; state.prevHex = null; state.defyApplied = 0;
-    state.result = runSim(state.lv, 5000, fnv1a("edit"+state.simId+JSON.stringify(state.lv)));
-    renderResult();
+    if(isComplete()){
+      state.simId = stableSimId();
+      state.prevSeries = null; state.prevS12 = null; state.prevHex = null; state.defyApplied = 0;
+      state.result = runSim(state.lv, 5000, fnv1a("edit"+state.projectId+JSON.stringify(state.lv)));
+      renderResult();
+    }else{
+      state.result = null;
+      hideResultCards();
+    }
   }
 });
 $("vetoBox").addEventListener("click", e=>{
@@ -979,7 +1073,53 @@ $("vetoBox").addEventListener("click", e=>{
   state.veto[k] = !state.veto[k];
   b.classList.toggle("on", state.veto[k]);
   $("vetoBox").classList.toggle("on", Object.values(state.veto).some(Boolean));
+  syncGate();
   if(state.result) cast();
+});
+$("projectList").addEventListener("click", e=>{
+  const b = e.target.closest("button[data-act]");
+  if(!b) return;
+  const project = DEADLAB_STORE.get(b.dataset.id);
+  if(!project) return;
+  if(b.dataset.act === "open") loadProject(project);
+  if(b.dataset.act === "compare") window.open("compare.html?project=" + encodeURIComponent(project.id), "_blank");
+  if(b.dataset.act === "report") window.open("report.html?project=" + encodeURIComponent(project.id), "_blank");
+  if(b.dataset.act === "export") DEADLAB_STORE.downloadJSON("deadlab-" + project.name.replace(/[^\w\u4e00-\u9fa5-]+/g,"_") + ".json", DEADLAB_STORE.exportPayload([project]));
+  if(b.dataset.act === "delete" && confirm("删除项目「" + project.name + "」？")){
+    DEADLAB_STORE.remove(project.id);
+    if(project.id === state.projectId) resetProject();
+    renderProjects();
+    toast("项目已删除");
+  }
+});
+$("newProjectBtn").addEventListener("click", resetProject);
+$("saveProjectBtn").addEventListener("click", ()=>{
+  DEADLAB_STORE.save(buildProject());
+  renderProjects();
+  toast("项目已保存");
+});
+$("exportProjectsBtn").addEventListener("click", ()=>{
+  DEADLAB_STORE.downloadJSON("deadlab-projects-" + fmt(new Date()) + ".json", DEADLAB_STORE.exportPayload());
+});
+$("importProjectsBtn").addEventListener("click", ()=>$("projectsInput").click());
+$("projectsInput").addEventListener("change", async e=>{
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  try{
+    const imported = DEADLAB_STORE.importPayload(await file.text());
+    renderProjects();
+    toast("已导入 " + imported.length + " 个项目");
+  }catch(err){
+    toast("导入失败：" + err.message);
+  }finally{
+    e.target.value = "";
+  }
+});
+$("appName").addEventListener("change", ()=>{
+  if(DEADLAB_STORE.get(state.projectId) || isComplete()){
+    DEADLAB_STORE.save(buildProject());
+    renderProjects();
+  }
 });
 $("records").addEventListener("click", e=>{
   const b = e.target.closest("button[data-id]"); if(!b) return;
@@ -994,26 +1134,43 @@ $("cardClose").addEventListener("click", ()=> $("cardModal").classList.remove("o
 $("cardDownload").addEventListener("click", ()=>{
   const a = document.createElement("a"); a.href = state.cardData; a.download = "deadlab-card.png"; a.click();
 });
-$("reportBtn").addEventListener("click", ()=>{ saveLast(); window.open("report.html", "_blank"); });
+$("reportBtn").addEventListener("click", ()=>{ saveLast(); window.open("report.html?project=" + encodeURIComponent(state.projectId), "_blank"); });
 renderInputs();
 renderRecs();
 renderDaily();
+renderProjects();
 
-if(location.search.indexOf('imp')>=0){
+const query = new URLSearchParams(location.search);
+if(query.get("project")){
+  loadProject(DEADLAB_STORE.get(query.get("project")));
+}else if(location.search.indexOf('imp')>=0){
   try{
+    const projectId = query.get("impProject");
+    if(projectId){
+      const project = DEADLAB_STORE.get(projectId);
+      if(project){
+        loadProject(project);
+        toast('已导入 ' + project.name + (project.source ? ' · ' + project.source : ''));
+        throw {handled:true};
+      }
+    }
     const d = JSON.parse(localStorage.getItem('deadlab_import')||'null');
     if(d && d.lv){
       Object.keys(state.lv).forEach(k=>{ if(d.lv[k]!==undefined) state.lv[k] = Math.max(0, Math.min(3, +d.lv[k])); });
+      state.unknown = {need:false,cap:false,econ:false,dist:false,dep:false,stam:false};
       const n = $('appName'); if(n) n.value = d.project || '';
+      state.projectSource = d.source || '';
+      state.projectMeta = d.meta || '';
       renderInputs();
       setTimeout(()=>{ cast(); toast('已导入 ' + (d.project||'') + ' · ' + (d.source||'')); }, 120);
     }
-  }catch(e){}
+  }catch(e){ if(!e || !e.handled) console.error(e); }
 }
 
 if(DEMO){
   setTimeout(()=>{
     state.lv = {need:3,cap:2,econ:1,dist:1,dep:2,stam:1};
+    state.unknown = {need:false,cap:false,econ:false,dist:false,dep:false,stam:false};
     const n = $("appName"); if(n) n.value = "需求雷达";
     renderInputs(); cast();
     if(location.search.indexOf("defy")>=0) setTimeout(defy, 900);

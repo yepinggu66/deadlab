@@ -62,7 +62,7 @@ textarea.inp{min-height:140px;font-family:var(--mono);font-size:12.5px;line-heig
       <input class="inp" id="ghUrl" placeholder="https://github.com/owner/repo" autocomplete="off">
       <details style="margin-top:12px">
         <summary style="font-size:11.5px;color:var(--dim2);cursor:pointer">接口限流了？填一个 GitHub Token（可选，5000 次/小时）</summary>
-        <input class="inp" id="ghToken" type="password" placeholder="ghp_… 只保存在本机浏览器里" style="margin-top:10px">
+        <input class="inp" id="ghToken" type="password" placeholder="ghp_… 仅本次页面有效，不写入本地存储" style="margin-top:10px">
       </details>
       <p class="hint">读取仓库元数据 + README + 文件树，不读代码内容。未登录的 GitHub 接口每小时 60 次（按 IP），够用；不够就填 Token。</p>
       <div class="actions"><button class="ghost" id="ghRun">分析仓库</button></div>
@@ -107,11 +107,14 @@ textarea.inp{min-height:140px;font-family:var(--mono);font-size:12.5px;line-heig
   </footer>
 </div>
 
+<script src="store.js"></script>
 <script src="engine.js"></script>
 <script>
 const {VARS} = DEADLAB;
+const esc = DEADLAB_STORE.escapeHTML;
 const $ = id => document.getElementById(id);
 let derived = null;
+let githubToken = '';
 
 document.querySelectorAll('.tabs button').forEach(b=>{
   b.addEventListener('click', ()=>{
@@ -136,7 +139,7 @@ async function fromGitHub(url){
     if(c && Date.now() - c.at < 3600e3) return c.data;
   }catch(e){}
   const api = `https://api.github.com/repos/${owner}/${repo}`;
-  const token = (localStorage.getItem('deadlab_gh_token') || '').trim();
+  const token = githubToken.trim();
   const r = await fetch(api, token ? {headers:{Authorization:'Bearer ' + token}} : undefined);
   if(r.status === 403) throw new Error('GitHub 接口限流了（每小时 60 次），过一会儿再试，或者用本地文件夹导入。');
   if(r.status === 404) throw new Error('仓库不存在，或者是私有的。');
@@ -263,8 +266,8 @@ function derive(sig){
 /* ---------- 渲染 ---------- */
 function render(res){
   derived = res;
-  $('srcBox').innerHTML = `<div><div class="t">${res.project}</div><div class="m">${res.source}</div></div>
-    <div class="m" style="flex:1;text-align:right;min-width:240px">${res.meta || ''}</div>`;
+  $('srcBox').innerHTML = `<div><div class="t">${esc(res.project)}</div><div class="m">${esc(res.source)}</div></div>
+    <div class="m" style="flex:1;text-align:right;min-width:240px">${esc(res.meta)}</div>`;
   const rows = VARS.map(v=>{
     const x = res.vars[v.k];
     const conf = x.conf === 'hi' ? '高置信' : x.conf === 'lo' ? '低置信' : '中等置信';
@@ -273,7 +276,7 @@ function render(res){
       <div><select class="sel" data-k="${v.k}" style="width:100%">
         ${v.lv.map((t,i)=>`<option value="${i}" ${i===x.lv?'selected':''}>${t}</option>`).join('')}
       </select></div>
-      <div class="vev">${x.ev.map(e=>'• ' + e).join('<br>')}</div>
+      <div class="vev">${x.ev.map(e=>'• ' + esc(e)).join('<br>')}</div>
     </div>`;
   }).join('');
   $('rows').innerHTML = rows;
@@ -318,7 +321,8 @@ $('jsonRun').addEventListener('click', ()=>{
     const j = JSON.parse($('jsonIn').value);
     const vars = {};
     VARS.forEach(v=>{
-      const lv = Math.max(0, Math.min(3, +(j.vars && j.vars[v.k] !== undefined ? j.vars[v.k] : 1)));
+      const raw = j.vars && j.vars[v.k] !== undefined ? Number(j.vars[v.k]) : 1;
+      const lv = Number.isFinite(raw) ? Math.max(0, Math.min(3, Math.round(raw))) : 1;
       vars[v.k] = {lv, conf:'hi', ev:[j.note || '来自 JSON，由数据源直接给出']};
     });
     render({project: j.project || '导入项目', source: 'JSON', meta: '', vars});
@@ -327,19 +331,24 @@ $('jsonRun').addEventListener('click', ()=>{
 
 $('goBtn').addEventListener('click', ()=>{
   const lv = collect();
-  const payload = {project: derived.project, source: derived.source, lv, at: Date.now()};
+  const project = DEADLAB_STORE.save({
+    name: derived.project,
+    source: derived.source,
+    sourceMeta: derived.meta,
+    lv: lv,
+    result: null
+  });
+  const payload = {project: project.name, source: project.source, lv, at: Date.now()};
   try{ localStorage.setItem('deadlab_import', JSON.stringify(payload)); }catch(e){}
-  location.href = 'index.html?imp=1';
+  location.href = 'index.html?imp=1&impProject=' + encodeURIComponent(project.id);
 });
 
 /* demo：自动跑一个公开仓库 */
 const tokEl = $('ghToken');
 if(tokEl){
-  tokEl.value = localStorage.getItem('deadlab_gh_token') || '';
-  tokEl.addEventListener('change', ()=>{
-    const v = tokEl.value.trim();
-    if(v) localStorage.setItem('deadlab_gh_token', v); else localStorage.removeItem('deadlab_gh_token');
-  });
+  try{ localStorage.removeItem('deadlab_gh_token'); }catch(e){}
+  tokEl.value = '';
+  tokEl.addEventListener('input', ()=>{ githubToken = tokEl.value; });
 }
 if(location.search.indexOf('json')>=0) setTimeout(()=> $('jsonRun').click(), 200);
 

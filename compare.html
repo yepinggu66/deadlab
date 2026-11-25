@@ -8,6 +8,10 @@
 <style>
 .cmp{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
 @media(max-width:820px){.cmp{grid-template-columns:1fr}}
+.projectbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}
+.projectbar label{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--dim2)}
+.projectbar select{flex:1 1 240px;width:100%;min-width:0;max-width:360px}
+.projectbar span{font-size:11.5px;color:var(--dim2)}
 .panel{border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--panel2)}
 .panel.b{border-color:rgba(62,224,143,.28)}
 .panel h3{margin:0 0 12px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;color:var(--dim)}
@@ -15,6 +19,7 @@
 .panel .row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:8px 0}
 .panel .row span{font-size:12px;color:var(--dim)}
 .panel .sel{width:58%}
+.diff-note{font-size:12px;color:var(--dim);line-height:1.8;margin:14px 0 0;border-top:1px solid var(--line2);padding-top:12px}
 .curve{width:100%;height:auto;margin-top:8px}
 .curve .gl{stroke:rgba(255,255,255,.055);stroke-width:1}
 .curve .ax{fill:#565E6E;font-size:10px;font-family:var(--mono)}
@@ -47,9 +52,19 @@
 
   <section class="card">
     <div class="sec"><span class="n">01</span><h2>SETUP</h2><em>方案 A / 方案 B</em><span class="rule"></span></div>
+    <div class="projectbar">
+      <label for="projectPick">基准项目</label>
+      <select class="sel" id="projectPick"></select>
+      <span id="projectSource">未选择项目时使用内置示例</span>
+    </div>
     <div class="cmp">
       <div class="panel a" id="pa"></div>
-      <div class="panel b" id="pb"></div>
+      <div class="panel b">
+        <h3>方案 B · 只改一个变量</h3>
+        <div class="row"><span>变量</span><select class="sel" id="diffKey"></select></div>
+        <div class="row"><span>目标档位</span><select class="sel" id="diffVal"></select></div>
+        <p class="diff-note" id="diffNote"></p>
+      </div>
     </div>
     <button class="primary" id="runBtn">同时推演两个方案</button>
   </section>
@@ -75,22 +90,88 @@
   </footer>
 </div>
 
+<script src="store.js"></script>
 <script src="engine.js"></script>
 <script>
 const {VARS, runSim, hexOf, CAUSES} = DEADLAB;
-const A = {need:2,cap:2,econ:1,dist:1,dep:1,stam:2};
-const B = {need:2,cap:2,econ:2,dist:3,dep:1,stam:2};
+const esc = DEADLAB_STORE.escapeHTML;
+let A = {need:2,cap:2,econ:1,dist:1,dep:1,stam:2};
+let diffKey = 'dist';
 
-function panel(el, name, data, cls){
+function panel(el, name, data){
   el.innerHTML = `<h3>${name}</h3>` + VARS.map(v=>`
     <div class="row"><span>${v.name}</span>
       <select class="sel" data-k="${v.k}">
         ${v.lv.map((t,j)=>`<option value="${j}" ${j===data[v.k]?'selected':''}>${t}</option>`).join('')}
       </select></div>`).join('');
-  el.addEventListener('change', e=>{ if(e.target.dataset.k) data[e.target.dataset.k] = +e.target.value; });
+  el.addEventListener('change', e=>{
+    if(!e.target.dataset.k) return;
+    A[e.target.dataset.k] = +e.target.value;
+    syncDiff(true);
+  });
 }
-panel(document.getElementById('pa'), '方案 A', A, 'a');
-panel(document.getElementById('pb'), '方案 B', B, 'b');
+
+function buildB(){
+  const B = Object.assign({}, A);
+  B[diffKey] = +document.getElementById('diffVal').value;
+  return B;
+}
+
+function updateDiffNote(){
+  const varDef = VARS.find(v=>v.k===diffKey) || VARS[0];
+  const next = +document.getElementById('diffVal').value;
+  document.getElementById('diffNote').textContent =
+    varDef.name + "：" + varDef.lv[A[diffKey]] + " → " + varDef.lv[next] + "。其余五爻完全一致。";
+}
+
+function syncDiff(preferUp){
+  const varDef = VARS.find(v=>v.k===diffKey) || VARS[0];
+  diffKey = varDef.k;
+  const current = A[diffKey];
+  const valEl = document.getElementById('diffVal');
+  const old = +valEl.value;
+  valEl.innerHTML = varDef.lv.map((label,value)=>{
+    if(value === current) return '';
+    return `<option value="${value}">${label}</option>`;
+  }).join('');
+  const choices = [...valEl.options].map(o=>+o.value);
+  const next = preferUp || !choices.includes(old) ? (choices.includes(current+1) ? current+1 : choices[0]) : old;
+  valEl.value = String(next);
+  updateDiffNote();
+}
+
+function selectProject(id){
+  const project = id === '__demo' ? null : DEADLAB_STORE.get(id);
+  if(project){
+    A = Object.assign({}, project.lv);
+    VARS.forEach(v=>{ if(!Number.isInteger(A[v.k])) A[v.k]=1; });
+    document.getElementById('projectSource').textContent = project.name + (project.source ? " · " + project.source : "");
+  }else{
+    A = {need:2,cap:2,econ:1,dist:1,dep:1,stam:2};
+    document.getElementById('projectSource').textContent = "内置示例 · 未使用项目库";
+  }
+  panel(document.getElementById('pa'), '方案 A · 基准', A);
+  const preferred = VARS.find(v=>A[v.k] < 3);
+  diffKey = preferred ? preferred.k : VARS[0].k;
+  document.getElementById('diffKey').value = diffKey;
+  syncDiff(true);
+}
+
+const projects = DEADLAB_STORE.list();
+document.getElementById('projectPick').innerHTML =
+  '<option value="__demo">内置示例</option>' +
+  projects.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
+document.getElementById('diffKey').innerHTML =
+  VARS.map(v=>`<option value="${v.k}">${v.name}</option>`).join('');
+document.getElementById('projectPick').addEventListener('change', e=>selectProject(e.target.value));
+document.getElementById('diffKey').addEventListener('change', e=>{ diffKey=e.target.value; syncDiff(true); });
+document.getElementById('diffVal').addEventListener('change', updateDiffNote);
+
+const requestedProject = new URLSearchParams(location.search).get('project');
+const initialProject = requestedProject && DEADLAB_STORE.get(requestedProject) ? requestedProject :
+  (projects.find(p=>p.result) || projects[0] || {id:'__demo'}).id;
+document.getElementById('projectPick').value = initialProject;
+selectProject(initialProject);
 
 const X = t => 56 + t*(560/24);
 const Y = s => 218 - s*180;
@@ -103,6 +184,7 @@ function grid(){
 }
 
 document.getElementById('runBtn').addEventListener('click', ()=>{
+  const B = buildB();
   const ra = runSim(A, 5000, 101), rb = runSim(B, 5000, 101);
   document.getElementById('metrics').innerHTML = `
     <div class="metric a"><div class="v">${Math.round(ra.s12*100)}%</div><div class="k">A · ${hexOf(A)[2]}</div></div>
