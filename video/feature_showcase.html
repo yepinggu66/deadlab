@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>DEADLAB Real Feature Showcase</title>
+<link rel="stylesheet" href="../ui.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 1920px; height: 1080px; overflow: hidden;
+  background-color: var(--bg);
+  background-image: url("../assets/ink_bg.jpg");
+  background-size: cover;
+  background-position: center top;
+  font-family: var(--sans);
+  color: var(--txt);
+}
+.frame {
+  width: 1920px; height: 1080px; position: absolute; inset: 0;
+  padding: 60px 100px; display: none; flex-direction: column; justify-content: space-between;
+}
+.frame.active { display: flex; }
+
+/* 顶部画卷导航 */
+.frame-top {
+  display: flex; justify-content: space-between; align-items: center;
+  background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(16px);
+  border: 1px solid rgba(26,28,33,0.14); border-radius: 16px;
+  padding: 16px 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.seal-red {
+  background: #C3272B; color: #FFF; font-size: 13px; font-weight: 700;
+  padding: 3px 10px; border-radius: 4px; letter-spacing: 1px;
+}
+.brand-title { font-family: var(--serif); font-size: 20px; font-weight: 700; color: #111216; }
+.frame-step { font-family: var(--mono); font-size: 15px; color: #A67C2E; font-weight: 700; }
+
+/* 主工作区卡片 */
+.frame-body {
+  flex: 1; margin: 30px 0; display: flex; gap: 36px; align-items: stretch;
+}
+
+/* 底部字幕提示条 */
+.frame-bottom {
+  background: rgba(18, 19, 22, 0.92); backdrop-filter: blur(16px);
+  color: #FFF; border-radius: 16px; padding: 18px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.subtitle-text { font-family: var(--serif); font-size: 20px; font-weight: 600; color: #FFF; letter-spacing: 0.5px; }
+.tag-pill { background: #A67C2E; color: #FFF; padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: 700; }
+
+/* 功能区卡片定制 */
+.card-content {
+  background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px);
+  border: 1px solid rgba(26, 28, 33, 0.16); border-radius: 20px;
+  padding: 36px 40px; box-shadow: 0 16px 48px rgba(26, 28, 33, 0.08);
+  flex: 1; display: flex; flex-direction: column; justify-content: center;
+}
+</style>
+</head>
+<body>
+
+<!-- Frame 1: 3D 动态八卦推演系统 -->
+<div class="frame active" id="f1">
+  <div class="frame-top">
+    <div class="brand">
+      <span class="seal-red">逆天卦</span>
+      <span class="brand-title">程序员逆天卦-沙盘 · DEADLAB</span>
+    </div>
+    <div class="frame-step">FEATURE 01 / 3D 动态八卦推演盘</div>
+  </div>
+  <div class="frame-body">
+    <div class="card-content" style="flex: 0 0 540px; text-align: center;">
+      <!-- 3D 八卦视觉罗盘 -->
+      <div style="width: 320px; height: 320px; margin: 0 auto 20px; border-radius: 50%; border: 3px solid rgba(166,124,46,0.5); display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, #FAF8F3 40%, rgba(166,124,46,0.1) 70%, transparent 100%); box-shadow: 0 0 50px rgba(166,124,46,0.25);">
+        <div style="font-size: 110px; color: #111216; text-shadow: 0 4px 20px rgba(0,0,0,0.15)">☯</div>
+      </div>
+      <div style="font-family: var(--serif); font-size: 26px; font-weight: 700; color: #111216; margin-bottom: 8px">东方易经卦盘 × 3D 动态推演</div>
+      <div style="font-size: 15px; color: var(--dim)">支持自由旋转、缩放视角与实时爻变模拟</div>
+    </div>
+    <div class="card-content">
+      <div style="display: flex; gap: 10px; margin-bottom: 16px"><span class="seal-red">事前验尸分析</span><span style="font-size: 18px; color: var(--gold); font-weight: 700">在写代码前先刹车</span></div>
+      <h1 style="font-family: var(--serif); font-size: 48px; font-weight: 800; color: #111216; line-height: 1.25; margin-bottom: 20px">
+        先算它怎么死，<br>再决定要不要做。
+      </h1>
+      <p style="font-size: 20px; color: #2D303A; line-height: 1.8">
+        所有大模型都在疯狂帮你写代码、制造立项的幻觉。<br>
+        但唯有事前验尸推演，能在狂热膨胀的技术浪潮中，为你踩下最清醒的刹车。
+      </p>
+    </div>
+  </div>
+  <div class="frame-bottom">
+    <span class="subtitle-text">先算它怎么死，再决定要不要做。在狂热的技术浪潮里，最科学的占卜叫事前验尸推演。</span>
+    <span class="tag-pill">3D 八卦罗盘</span>
+  </div>
+</div>
+
+<!-- Frame 2: 六爻滑块控制面板实操 -->
+<div class="frame" id="f2">
+  <div class="frame-top">
+    <div class="brand">
+      <span class="seal-red">核心面板</span>
+      <span class="brand-title">六爻商业状态离散约束</span>
+    </div>
+    <div class="frame-step">FEATURE 02 / 六爻维度量化面板</div>
+  </div>
+  <div class="frame-body">
+    <div class="card-content">
+      <div style="font-family: var(--serif); font-size: 22px; font-weight: 700; margin-bottom: 24px; color: #111216">
+        六大商业维度量化控制面板 (0 ~ 3 档位)
+      </div>
+      <!-- 模拟 6 个滑块行 -->
+      <div style="display: flex; flex-direction: column; gap: 16px">
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #FAF8F3; padding: 14px 20px; border-radius: 12px; border: 1px solid rgba(26,28,33,0.12)">
+          <span style="font-weight: 700; font-size: 17px; width: 140px">初爻 · 需求</span>
+          <span style="color: var(--dim); font-size: 15px; flex: 1">有人真的痛吗？</span>
+          <span style="background: var(--green); color: #FFF; padding: 4px 14px; border-radius: 20px; font-size: 14px; font-weight: 700">lv=2 有人付钱</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #FAF8F3; padding: 14px 20px; border-radius: 12px; border: 1px solid rgba(26,28,33,0.12)">
+          <span style="font-weight: 700; font-size: 17px; width: 140px">二爻 · 能力</span>
+          <span style="color: var(--dim); font-size: 15px; flex: 1">交付能闭环吗？</span>
+          <span style="background: var(--green); color: #FFF; padding: 4px 14px; border-radius: 20px; font-size: 14px; font-weight: 700">lv=2 基本可信</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #FAF8F3; padding: 14px 20px; border-radius: 12px; border: 1px solid rgba(195,39,43,0.25)">
+          <span style="font-weight: 700; font-size: 17px; width: 140px; color: var(--red)">三爻 · 经济</span>
+          <span style="color: var(--dim); font-size: 15px; flex: 1">越用越赚还是越亏？</span>
+          <span style="background: var(--red); color: #FFF; padding: 4px 14px; border-radius: 20px; font-size: 14px; font-weight: 700">lv=0 越用越亏 (死穴)</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #FAF8F3; padding: 14px 20px; border-radius: 12px; border: 1px solid rgba(26,28,33,0.12)">
+          <span style="font-weight: 700; font-size: 17px; width: 140px">四爻 · 分发</span>
+          <span style="color: var(--dim); font-size: 15px; flex: 1">人从哪来？</span>
+          <span style="background: var(--green); color: #FFF; padding: 4px 14px; border-radius: 20px; font-size: 14px; font-weight: 700">lv=3 病毒传播</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #FAF8F3; padding: 14px 20px; border-radius: 12px; border: 1px solid rgba(26,28,33,0.12)">
+          <span style="font-weight: 700; font-size: 17px; width: 140px">五爻 · 依赖</span>
+          <span style="color: var(--dim); font-size: 15px; flex: 1">上游会不会做掉你？</span>
+          <span style="background: var(--gold); color: #FFF; padding: 4px 14px; border-radius: 20px; font-size: 14px; font-weight: 700">lv=1 单点依赖</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-content" style="flex: 0 0 500px">
+      <div style="font-size: 18px; color: var(--red); font-weight: 700; margin-bottom: 12px">三票否决断头台</div>
+      <p style="font-size: 16px; color: var(--dim); line-height: 1.8; margin-bottom: 24px">
+        版权红线、牌照许可、平台 TOS 规则。<br>
+        商业法律红线不是渐进概率，而是一票否决的断头台——任一票红，存活率瞬间归零。
+      </p>
+      <div style="background: #111216; color: #FFF; border-radius: 14px; padding: 24px">
+        <div style="font-size: 15px; color: var(--gold); font-weight: 700; margin-bottom: 6px">MONTE CARLO SIMULATION</div>
+        <div style="font-size: 26px; font-weight: 800">5,000 次蒙特卡洛危险率推演</div>
+      </div>
+    </div>
+  </div>
+  <div class="frame-bottom">
+    <span class="subtitle-text">生成是廉价的膨胀，杀死才是稀缺的清醒。六爻离散约束剥离盲目乐观。</span>
+    <span class="tag-pill">六爻量化面板</span>
+  </div>
+</div>
+
+<!-- Frame 3: 24 个月存活曲线与推演大盘 -->
+<div class="frame" id="f3">
+  <div class="frame-top">
+    <div class="brand">
+      <span class="seal-red">量化结果</span>
+      <span class="brand-title">24 个月存活率曲线与死因</span>
+    </div>
+    <div class="frame-step">FEATURE 03 / 蒙特卡洛生存大盘</div>
+  </div>
+  <div class="frame-body">
+    <div class="card-content" style="flex: 0 0 420px; text-align: center">
+      <div style="font-size: 14px; color: var(--dim); font-family: var(--mono); margin-bottom: 4px">24 MONTHS SURVIVAL</div>
+      <div style="font-family: var(--mono); font-size: 80px; font-weight: 800; color: #C3272B; line-height: 1; margin-bottom: 14px">11.5%</div>
+      <div style="font-size: 18px; font-weight: 700; color: #111216; margin-bottom: 20px">中位死亡时间: 第 7 个月</div>
+      <div style="background: rgba(195,39,43,0.08); border: 1px solid rgba(195,39,43,0.25); border-radius: 12px; padding: 14px 18px">
+        <div style="font-size: 13px; color: var(--red); font-weight: 700; margin-bottom: 4px">头号死因 (占比 64.8%)</div>
+        <div style="font-size: 16px; font-weight: 700; color: #111216">越用越亏 · 成本高于客单价</div>
+      </div>
+    </div>
+    <div class="card-content">
+      <div style="font-family: var(--serif); font-size: 20px; font-weight: 700; margin-bottom: 14px; color: #111216">
+        24 个月非线性衰减存活曲线 (蒙特卡洛危险率积分)
+      </div>
+      <!-- 曲线图视觉 -->
+      <svg viewBox="0 0 660 220" style="width: 100%; height: 260px; background: #FAF8F3; border-radius: 14px; border: 1px solid rgba(26,28,33,0.1)">
+        <path d="M 40,30 L 620,30 M 40,80 L 620,80 M 40,130 L 620,130 M 40,180 L 620,180" stroke="rgba(26,28,33,0.06)" stroke-width="1"/>
+        <path d="M 40,40 Q 180,50 240,110 T 420,170 T 620,195 L 620,200 L 40,200 Z" fill="rgba(195,39,43,0.12)"/>
+        <path d="M 40,40 Q 180,50 240,110 T 420,170 T 620,195" fill="none" stroke="#C3272B" stroke-width="4"/>
+        <circle cx="240" cy="110" r="6" fill="#C3272B"/>
+        <text x="250" y="105" font-size="14" fill="#C3272B" font-weight="bold">第 4 月动爻断崖</text>
+      </svg>
+    </div>
+  </div>
+  <div class="frame-bottom">
+    <span class="subtitle-text">启动五千次蒙特卡洛危险率推演，交出三张底牌：死法、死期与命门。</span>
+    <span class="tag-pill">存活曲线大盘</span>
+  </div>
+</div>
+
+<!-- Frame 4: 动爻变卦演化剧本实操 -->
+<div class="frame" id="f4">
+  <div class="frame-top">
+    <div class="brand">
+      <span class="seal-red">算法核心</span>
+      <span class="brand-title">动爻连锁与变卦演化状态机</span>
+    </div>
+    <div class="frame-step">FEATURE 04 / 跨爻连锁推演剧本</div>
+  </div>
+  <div class="frame-body">
+    <div class="card-content">
+      <div style="background: #FAF8F3; border: 1px solid rgba(166,124,46,0.3); border-radius: 18px; padding: 28px 36px; margin-bottom: 24px">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px">
+          <span style="font-family: var(--serif); font-size: 24px; font-weight: 700; color: #111216">
+            本卦【地泽临】(用户涌入) ──( 动爻突变 )──> 变卦【泽水困】(预算见底)
+          </span>
+          <span class="seal-red">九三动爻发动</span>
+        </div>
+        <p style="font-size: 18px; color: #2D303A; line-height: 1.8">
+          <strong>时序动爻叙事剧本：</strong><br>
+          第 4 个月：第三爻（经济）发动动爻。流量激增（分发=3）反噬微薄毛利（经济=0），
+          算力与获客成本撕裂资金链，续航直接跌至极限，项目进入植物人状态。
+        </p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px">
+        <div style="background: #FFF; border: 1px solid rgba(26,28,33,0.12); border-radius: 14px; padding: 20px">
+          <div style="font-weight: 700; color: var(--red); font-size: 16px; margin-bottom: 6px">⚠️ 致命短板警告 (Fatal Flags)</div>
+          <div style="font-size: 14px; color: var(--dim)">【死亡加速·负毛利扩张】单位经济为负时放大流量会加速现金流枯竭。</div>
+        </div>
+        <div style="background: #FFF; border: 1px solid rgba(26,28,33,0.12); border-radius: 14px; padding: 20px">
+          <div style="font-weight: 700; color: var(--green); font-size: 16px; margin-bottom: 6px">🛡️ 最小化避坑任务 (Action Plan)</div>
+          <div style="font-size: 14px; color: var(--dim)">停更两周，先验证单位经济：算清单次 Token 与获客成本底线。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="frame-bottom">
+    <span class="subtitle-text">动爻连锁，本卦转变卦。提前推演 24 个月的死因剧本，看清最先裂开的缝隙。</span>
+    <span class="tag-pill">动爻状态机</span>
+  </div>
+</div>
+
+<!-- Frame 5: 冷酷投资人审讯室实操 -->
+<div class="frame" id="f5">
+  <div class="frame-top">
+    <div class="brand">
+      <span class="seal-red">输入层革命</span>
+      <span class="brand-title">冷酷投资人证据审讯室</span>
+    </div>
+    <div class="frame-step">FEATURE 05 / 对抗式证据尽调</div>
+  </div>
+  <div class="frame-body">
+    <div class="card-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px">
+        <div style="font-family: var(--serif); font-size: 24px; font-weight: 700; color: #111216">
+          ⚖️ 拒绝假数据自嗨 · 贴入落地页直接反向尽调
+        </div>
+        <div style="color: var(--red); font-weight: 700; font-size: 16px">初始置信度打折锁定: 75%</div>
+      </div>
+
+      <!-- 质询条目 -->
+      <div style="display: flex; flex-direction: column; gap: 14px">
+        <div style="background: #FAF8F3; border-left: 4px solid var(--red); border-radius: 10px; padding: 18px 22px">
+          <div style="font-weight: 700; font-size: 17px; color: #111216; margin-bottom: 4px">
+            【需求存疑】检测到你有预约名单，但过去 30 天是否有任何陌生人为你支付过定金？
+          </div>
+          <div style="font-size: 14px; color: var(--dim)">在商业世界里，“鼓掌”不等于“付钱”。未见定金凭证，初爻强制锁定为 lv=0。</div>
+        </div>
+        <div style="background: #FAF8F3; border-left: 4px solid var(--red); border-radius: 10px; padding: 18px 22px">
+          <div style="font-weight: 700; font-size: 17px; color: #111216; margin-bottom: 4px">
+            【毛利陷阱】若单个用户月消耗 $15 算力，而定价仅 $19，加上 30% 获客成本，毛利从哪来？
+          </div>
+          <div style="font-size: 14px; color: var(--dim)">未测算保本边际，三爻强制锁定为 lv=0 越用越亏。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="frame-bottom">
+    <span class="subtitle-text">冷酷投资人审讯室反向取证质询。未见付费凭证直接打折锁定，逼你直面残酷现实。</span>
+    <span class="tag-pill">证据审讯室</span>
+  </div>
+</div>
+
+<!-- Frame 6: GitHub 活体脉搏心电图实操 -->
+<div class="frame" id="f6">
+  <div class="frame-top">
+    <div class="brand">
+      <span class="seal-red">常态监护</span>
+      <span class="brand-title">GitHub 仓库活体脉搏与失温指数</span>
+    </div>
+    <div class="frame-step">FEATURE 06 / 代码失温预警</div>
+  </div>
+  <div class="frame-body">
+    <div class="card-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px">
+        <div>
+          <div style="font-size: 22px; font-weight: 700; font-family: var(--serif); color: #111216">github.com/owner/repo</div>
+          <div style="font-size: 15px; color: var(--green); font-weight: 700">心跳强劲 · 活跃发版</div>
+        </div>
+        <div style="text-align: right">
+          <div style="font-size: 13px; color: var(--dim2)">失温指数 HYPOTHERMIA:</div>
+          <div style="font-family: var(--mono); font-size: 32px; font-weight: 800; color: var(--green)">14%</div>
+        </div>
+      </div>
+
+      <!-- 实时心电图波形 -->
+      <div style="width: 100%; height: 120px; background: #111216; border-radius: 14px; position: relative; overflow: hidden; margin-bottom: 20px">
+        <svg viewBox="0 0 600 90" style="width: 100%; height: 100%" preserveAspectRatio="none">
+          <path d="M 0,45 L 80,45 L 90,38 L 100,45 L 110,55 L 120,10 L 130,75 L 145,45 L 170,30 L 190,45 L 280,45 L 290,38 L 300,45 L 310,55 L 320,10 L 330,75 L 345,45 L 370,30 L 390,45 L 480,45 L 490,38 L 500,45 L 510,55 L 520,10 L 530,75 L 545,45 L 570,30 L 600,45" fill="none" stroke="#2A7553" stroke-width="3"/>
+        </svg>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; font-size: 16px; color: var(--dim)">
+        <span>最近提交: <b>2 天前</b></span>
+        <span>Stars: <b>1,420</b></span>
+        <span>未决 Issues: <b>12</b></span>
+        <span>续航爻判定: <b style="color:var(--green)">lv=3 充沛</b></span>
+      </div>
+    </div>
+  </div>
+  <div class="frame-bottom">
+    <span class="subtitle-text">绑定 GitHub 仓库实时检测代码失温心电图。在创始人精力枯竭停更前敲响警钟。</span>
+    <span class="tag-pill">活体脉搏心电图</span>
+  </div>
+</div>
+
+<!-- Frame 7: AI 编程熔断器与品牌收尾 -->
+<div class="frame" id="f7">
+  <div class="frame-top">
+    <div class="brand">
+      <span class="seal-red">分发通道</span>
+      <span class="brand-title">AI 编程助手的立项熔断器 (CLI / MCP)</span>
+    </div>
+    <div class="frame-step">FEATURE 07 / 终端与 IDE 熔断</div>
+  </div>
+  <div class="frame-body">
+    <div class="card-content" style="flex: 0 0 760px; background: #131418; color: #FFF; border: 1px solid rgba(255,255,255,0.15)">
+      <div style="font-family: var(--mono); font-size: 15px; color: var(--gold); margin-bottom: 12px">TERMINAL RUNTIME · npx deadlab-check</div>
+      <div style="font-family: var(--mono); font-size: 14px; line-height: 1.7; color: #E6E9F0">
+        <span style="color: #4EBA87">┌────────────────────────────────────────────────────────┐</span><br>
+        <span style="color: #4EBA87">│   ☯  DEADLAB · 程序员逆天卦 (AI 时代商业立项熔断器)     │</span><br>
+        <span style="color: #4EBA87">└────────────────────────────────────────────────────────┘</span><br>
+        【卦象推演】: 本卦【地泽临】 ──(三爻动)──> 变卦【泽水困】<br>
+        上爻 [续航]: ━━━━━ ━━━━━ 阴  (还能撑半年)<br>
+        三爻 [经济]: ━━━━━ ⭕ ━━━━ <span style="background:#C3272B;color:#FFF;padding:1px 6px">动爻发动 · 流量反噬</span><br>
+        12 个月存活率: <span style="color:#FF5A5F;font-weight:bold">34.2%</span>  |  24 个月存活率: <span style="color:#FF5A5F;font-weight:bold">11.5%</span><br>
+        <span style="background:#C3272B;color:#FFF;padding:2px 8px;font-weight:bold">⚠️ 【立项熔断警告 CIRCUIT BREAKER TRIGGERED】</span>
+      </div>
+    </div>
+    <div class="card-content" style="display: flex; flex-direction: column; justify-content: center">
+      <div style="display: flex; gap: 10px; margin-bottom: 12px"><span class="seal-red">知止不殆</span><span style="font-size: 20px; color: var(--gold); font-weight: 700">方能逆天</span></div>
+      <div style="font-family: var(--serif); font-size: 34px; font-weight: 800; color: #111216; line-height: 1.3; margin-bottom: 16px">
+        切入 AI 编程第一线，<br>成为全球独立开发者的立项安全阀。
+      </div>
+      <div style="font-size: 16px; color: var(--dim); line-height: 1.7">
+        Cursor / Claude Code 写代码前调用 MCP 工具。<br>
+        一旦触发死穴，直接终端拦截生成。
+      </div>
+    </div>
+  </div>
+  <div class="frame-bottom">
+    <span class="subtitle-text">知止不殆，方能逆天。在敲下下一行代码前，先来逆天卦算算它最先死在哪。</span>
+    <span class="tag-pill">AI 编程立项熔断器</span>
+  </div>
+</div>
+
+</body>
+</html>
