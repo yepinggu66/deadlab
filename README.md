@@ -1,5 +1,9 @@
 # 程序员逆天卦-沙盘 · DEADLAB (Global Edition)
 
+[![Glama MCP server](https://glama.ai/mcp/servers/yepinggu66/deadlab/badge)](https://glama.ai/mcp/servers/yepinggu66/deadlab)
+[![npm version](https://img.shields.io/npm/v/deadlab.svg)](https://www.npmjs.com/package/deadlab)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 > **Every AI writes your plan. DEADLAB calculates how it dies first.**
 > 先算它怎么死，再决定要不要做。
 
