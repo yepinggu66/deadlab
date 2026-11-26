@@ -8,7 +8,7 @@
 :root{
   --bg:#F6F4ED; --panel:#FFFFFF; --panel2:#F4F1EA;
   --line:rgba(26,28,33,.12); --line2:rgba(26,28,33,.06);
-  --txt:#18191E; --dim:#555966; --dim2:#8A8F9E;
+  --txt:#111216; --dim:#252830; --dim2:#484C58;
   --red:#C3272B; --red2:#D8383F; --green:#2A7553; --gold:#A67C2E;
   --mono:ui-monospace,SFMono-Regular,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
   --serif:"Noto Serif SC","Source Han Serif CN","Songti SC","STSong","SimSun",serif;
@@ -16,7 +16,19 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-body{background:var(--bg); color:var(--txt); font-family:var(--sans); line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden}
+body{
+  background-color: var(--bg);
+  background-image: url("assets/ink_bg.jpg");
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: cover;
+  background-attachment: fixed;
+  color: var(--txt);
+  font-family: var(--sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
 body::before{content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
   background:radial-gradient(760px 420px at 18% -6%, rgba(255,90,95,.12), transparent 62%),
              radial-gradient(620px 380px at 88% 0%, rgba(80,120,255,.07), transparent 60%);}
@@ -42,30 +54,55 @@ a.back:hover{color:var(--txt); border-color:rgba(255,255,255,.22)}
 .hero h1{margin:16px 0 0; font-size:56px; line-height:1.06; letter-spacing:-.02em; font-weight:600}
 .lead{margin:16px 0 0; font-size:17px; color:var(--dim); max-width:680px}
 
-.case{background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:26px 28px; margin-bottom:16px}
+.case{
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(26, 28, 33, 0.14);
+  border-radius: 18px;
+  padding: 28px 30px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 32px rgba(26, 28, 33, 0.05);
+}
 .case-head{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap}
 .case-no{font-family:var(--mono); font-size:12px; color:var(--red); letter-spacing:.16em}
 .case-head h2{margin:0; font-size:23px; font-weight:600}
-.case-sub{font-size:13.5px; color:var(--dim2)}
+.case-sub{font-size:13.5px; color:#383B46; font-weight:500;}
 .case-grid{display:grid; grid-template-columns:250px 1fr; gap:26px; margin-top:20px; align-items:center}
 @media(max-width:760px){.case-grid{grid-template-columns:1fr}}
 .hexbox{display:flex; gap:16px; align-items:center; border:1px solid var(--line); background:var(--panel2); border-radius:14px; padding:16px}
 .lines{display:flex; flex-direction:column; gap:7px; width:88px; flex:0 0 auto}
 .yao{display:flex; height:6px; gap:9px}
-.yao i{display:block; flex:1; background:#E9ECF2; border-radius:1px}
+.yao i{display:block; flex:1; background:#18191E; border-radius:2px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);}
 .hn{font-size:19px; font-weight:600; white-space:nowrap}
 .ht{font-family:var(--mono); font-size:10.5px; color:var(--dim2); margin-top:4px; letter-spacing:.2em}
 .metrics{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
 .metric b{display:block; font-family:var(--mono); font-size:31px; font-weight:500; letter-spacing:-.02em}
 .metric b.red{color:var(--red)}
-.metric span{display:block; font-size:11.5px; color:var(--dim2); margin-top:5px}
+.metric span{display:block; font-size:12px; color:#484C58; font-weight:600; margin-top:6px;}
 .causes{display:flex; gap:10px; flex-wrap:wrap; margin-top:20px}
-.pill{font-family:var(--mono); font-size:11.5px; color:var(--dim); border:1px solid var(--line); border-radius:999px; padding:5px 11px}
+.pill{font-family:var(--mono); font-size:12px; color:#252830; border:1px solid rgba(26,28,33,.16); background:#FAF8F3; border-radius:999px; padding:6px 13px; font-weight:500;}
 .pill b{color:var(--txt); font-weight:400}
-.line{margin-top:18px; padding:14px 16px; border-left:2px solid var(--red); background:rgba(255,90,95,.05); font-size:13.5px; color:#EAD9D7; line-height:1.75}
-.line.fix{border-left-color:var(--green); background:rgba(62,224,143,.05); color:#CFE9DC; margin-top:10px}
-.line .k{font-family:var(--mono); font-size:10.5px; letter-spacing:.18em; display:block; margin-bottom:4px; color:var(--dim2)}
-.line.fix .k{color:#6FBF95}
+.line{
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-left: 3px solid var(--red);
+  background: rgba(195, 39, 43, 0.06);
+  font-size: 13.5px;
+  color: #18191E;
+  font-weight: 500;
+  line-height: 1.8;
+  border-radius: 4px 10px 10px 4px;
+}
+.line.fix{
+  border-left-color: var(--green);
+  background: rgba(42, 117, 83, 0.06);
+  color: #18191E;
+  font-weight: 500;
+  margin-top: 10px;
+}
+.line .k{font-family:var(--mono); font-size:11px; letter-spacing:.18em; display:block; margin-bottom:6px; color:var(--red); font-weight:700;}
+.line.fix .k{color:var(--green); font-weight:700;}
 
 .cta{border:1px solid var(--line); border-radius:18px; padding:34px 28px; text-align:center; margin-top:26px; background:linear-gradient(180deg, rgba(255,90,95,.05), transparent)}
 .cta h2{margin:0; font-size:30px; font-weight:600}
@@ -73,16 +110,113 @@ a.back:hover{color:var(--txt); border-color:rgba(255,255,255,.22)}
 a.btn{display:inline-block; background:#18191E; color:#FFF; text-decoration:none; font-weight:600; font-size:15px; padding:14px 28px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,.15); transition:.18s}
 a.btn:hover{background:#2A2D36; transform:translateY(-1px)}
 
-footer{margin-top:36px; padding-top:24px; border-top:1px solid rgba(26,28,33,.12); font-size:12.5px; color:#8A8F9E; display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap}
-footer .mono{font-family:var(--serif); color:#18191E; font-weight:600}
-.fnav{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
-.fnav a{
-  color:#555966 !important; text-decoration:none !important; font-size:11.5px; font-family:var(--serif);
-  padding:5px 12px; border-radius:6px; border:1px solid rgba(26,28,33,.12);
-  background:#FFF; transition:all .18s ease; box-shadow:0 1px 3px rgba(0,0,0,.03);
+footer{
+  margin-top: 56px;
+  margin-bottom: 24px;
+  padding: 30px 36px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(26, 28, 33, 0.14);
+  border-radius: 20px;
+  box-shadow: 0 14px 40px rgba(20, 22, 28, 0.08), 0 2px 6px rgba(0, 0, 0, 0.02);
+  font-size: 13px;
+  color: #2D303A;
+  line-height: 1.9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
 }
-.fnav a:hover{
-  color:#18191E !important; border-color:var(--gold) !important; background:#FAF8F3 !important;
+footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #C3272B 0%, #A67C2E 35%, rgba(26,28,33,0.12) 100%);
+}
+footer .footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+footer .footer-title {
+  font-family: var(--serif);
+  font-size: 15.5px;
+  font-weight: 700;
+  color: #111216;
+  letter-spacing: 0.5px;
+}
+footer .footer-seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  background: #C3272B;
+  color: #FFF;
+  font-size: 11px;
+  font-family: var(--serif);
+  font-weight: 700;
+  border-radius: 4px;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 6px rgba(195, 39, 43, 0.25);
+}
+.fnav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.fnav a {
+  color: #18191E !important;
+  text-decoration: none;
+  font-size: 12.5px;
+  font-family: var(--serif);
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(26, 28, 33, 0.16);
+  background: #FAF8F3;
+  transition: all .2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  display: inline-flex;
+  align-items: center;
+}
+.fnav a:hover {
+  color: #FFFFFF !important;
+  border-color: #111216 !important;
+  background: #18191E !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(24, 25, 30, 0.18);
+  text-decoration: none;
+}
+.footer-desc {
+  max-width: 520px;
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.85;
+  color: #2D303A;
+}
+.footer-desc-item {
+  margin-bottom: 6px;
+}
+.footer-desc-item:last-child {
+  margin-bottom: 0;
+}
+.footer-desc strong {
+  color: #111216;
+  font-weight: 700;
+}
+.seal-dot {
+  color: #C3272B;
+  font-weight: bold;
+  margin-right: 5px;
 }
 </style>
 </head>
@@ -440,19 +574,19 @@ footer .mono{font-family:var(--serif); color:#18191E; font-weight:600}
 
   <footer>
     <div>
-      <div class="mono" style="margin-bottom:8px">程序员逆天卦-沙盘 · DEADLAB</div>
-      <div class="fnav" style="display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:11px">
-        <a href="index.html" style="color:#565E6E;text-decoration:none">沙盘</a>
-        <a href="import.html" style="color:#565E6E;text-decoration:none">导入</a>
-        <a href="cases.html" style="color:#565E6E;text-decoration:none">案例</a>
-        <a href="library.html" style="color:#565E6E;text-decoration:none">案例库</a>
-        <a href="team.html" style="color:#565E6E;text-decoration:none">团队</a>
-        <a href="compare.html" style="color:#565E6E;text-decoration:none">对比</a>
-        <a href="report.html" style="color:#565E6E;text-decoration:none">报告</a>
-        <a href="api.html" style="color:#565E6E;text-decoration:none">API</a>
+      <div class="footer-brand">
+        <span class="footer-seal">逆天卦</span>
+        <span class="footer-title">程序员逆天卦-沙盘 · DEADLAB</span>
+      </div>
+      <div class="fnav">
+        <a href="index.html">沙盘</a><a href="import.html">导入</a><a href="cases.html">案例</a><a href="library.html">案例库</a>
+        <a href="team.html">团队</a><a href="compare.html">对比</a><a href="report.html">报告</a><a href="api.html">API</a>
       </div>
     </div>
-    <span>案例为演示用途，数字来自模型推演，不代表真实预测。不构成任何投资或经营建议。</span>
+    <div class="footer-desc">
+      <div class="footer-desc-item"><span class="seal-dot">▪</span> <strong>不是预测，是压力测试。</strong>绝对值别信，排序可信。</div>
+      <div class="footer-desc-item"><span class="seal-dot">▪</span> 我们不算：命运 · 合婚 · 荐股 · 个人成败。<strong>只算一件事：这个项目最先死在哪、改哪一爻最管用。</strong></div>
+    </div>
   </footer>
 </div>
 </body>
