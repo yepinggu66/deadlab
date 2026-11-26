@@ -1637,9 +1637,9 @@ function makeCard(){
 
 /* ============ 今日一卦 ============ */
 const DAILY = [
-  ["AI 记账 App", {need:2,cap:2,econ:1,dist:0,dep:2,stam:1}],
+  ["极客写作器 (公开案例)", {need:2,cap:2,econ:1,dist:0,dep:2,stam:1}],
   ["中文歌英译", {need:2,cap:1,econ:1,dist:2,dep:0,stam:1}],
-  ["外贸合规台", {need:3,cap:2,econ:3,dist:1,dep:1,stam:2}],
+  ["跨境单证审计 (公开案例)", {need:3,cap:2,econ:3,dist:1,dep:1,stam:2}],
   ["AI 陪伴", {need:3,cap:2,econ:1,dist:2,dep:0,stam:2}],
   ["独立开发者导航", {need:2,cap:3,econ:1,dist:2,dep:2,stam:2}],
   ["企业知识库 RAG", {need:3,cap:2,econ:2,dist:1,dep:1,stam:1}],
@@ -1796,7 +1796,7 @@ if(DEMO){
   setTimeout(()=>{
     state.lv = {need:3,cap:2,econ:1,dist:1,dep:2,stam:1};
     state.unknown = {need:false,cap:false,econ:false,dist:false,dep:false,stam:false};
-    const n = $("appName"); if(n) n.value = "需求雷达";
+    const n = $("appName"); if(n) n.value = "微型 SaaS 商业沙盘";
     renderInputs(); cast();
     if(location.search.indexOf("defy")>=0) setTimeout(defy, 900);
     if(location.search.indexOf("veto")>=0){ state.veto.copy = true; cast(); }
