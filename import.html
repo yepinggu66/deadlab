@@ -3,80 +3,210 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>导入项目 · 程序员逆天卦-沙盘</title>
+<title>证据审讯室 & 活体脉搏 · 程序员逆天卦-沙盘</title>
 <script src="i18n.js"></script>
 <link rel="stylesheet" href="ui.css">
 <style>
-.tabs{display:flex;gap:8px;margin:18px 0 0;flex-wrap:wrap}
-.tabs button{background:transparent;border:1px solid var(--line);color:var(--dim);border-radius:9px;padding:10px 16px;font-size:12.5px;cursor:pointer;font-family:var(--sans)}
-.tabs button.on{background:#EDEFF4;color:#0A0B0E;border-color:#EDEFF4;font-weight:600}
-.panel{display:none;margin-top:18px}
+/* 继承水墨宣纸视觉规范 */
+.tabs{display:flex;gap:10px;margin:22px 0 0;flex-wrap:wrap}
+.tabs button{
+  background:#FAF8F3;border:1px solid rgba(26,28,33,.16);color:var(--txt);
+  border-radius:10px;padding:11px 18px;font-size:13.5px;cursor:pointer;
+  font-family:var(--serif);font-weight:600;transition:all .18s ease;box-shadow:0 1px 3px rgba(0,0,0,.03);
+}
+.tabs button.on{
+  background:#111216;color:#FFF;border-color:#111216;box-shadow:0 4px 12px rgba(24,25,30,.2);
+}
+.panel{display:none;margin-top:20px}
 .panel.on{display:block}
-.inp{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:13px 14px;color:var(--txt);font-size:13.5px;outline:none;font-family:var(--sans)}
-.inp:focus{border-color:rgba(255,90,95,.45)}
-textarea.inp{min-height:140px;font-family:var(--mono);font-size:12.5px;line-height:1.6;resize:vertical}
-.drop{border:1px dashed rgba(255,255,255,.18);border-radius:12px;padding:26px;text-align:center;color:var(--dim2);font-size:13px}
-.drop b{color:var(--txt)}
-.hint{font-size:11.5px;color:var(--dim2);margin-top:10px;line-height:1.8}
-.src{display:flex;gap:14px;align-items:center;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--panel2)}
-.src .t{font-size:17px;font-weight:600}
-.src .m{font-family:var(--mono);font-size:11px;color:var(--dim2);margin-top:4px}
-.vrow{display:grid;grid-template-columns:150px 150px 1fr;gap:16px;padding:16px 0;border-bottom:1px solid var(--line2);align-items:start}
-@media(max-width:820px){.vrow{grid-template-columns:1fr;gap:8px}}
-.vrow .vn{font-size:14px}
-.vrow .vn em{font-style:normal;font-size:10px;font-family:var(--mono);color:var(--dim2);margin-left:6px}
-.vrow .vev{font-size:12px;color:var(--dim);line-height:1.9}
-.vrow .vev i{font-style:normal;color:var(--dim2)}
-.conf{display:inline-block;font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:4px;border:1px solid var(--line);color:var(--dim2);margin-left:6px;vertical-align:1px}
-.conf.hi{color:var(--green);border-color:rgba(62,224,143,.35)}
-.conf.lo{color:var(--amber);border-color:rgba(255,196,107,.35)}
-.err{color:var(--red2);font-size:12.5px;margin-top:12px;line-height:1.7}
-.actions{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap;align-items:center}
+.inp{
+  width:100%;background:#FAF8F3;border:1px solid rgba(26,28,33,.18);border-radius:12px;
+  padding:14px 16px;color:var(--txt);font-size:14px;outline:none;font-family:var(--sans);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.02);
+}
+.inp:focus{border-color:var(--gold);background:#FFF}
+textarea.inp{min-height:130px;font-family:var(--sans);font-size:13.5px;line-height:1.7;resize:vertical}
+.drop{
+  border:1px dashed rgba(26,28,33,.24);border-radius:14px;padding:32px 20px;
+  text-align:center;color:var(--dim);font-size:13.5px;background:#FAF8F3;
+}
+.drop b{color:var(--txt);font-size:15px}
+.hint{font-size:12.5px;color:var(--dim2);margin-top:10px;line-height:1.8;font-family:var(--serif)}
+.src{
+  display:flex;gap:16px;align-items:center;flex-wrap:wrap;border:1px solid rgba(26,28,33,.12);
+  border-radius:14px;padding:18px 22px;background:#FAF8F3;margin-bottom:18px;
+}
+.src .t{font-size:17.5px;font-weight:700;color:var(--txt);font-family:var(--serif)}
+.src .m{font-family:var(--mono);font-size:12px;color:var(--dim2);margin-top:4px}
+.vrow{display:grid;grid-template-columns:160px 1fr 140px;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid rgba(26,28,33,.08)}
+.vrow:last-child{border-bottom:none}
+.vname{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--txt)}
+.vev{font-size:13px;color:var(--dim);line-height:1.6}
+.vselect{
+  background:#FAF8F3;border:1px solid rgba(26,28,33,.18);border-radius:8px;padding:7px 10px;
+  font-family:var(--serif);font-size:13px;color:var(--txt);font-weight:600;outline:none;
+}
+
+/* 审讯室对抗质询卡片 */
+.inq-box{
+  margin-top:20px;padding:22px 24px;background:rgba(255,255,255,.95);border:1px solid rgba(195,39,43,.3);
+  border-left:4px solid var(--red);border-radius:14px;box-shadow:0 6px 20px rgba(195,39,43,.06);
+}
+.inq-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.inq-title{font-size:16px;font-weight:700;color:var(--txt);font-family:var(--serif);display:flex;align-items:center;gap:8px}
+.inq-badge{background:var(--red);color:#FFF;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px}
+.inq-rate{font-family:var(--mono);font-size:12.5px;color:var(--red);font-weight:700}
+.inq-q-item{
+  padding:14px 16px;margin-bottom:12px;background:#FAF8F3;border:1px solid rgba(26,28,33,.1);
+  border-radius:10px;font-size:13.5px;line-height:1.75;
+}
+.inq-q-title{font-weight:700;color:#111216;margin-bottom:4px;font-family:var(--serif)}
+.inq-q-hint{font-size:12.5px;color:var(--dim);margin-bottom:8px}
+.inq-proof-btn{
+  background:#111216;color:#FFF;border:none;border-radius:6px;padding:5px 12px;font-size:12px;
+  cursor:pointer;font-family:var(--serif);font-weight:600;margin-top:4px;
+}
+.inq-proof-btn.unlocked{background:var(--green);cursor:default}
+
+/* GitHub 活体脉搏心电图 */
+.pulse-box{
+  margin-top:20px;padding:22px 26px;background:rgba(255,255,255,.95);border:1px solid rgba(166,124,46,.3);
+  border-left:4px solid var(--gold);border-radius:14px;box-shadow:0 6px 20px rgba(166,124,46,.06);
+}
+.ecg-canvas{
+  width:100%;height:100px;background:#111216;border-radius:10px;margin:16px 0;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.4);position:relative;overflow:hidden;
+}
+.ecg-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(42,117,83,.15) 1px, transparent 1px), linear-gradient(90deg, rgba(42,117,83,.15) 1px, transparent 1px);
+  background-size:20px 20px;
+}
+.ecg-wave{width:100%;height:100%;position:relative;z-index:2}
+.ecg-stat-bar{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-top:12px;font-size:13px}
+.ecg-stat-bar b{font-family:var(--mono);font-size:15px;color:var(--txt)}
+
+.preset-pills{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.preset-pills span{
+  font-size:12px;font-family:var(--serif);background:#FFF;border:1px solid rgba(26,28,33,.16);
+  padding:4px 10px;border-radius:6px;cursor:pointer;color:var(--dim);transition:.15s;
+}
+.preset-pills span:hover{color:var(--txt);border-color:var(--gold);background:#FAF8F3}
 </style>
 </head>
 <body>
 <div class="gridbg"></div>
 <div class="shell">
   <div class="top">
-    <a class="logo" href="index.html"><span class="mark"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="name">程序员逆天卦-沙盘</span><span class="cn">IMPORT</span></a>
+    <a class="logo" href="index.html">
+      <span class="mark"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="name">程序员逆天卦-沙盘</span>
+      <span class="cn">证据审讯</span>
+    </a>
     <div class="nav">
-      <a href="index.html">沙盘</a><a class="on" href="import.html">导入</a><a href="cases.html">案例</a><a href="library.html">案例库</a>
-      <a href="team.html">团队</a><a href="compare.html">对比</a><a href="report.html">报告</a><a href="api.html">API</a>
+      <a href="index.html">沙盘</a>
+      <a class="on" href="import.html">导入</a>
+      <a href="cases.html">案例</a>
+      <a href="library.html">案例库</a>
+      <a href="team.html">团队</a>
+      <a href="compare.html">对比</a>
+      <a href="report.html">报告</a>
+      <a href="api.html">API</a>
     </div>
   </div>
 
   <section class="hero">
-    <div class="eyebrow">IMPORT / 别手填，把项目导进来</div>
-    <h1>已经做好的项目，<br>直接导入</h1>
-    <p class="lead">从 GitHub 仓库、本地文件夹或一段 JSON 里读出证据，推出六爻。所有推断都列出来，你可以一条条改回去。</p>
+    <div class="eyebrow">INQUISITION & TELEMETRY · 拒绝假数据自嗨</div>
+    <h1>冷酷投资人审讯室<br>& 活体项目生存脉搏</h1>
+    <p class="lead">商业不是填表自嗨。贴入你的产品落地页或商业计划，接受尖锐取证质询；或绑定 GitHub 仓库，实时检测代码失温指数与生命脉搏。</p>
   </section>
 
   <section class="card">
-    <div class="sec"><span class="n">01</span><h2>SOURCE</h2><em>选一种来源</em><span class="rule"></span></div>
+    <div class="sec"><span class="n">01</span><h2>EVIDENCE INTAKE</h2><em>取证与遥测源</em><span class="rule"></span></div>
+    
     <div class="tabs">
-      <button data-tab="gh" class="on">GitHub 仓库</button>
-      <button data-tab="dir">本地文件夹</button>
-      <button data-tab="json">JSON</button>
+      <button data-tab="inq" class="on">⚖️ 投资人审讯室 (落地页/PRD)</button>
+      <button data-tab="gh">💓 GitHub 活体脉搏</button>
+      <button data-tab="dir">📁 本地工程深度扫描</button>
+      <button data-tab="json">📝 结构化 JSON</button>
     </div>
 
-    <div class="panel on" id="p-gh">
-      <input class="inp" id="ghUrl" placeholder="https://github.com/owner/repo" autocomplete="off">
+    <!-- 1. 投资人审讯室 -->
+    <div class="panel on" id="p-inq">
+      <div style="margin-bottom:12px">
+        <label style="font-size:13px;font-weight:700;color:var(--txt);font-family:var(--serif)">落地页链接 或 商业方案简述:</label>
+        <textarea class="inp" id="inqInput" placeholder="例如：一个面向自由职业者的自动化发票与税务插件，每月收费 $19。已有 50 个内测预约，核心依赖 Stripe API。或直接贴入你的产品宣传页文案/PRD..."></textarea>
+      </div>
+
+      <div class="preset-pills">
+        <strong style="font-size:12px;color:var(--dim2);line-height:24px">快捷填入典型试案:</strong>
+        <span onclick="setInqPreset('ai')">薄套壳 AI 应用 (自嗨型)</span>
+        <span onclick="setInqPreset('saas')">已收定金垂直小 SaaS (稳健型)</span>
+        <span onclick="setInqPreset('open')">为爱发电开源工具 (零收入)</span>
+      </div>
+
+      <div class="actions">
+        <button class="primary" style="width:auto;padding:12px 24px" id="inqRun">开始对抗式审讯 →</button>
+      </div>
+
+      <!-- 审讯质询卡片 (动态注入) -->
+      <div class="inq-box hidden" id="inqResultBox"></div>
+    </div>
+
+    <!-- 2. GitHub 活体脉搏心电图 -->
+    <div class="panel" id="p-gh">
+      <input class="inp" id="ghUrl" placeholder="https://github.com/owner/repo" autocomplete="off" value="https://github.com/yepinggu66/deadlab">
       <details style="margin-top:12px">
-        <summary style="font-size:11.5px;color:var(--dim2);cursor:pointer">接口限流了？填一个 GitHub Token（可选，5000 次/小时）</summary>
-        <input class="inp" id="ghToken" type="password" placeholder="ghp_… 仅本次页面有效，不写入本地存储" style="margin-top:10px">
+        <summary style="font-size:12px;color:var(--dim2);cursor:pointer">接口限流了？填一个 GitHub Token (可选，5000 次/小时)</summary>
+        <input class="inp" id="ghToken" type="password" placeholder="ghp_… 仅本次页面有效，不写入持久存储" style="margin-top:10px">
       </details>
-      <p class="hint">读取仓库元数据 + README + 文件树，不读代码内容。未登录的 GitHub 接口每小时 60 次（按 IP），够用；不够就填 Token。</p>
-      <div class="actions"><button class="ghost" id="ghRun">分析仓库</button></div>
+      <p class="hint">读取公开 commit 活跃频次、Issue 积压比与发版节奏，实时推演【项目失温指数】与生存心电图。</p>
+      
+      <div class="actions">
+        <button class="primary" style="width:auto;padding:12px 24px" id="ghRun">测算活体脉搏心电图</button>
+      </div>
+
+      <!-- 动态心电图与失温卡片 -->
+      <div class="pulse-box hidden" id="pulseBox">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--txt);font-family:var(--serif)" id="pulseRepoName">owner/repo</div>
+            <div style="font-size:12px;color:var(--dim)" id="pulseStatusLabel">正在测算心跳...</div>
+          </div>
+          <div style="text-align:right">
+            <span style="font-size:11.5px;color:var(--dim2)">失温指数 (HYPOTHERMIA):</span>
+            <div style="font-size:22px;font-weight:700;font-family:var(--mono)" id="pulseScore">0</div>
+          </div>
+        </div>
+
+        <div class="ecg-canvas">
+          <div class="ecg-grid"></div>
+          <svg class="ecg-wave" id="ecgSvg" viewBox="0 0 600 90" preserveAspectRatio="none">
+            <path id="ecgPath" d="M 0,45 L 600,45" fill="none" stroke="#2A7553" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <div class="ecg-stat-bar">
+          <div>最近提交: <b id="pulseLastCommit">— 天前</b></div>
+          <div>Stars: <b id="pulseStars">—</b></div>
+          <div>未决 Issues: <b id="pulseIssues">—</b></div>
+          <div>续航爻建议: <b id="pulseStam">—</b></div>
+        </div>
+
+        <div class="hint" style="margin-top:14px;color:var(--txt);font-weight:600" id="pulseAlert"></div>
+      </div>
     </div>
 
+    <!-- 3. 本地文件夹深度扫描 -->
     <div class="panel" id="p-dir">
       <div class="drop">
-        <b>选择一个项目文件夹</b><br>只读取文件名、体积、修改时间和 README / package.json，不上传、不联网。
+        <b>选择一个项目文件夹</b><br>浏览器本地快速只读文件名、体积、修改时间和 README / package.json，不上传服务器。
       </div>
       <input type="file" id="dirInput" webkitdirectory directory multiple style="display:none">
       <div class="actions"><button class="ghost" id="dirPick">选择文件夹</button><span class="hint" id="dirName" style="margin:0"></span></div>
     </div>
 
+    <!-- 4. 结构化 JSON -->
     <div class="panel" id="p-json">
       <textarea class="inp" id="jsonIn">{
   "project": "我的项目",
@@ -89,276 +219,320 @@ textarea.inp{min-height:140px;font-family:var(--mono);font-size:12.5px;line-heig
     <div class="err" id="err"></div>
   </section>
 
+  <!-- 推断结论与手动校准 -->
   <section class="card hidden" id="resultCard">
-    <div class="sec"><span class="n">02</span><h2>EVIDENCE</h2><em>推断依据，可手动修正</em><span class="rule"></span></div>
+    <div class="sec"><span class="n">02</span><h2>EVIDENCE AUDIT</h2><em>审讯推断结论，点击可微调</em><span class="rule"></span></div>
     <div class="src" id="srcBox"></div>
     <div id="rows"></div>
-    <div class="actions">
-      <button class="primary" style="width:auto;margin:0;padding:14px 26px" id="goBtn">带入沙盘 →</button>
-      <span class="hint" style="margin:0">导入不会覆盖你的存证记录。</span>
+    <div class="actions" style="margin-top:24px">
+      <button class="primary" style="width:auto;margin:0;padding:14px 28px" id="goBtn">带入主沙盘进行动爻推演 →</button>
+      <span class="hint" style="margin:0">带入沙盘不会覆盖已有存证记录。</span>
     </div>
   </section>
 
+  <!-- 白宣水墨毛玻璃页脚 -->
   <footer>
     <div>
-      <div class="mono" style="margin-bottom:8px">程序员逆天卦-沙盘 · DEADLAB</div>
-      <div class="fnav"><a href="index.html">沙盘</a><a href="import.html">导入</a><a href="cases.html">案例</a><a href="library.html">案例库</a><a href="team.html">团队</a><a href="compare.html">对比</a><a href="report.html">报告</a><a href="api.html">API</a></div>
+      <div class="footer-brand">
+        <span class="footer-seal">逆天卦</span>
+        <span class="footer-title">程序员逆天卦-沙盘 · DEADLAB</span>
+      </div>
+      <div class="fnav">
+        <a href="index.html">沙盘</a><a href="import.html">导入</a><a href="cases.html">案例</a><a href="library.html">案例库</a>
+        <a href="team.html">团队</a><a href="compare.html">对比</a><a href="report.html">报告</a><a href="api.html">API</a>
+      </div>
     </div>
-    <span>推断是启发式的，不是读心术。置信度低的那几爻，请自己改。</span>
+    <div class="footer-desc">
+      <div class="footer-desc-item"><span class="seal-dot">▪</span> <strong>不是预测，是压力测试。</strong>绝对值别信，排序可信。</div>
+      <div class="footer-desc-item"><span class="seal-dot">▪</span> 我们不算：命运 · 合婚 · 荐股 · 个人成败。<strong>只算一件事：这个项目最先死在哪、改哪一爻最管用。</strong></div>
+    </div>
   </footer>
 </div>
 
 <script src="store.js"></script>
 <script src="engine.js"></script>
+<script src="telemetry.js"></script>
 <script>
 const {VARS} = DEADLAB;
+const {auditCommercialCase, computeVitalPulse} = DEADLAB_TELEMETRY;
 const esc = DEADLAB_STORE.escapeHTML;
 const $ = id => document.getElementById(id);
 let derived = null;
-let githubToken = '';
+let currentInqAudit = null;
 
-document.querySelectorAll('.tabs button').forEach(b=>{
-  b.addEventListener('click', ()=>{
-    document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));
+// Tab 切换
+document.querySelectorAll('.tabs button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach(x => x.classList.remove('on'));
     b.classList.add('on');
-    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
     $('p-' + b.dataset.tab).classList.add('on');
     $('err').textContent = '';
   });
 });
 
-function setErr(m){ $('err').textContent = m || ''; }
-
-/* ---------- GitHub ---------- */
-async function fromGitHub(url){
-  const m = String(url).match(/github\.com\/([^\/\s]+)\/([^\/\s#?]+)/);
-  if(!m) throw new Error('看不出是 GitHub 地址，格式应为 https://github.com/owner/repo');
-  const owner = m[1], repo = m[2].replace(/\.git$/,'');
-  const cacheKey = 'ghcache:' + owner + '/' + repo;
-  try{
-    const c = JSON.parse(localStorage.getItem(cacheKey) || 'null');
-    if(c && Date.now() - c.at < 3600e3) return c.data;
-  }catch(e){}
-  const api = `https://api.github.com/repos/${owner}/${repo}`;
-  const token = githubToken.trim();
-  const r = await fetch(api, token ? {headers:{Authorization:'Bearer ' + token}} : undefined);
-  if(r.status === 403) throw new Error('GitHub 接口限流了（每小时 60 次），过一会儿再试，或者用本地文件夹导入。');
-  if(r.status === 404) throw new Error('仓库不存在，或者是私有的。');
-  if(!r.ok) throw new Error('GitHub 返回 ' + r.status);
-  const d = await r.json();
-
-  const raw = `https://raw.githubusercontent.com/${owner}/${repo}/HEAD/`;
-  const readme = await fetch(raw + 'README.md').then(x=> x.ok ? x.text() : '').catch(()=> '');
-  const tree = await fetch(`${api}/git/trees/HEAD?recursive=1`)
-    .then(x=> x.ok ? x.json() : {tree:[]}).catch(()=>({tree:[]}));
-  const files = (tree.tree || []).map(t=>t.path);
-  const pkg = await fetch(raw + 'package.json').then(x=> x.ok ? x.text() : '').catch(()=> '');
-  let deps = 0, devDeps = 0;
-  try{ const p = JSON.parse(pkg); deps = Object.keys(p.dependencies||{}).length; devDeps = Object.keys(p.devDependencies||{}).length; }catch(e){}
-
-  const res = {
-    project: d.full_name,
-    source: 'GitHub · ' + d.full_name,
-    meta: [
-      d.stargazers_count + ' stars',
-      d.forks_count + ' forks',
-      d.open_issues_count + ' open issues',
-      (d.language || '—'),
-      (d.license && d.license.spdx_id) || '无 license',
-      '更新于 ' + (d.pushed_at || '').slice(0,10)
-    ].join(' · '),
-    signals: {d, readme, files, deps, devDeps, contributors: null}
-  };
-  try{
-    const s = JSON.stringify({at: Date.now(), data: res});
-    if(s.length < 400000) localStorage.setItem(cacheKey, s);
-  }catch(e){}
-  return res;
-}
-/* ---------- 本地文件夹 ---------- */
-function fromFolder(fileList){
-  const files = Array.from(fileList);
-  const paths = files.map(f=>f.webkitRelativePath || f.name);
-  const root = paths[0] ? paths[0].split('/')[0] : '本地项目';
-  const textFiles = files.filter(f=>/\.(md|json|txt|ya?ml)$/i.test(f.name) && f.size < 400000);
-  const readmeFile = textFiles.find(f=>/^readme\.md$/i.test(f.name));
-  const pkgFile = textFiles.find(f=>f.name === 'package.json' && (f.webkitRelativePath||'').split('/').length <= 2);
-  return Promise.all([
-    readmeFile ? readmeFile.text() : Promise.resolve(''),
-    pkgFile ? pkgFile.text() : Promise.resolve('')
-  ]).then(([readme, pkg])=>{
-    let deps = 0, devDeps = 0;
-    try{ const p = JSON.parse(pkg); deps = Object.keys(p.dependencies||{}).length; devDeps = Object.keys(p.devDependencies||{}).length; }catch(e){}
-    const last = files.reduce((m,f)=> Math.max(m, f.lastModified || 0), 0);
-    return {
-      project: root,
-      source: '本地文件夹 · ' + root,
-      meta: [files.length + ' 个文件', (files.reduce((a,b)=>a+b.size,0)/1048576).toFixed(1) + ' MB', '最后修改 ' + new Date(last).toISOString().slice(0,10)].join(' · '),
-      signals: {d:null, readme, files: paths, deps, devDeps, lastModified: last, contributors: null}
-    };
-  });
+// 预设用例
+function setInqPreset(type) {
+  if (type === 'ai') {
+    $('inqInput').value = '做一个基于 GPT-4 的全自动生成长篇小说的 AI 工具，市场需求很大，大家都在讨论，上线后靠社交媒体自然传播！';
+  } else if (type === 'saas') {
+    $('inqInput').value = 'B2B 获客增强插件，已有 3 位客户预付定金 $99，核算单次 API 成本约 $0.02，已搭建独立的 Chrome 扩展与本地工作流，并建立了专属客户社群。';
+  } else if (type === 'open') {
+    $('inqInput').value = '为爱发电开源脚手架，代码写得很优雅，但没有收费页面，没有商业闭环，已在 GitHub 获得 300 stars。';
+  }
 }
 
-/* ---------- 打分 ---------- */
-function daysSince(t){ return t ? Math.max(1, (Date.now() - new Date(t).getTime())/864e5) : 365; }
+// 1. 投资人审讯室逻辑
+$('inqRun').addEventListener('click', () => {
+  const text = $('inqInput').value.trim();
+  if (!text) {
+    $('err').textContent = '请先输入商业方案文案或产品宣传页介绍。';
+    return;
+  }
+  $('err').textContent = '';
+  const audit = auditCommercialCase(text);
+  currentInqAudit = audit;
 
-function derive(sig){
-  const {d, readme, files, deps} = sig;
-  const out = {};
-  const has = re => files.some(f=>re.test(f));
-  const hasTests = has(/(^|\/)(__tests__|tests?|spec)\//i) || has(/\.(test|spec)\.[jt]sx?$/i) || has(/_test\.(go|py)$/i);
-  const hasCI = has(/^\.github\/workflows\//i) || has(/^\.gitlab-ci\.yml$/i) || has(/^\.circleci\//i);
-  const isTS = has(/tsconfig\.json$/i) || has(/\.tsx?$/i);
-  const hasDocs = (readme || '').length > 1500;
-  const hasHome = !!(d && d.homepage);
-  const monetize = /pricing|subscribe|billing|paid plan|upgrade|¥|￥|usd|\/month|per month/i.test(readme || '');
+  const box = $('inqResultBox');
+  box.classList.remove('hidden');
 
-  /* 需求：star 速度 */
-  const age = d ? daysSince(d.created_at) : 365;
-  const stars = d ? d.stargazers_count : 0;
-  const vel = stars / age;
-  let lv = vel > 3 ? 3 : vel > 0.8 ? 2 : vel > 0.08 ? 1 : 0;
-  out.need = {lv, conf: d ? (vel > 0.5 ? 'hi' : 'mid') : 'lo', ev: d
-    ? [`${stars} stars ÷ ${Math.round(age)} 天 ≈ ${vel.toFixed(2)} star/天`, `${d.forks_count} forks`, '注意：star 是"关注"信号，不等于"付钱"']
-    : ['本地文件夹看不到外部关注度', '这一爻建议自己填']};
+  let html = `
+    <div class="inq-head">
+      <div class="inq-title">
+        <span class="inq-badge">尽调反问</span>
+        <span>冷酷投资人取证质询 (${audit.questions.length} 处证据缺陷)</span>
+      </div>
+      <div class="inq-rate">置信度打折锁定: ${audit.discountRate}</div>
+    </div>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:14px;line-height:1.7">${audit.summary}</p>
+  `;
 
-  /* 能力：工程化程度 */
-  let cs = 0, ce = [];
-  if(hasTests){ cs++; ce.push('检测到测试目录/测试文件'); } else ce.push('没有找到测试文件');
-  if(hasCI){ cs++; ce.push('检测到 CI 配置'); } else ce.push('没有 CI 配置');
-  if(isTS){ cs++; ce.push('使用 TypeScript'); }
-  if(hasDocs){ cs++; ce.push('README 超过 1500 字'); }
-  out.cap = {lv: cs >= 4 ? 3 : cs >= 3 ? 2 : cs >= 1 ? 1 : 0, conf: cs >= 2 ? 'hi' : 'mid', ev: ce};
-
-  /* 经济：变现线索 */
-  out.econ = {lv: monetize ? 2 : (d && d.license ? 1 : 0), conf: 'lo', ev: [
-    monetize ? 'README 里出现定价/订阅/付费字样' : 'README 里没有发现任何定价或付费线索',
-    d && d.license ? '有 ' + d.license.spdx_id + ' license（能商用，但还没看到怎么收钱）' : '没有 license',
-    '这一爻只能读文字，读不出真实的付费意愿'
-  ]};
-
-  /* 分发：绝对量 + 渠道 */
-  let dl = stars >= 1000 ? 3 : stars >= 200 ? 2 : stars >= 30 ? 1 : 0;
-  let de = [`${stars} stars`];
-  if(d && d.homepage){ dl = Math.min(3, dl + 1); de.push('有独立主页 ' + d.homepage); }
-  if(d && d.topics && d.topics.length){ de.push(d.topics.length + ' 个 topics'); }
-  out.dist = {lv: dl, conf: d ? 'mid' : 'lo', ev: de};
-
-  /* 依赖：运行时依赖数量（越多越被动），devDependencies 不算风险 */
-  const dv = (sig.devDeps || 0);
-  const dlv = deps > 25 ? 0 : deps > 11 ? 1 : deps > 3 ? 2 : 3;
-  out.dep = {lv: dlv, conf: deps ? 'mid' : 'lo', ev: [
-    deps ? '运行时依赖 ' + deps + ' 个' + (dv ? '（另有 ' + dv + ' 个 devDependencies，不计入风险）' : '') : '没读到 package.json（可能不是 JS 项目）',
-    d && d.archived ? '仓库已归档' : '未归档',
-    '这一爻真正该问的是：上游有没有能力顺手做掉你'
-  ]};
-
-  /* 续航：最近活跃 + 人 */
-  const pushAge = d ? daysSince(d.pushed_at) : (sig.lastModified ? daysSince(sig.lastModified) : 999);
-  const lv6 = pushAge < 90 ? 3 : pushAge < 365 ? 2 : 1;
-  out.stam = {lv: lv6, conf: 'mid', ev: [
-    pushAge < 999 ? Math.round(pushAge) + ' 天前还有提交' : '看不出最近活动',
-    d && d.open_issues_count > 200 ? d.open_issues_count + ' 个 open issue（积压严重）' : 'issue 量正常'
-  ]};
-
-  return out;
-}
-
-/* ---------- 渲染 ---------- */
-function render(res){
-  derived = res;
-  $('srcBox').innerHTML = `<div><div class="t">${esc(res.project)}</div><div class="m">${esc(res.source)}</div></div>
-    <div class="m" style="flex:1;text-align:right;min-width:240px">${esc(res.meta)}</div>`;
-  const rows = VARS.map(v=>{
-    const x = res.vars[v.k];
-    const conf = x.conf === 'hi' ? '高置信' : x.conf === 'lo' ? '低置信' : '中等置信';
-    return `<div class="vrow">
-      <div class="vn">${v.yao}爻 · ${v.name}<span class="conf ${x.conf}">${conf}</span></div>
-      <div><select class="sel" data-k="${v.k}" style="width:100%">
-        ${v.lv.map((t,i)=>`<option value="${i}" ${i===x.lv?'selected':''}>${t}</option>`).join('')}
-      </select></div>
-      <div class="vev">${x.ev.map(e=>'• ' + esc(e)).join('<br>')}</div>
-    </div>`;
-  }).join('');
-  $('rows').innerHTML = rows;
-  $('resultCard').classList.remove('hidden');
-  $('resultCard').scrollIntoView({behavior:'smooth', block:'start'});
-}
-
-function collect(){
-  const lv = {};
-  document.querySelectorAll('#rows select').forEach(s=>{ lv[s.dataset.k] = +s.value; });
-  return lv;
-}
-
-/* ---------- 事件 ---------- */
-$('ghRun').addEventListener('click', async ()=>{
-  setErr('');
-  const btn = $('ghRun'); btn.disabled = true; btn.textContent = '读取中…';
-  try{
-    const res = await fromGitHub($('ghUrl').value.trim());
-    const vars = derive(res.signals);
-    render({project: res.project, source: res.source, meta: res.meta, vars});
-  }catch(e){ setErr(e.message); }
-  finally{ btn.disabled = false; btn.textContent = '分析仓库'; }
-});
-
-$('dirPick').addEventListener('click', ()=> $('dirInput').click());
-$('dirInput').addEventListener('change', async e=>{
-  setErr('');
-  const files = e.target.files;
-  if(!files || !files.length) return;
-  $('dirName').textContent = '已选 ' + files.length + ' 个文件';
-  try{
-    const res = await fromFolder(files);
-    const vars = derive(res.signals);
-    render({project: res.project, source: res.source, meta: res.meta, vars});
-  }catch(err){ setErr('读取失败：' + err.message); }
-});
-
-$('jsonRun').addEventListener('click', ()=>{
-  setErr('');
-  try{
-    const j = JSON.parse($('jsonIn').value);
-    const vars = {};
-    VARS.forEach(v=>{
-      const raw = j.vars && j.vars[v.k] !== undefined ? Number(j.vars[v.k]) : 1;
-      const lv = Number.isFinite(raw) ? Math.max(0, Math.min(3, Math.round(raw))) : 1;
-      vars[v.k] = {lv, conf:'hi', ev:[j.note || '来自 JSON，由数据源直接给出']};
+  if (audit.questions.length === 0) {
+    html += `<div style="color:var(--green);font-weight:700;font-size:14px">✔ 未检测到重大逻辑漏洞，各爻位已解锁真实高档位评估！</div>`;
+  } else {
+    audit.questions.forEach((q, idx) => {
+      html += `
+        <div class="inq-q-item" id="qItem-${idx}">
+          <div class="inq-q-title">${q.q}</div>
+          <div class="inq-q-hint">💡 风险底线: ${q.hint}</div>
+          <div style="font-size:12px;color:var(--dim2);margin-bottom:6px">解锁要求: ${q.requiredProof}</div>
+          <button class="inq-proof-btn" onclick="unlockProof(${idx}, '${q.dim}', ${q.unlockTarget})">
+            补充证据并解锁该爻高档位 →
+          </button>
+        </div>
+      `;
     });
-    render({project: j.project || '导入项目', source: 'JSON', meta: '', vars});
-  }catch(err){ setErr('JSON 解析失败：' + err.message); }
-});
+  }
 
-$('goBtn').addEventListener('click', ()=>{
-  const lv = collect();
-  const project = DEADLAB_STORE.save({
-    name: derived.project,
-    source: derived.source,
-    sourceMeta: derived.meta,
-    lv: lv,
-    result: null
+  box.innerHTML = html;
+
+  // 将审讯结论绑定到 rows
+  bindDerived({
+    project: '审讯项目 · ' + (text.slice(0, 18) + '...'),
+    source: '投资人证据审讯室',
+    meta: `检测到 ${audit.questions.length} 项关键缺口 · 初始置信度已打折`,
+    lv: Object.assign({}, audit.baseLv),
+    ev: {
+      need: [audit.questions.find(q=>q.dim==='need') ? '未见陌生人付费证明，按0~1档折算' : '已有定金/真实交易证据'],
+      cap: ['基础架构已具备'],
+      econ: [audit.questions.find(q=>q.dim==='econ') ? '毛利底线未核实，按0档警示' : '单用户毛利有保障'],
+      dist: [audit.questions.find(q=>q.dim==='dist') ? '无自营入口，按零分发测算' : '有确定获客阵地'],
+      dep: [audit.questions.find(q=>q.dim==='dep') ? '纯套壳依附，判定0档高危' : '具备独立护城河'],
+      stam: ['按当前团队常规精力估算']
+    }
   });
-  const payload = {project: project.name, source: project.source, lv, at: Date.now()};
-  try{ localStorage.setItem('deadlab_import', JSON.stringify(payload)); }catch(e){}
-  location.href = 'index.html?imp=1&impProject=' + encodeURIComponent(project.id);
 });
 
-/* demo：自动跑一个公开仓库 */
-const tokEl = $('ghToken');
-if(tokEl){
-  try{ localStorage.removeItem('deadlab_gh_token'); }catch(e){}
-  tokEl.value = '';
-  tokEl.addEventListener('input', ()=>{ githubToken = tokEl.value; });
-}
-if(location.search.indexOf('json')>=0) setTimeout(()=> $('jsonRun').click(), 200);
+window.unlockProof = function(idx, dim, targetVal) {
+  const proof = prompt("请输入您拥有的真实证据凭证 (例如：已有3位客户转账定金截图、已完成模型压测单次成本低于$0.01):");
+  if (proof && proof.trim().length > 2) {
+    if (derived && derived.lv) {
+      derived.lv[dim] = targetVal;
+      renderRows(derived);
+    }
+    const btn = document.querySelector(`#qItem-${idx} button`);
+    if (btn) {
+      btn.textContent = '✔ 证据已提交已核销';
+      btn.classList.add('unlocked');
+    }
+    alert(`【核销成功】已认可您的补充证据，${dim} 爻位已由打折状态成功解锁至等级 ${targetVal}！`);
+  }
+};
 
-if(location.search.indexOf('demo')>=0){
-  const u = new URLSearchParams(location.search).get('repo') || 'sindresorhus/got';
-  $('ghUrl').value = 'https://github.com/' + u;
-  setTimeout(()=> $('ghRun').click(), 200);
-  if(location.search.indexOf('go')>=0) setTimeout(()=> $('goBtn').click(), 4000);
+// 2. GitHub 活体脉搏逻辑
+$('ghRun').addEventListener('click', async () => {
+  const url = $('ghUrl').value.trim();
+  const m = url.match(/github\.com\/([^/]+)\/([^/#?]+)/);
+  if (!m) {
+    $('err').textContent = '请输入合法的 GitHub 仓库链接，如 https://github.com/owner/repo';
+    return;
+  }
+  const [, owner, repo] = m;
+  const token = $('ghToken').value.trim();
+  const headers = { 'Accept': 'application/vnd.github.v3+json' };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+
+  $('err').textContent = '正在实时调取 GitHub 仓库提交与活跃遥测数据...';
+
+  try {
+    const [repoRes, commitsRes] = await Promise.all([
+      fetch(`https://api.github.com/repos/${owner}/${repo}`, { headers }),
+      fetch(`https://api.github.com/repos/${owner}/${repo}/commits?per_page=20`, { headers })
+    ]);
+
+    if (!repoRes.ok) throw new Error('仓库读取失败: ' + repoRes.statusText);
+    const repoData = await repoRes.json();
+    const commitsData = commitsRes.ok ? await commitsRes.json() : [];
+
+    const pulse = computeVitalPulse({ repo: repoData, commits: commitsData });
+    $('err').textContent = '';
+
+    // 展示心电图
+    $('pulseBox').classList.remove('hidden');
+    $('pulseRepoName').textContent = pulse.repoName;
+    $('pulseStatusLabel').textContent = pulse.statusLabel;
+    $('pulseStatusLabel').style.color = pulse.color;
+    $('pulseScore').textContent = pulse.hypothermiaScore;
+    $('pulseScore').style.color = pulse.color;
+    $('pulseLastCommit').textContent = pulse.daysSinceLastCommit + ' 天前';
+    $('pulseStars').textContent = pulse.stars;
+    $('pulseIssues').textContent = pulse.openIssues;
+    $('pulseStam').textContent = 'lv=' + pulse.stamRecommended;
+    $('pulseAlert').textContent = pulse.alertMessage;
+
+    // 绘制心电波形
+    $('ecgPath').setAttribute('d', pulse.svgPath);
+    $('ecgPath').setAttribute('stroke', pulse.color);
+
+    // 绑定到沙盘输入
+    let needLv = pulse.stars > 1000 ? 3 : (pulse.stars > 200 ? 2 : (pulse.stars > 30 ? 1 : 0));
+    let distLv = pulse.stars > 500 ? 3 : (pulse.stars > 100 ? 2 : 1);
+    
+    bindDerived({
+      project: pulse.repoName,
+      source: 'GitHub 实时遥测脉搏',
+      meta: `${pulse.stars} stars · ${pulse.daysSinceLastCommit} 天前提交 · 失温指数 ${pulse.hypothermiaScore}`,
+      lv: { need: needLv, cap: 2, econ: 1, dist: distLv, dep: 1, stam: pulse.stamRecommended },
+      ev: {
+        need: [`${pulse.stars} stars，作为公开关注度参考`],
+        cap: ['检测到公开源码与工程文件'],
+        econ: ['开源代码通常未见直接收费通道'],
+        dist: [`Star 关注量级: ${pulse.stars}`],
+        dep: ['常规技术依赖'],
+        stam: [pulse.alertMessage]
+      }
+    });
+  } catch (err) {
+    $('err').textContent = 'GitHub 遥测失败: ' + err.message + ' (若遇 API 速率限制，请填入个人 Token 重试)';
+  }
+});
+
+// 3. 本地文件夹扫描
+$('dirPick').addEventListener('click', () => $('dirInput').click());
+$('dirInput').addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files || []);
+  if (!files.length) return;
+  const paths = files.map(f => f.webkitRelativePath || f.name);
+  const root = paths[0] ? paths[0].split('/')[0] : '本地项目';
+  $('dirName').textContent = '已选择: ' + root + ` (${files.length} 个文件)`;
+
+  const hasTests = paths.some(p => /test|spec/i.test(p));
+  const hasCI = paths.some(p => /github\/workflows|gitlab-ci/i.test(p));
+  const capLv = (hasTests ? 1 : 0) + (hasCI ? 1 : 0) + 1;
+
+  bindDerived({
+    project: root,
+    source: '本地工程深度扫描',
+    meta: `${files.length} 个文件 · ${root}`,
+    lv: { need: 1, cap: Math.min(3, capLv), econ: 1, dist: 0, dep: 1, stam: 2 },
+    ev: {
+      need: ['本地工程无法评估外界付费意向，预设为待验证'],
+      cap: [hasTests ? '检测到测试文件' : '未检测到自动化测试', hasCI ? '检测到 CI/CD 流程' : '未检测到 CI 配置'],
+      econ: ['无直接公开价格标记'],
+      dist: ['本地工程未见公共分发渠道'],
+      dep: ['常规工程依赖'],
+      stam: ['常规储备']
+    }
+  });
+});
+
+// 4. JSON 导入
+$('jsonRun').addEventListener('click', () => {
+  try {
+    const data = JSON.parse($('jsonIn').value);
+    const lv = data.vars || {};
+    bindDerived({
+      project: data.project || 'JSON 导入项目',
+      source: '外部 JSON 结构化数据',
+      meta: data.note || '手动输入',
+      lv: {
+        need: lv.need ?? 1,
+        cap: lv.cap ?? 1,
+        econ: lv.econ ?? 1,
+        dist: lv.dist ?? 1,
+        dep: lv.dep ?? 1,
+        stam: lv.stam ?? 1
+      },
+      ev: {
+        need: ['外部数据指定'], cap: ['外部数据指定'], econ: ['外部数据指定'],
+        dist: ['外部数据指定'], dep: ['外部数据指定'], stam: ['外部数据指定']
+      }
+    });
+  } catch (err) {
+    $('err').textContent = 'JSON 格式解析失败: ' + err.message;
+  }
+});
+
+function bindDerived(data) {
+  derived = data;
+  $('resultCard').classList.remove('hidden');
+  $('srcBox').innerHTML = `
+    <div>
+      <div class="t">${esc(data.project)}</div>
+      <div class="m">${esc(data.source)} · ${esc(data.meta)}</div>
+    </div>
+  `;
+  renderRows(data);
+  $('resultCard').scrollIntoView({ behavior: 'smooth' });
 }
+
+function renderRows(data) {
+  const rows = $('rows');
+  rows.innerHTML = '';
+  VARS.forEach(v => {
+    const curLv = data.lv[v.k];
+    const evText = (data.ev[v.k] || []).join('；');
+    const row = document.createElement('div');
+    row.className = 'vrow';
+    row.innerHTML = `
+      <div class="vname">${v.yao}爻 · ${v.name}</div>
+      <div class="vev">${esc(evText)}</div>
+      <div>
+        <select class="vselect" onchange="updateLv('${v.k}', this.value)">
+          ${v.lv.map((label, idx) => `<option value="${idx}" ${idx === curLv ? 'selected' : ''}>${idx} - ${label}</option>`).join('')}
+        </select>
+      </div>
+    `;
+    rows.appendChild(row);
+  });
+}
+
+window.updateLv = function(key, val) {
+  if (derived && derived.lv) {
+    derived.lv[key] = parseInt(val, 10);
+  }
+};
+
+// 提交带入沙盘
+$('goBtn').addEventListener('click', () => {
+  if (!derived || !derived.lv) return;
+  const p = new URLSearchParams();
+  p.set('name', derived.project);
+  ['need', 'cap', 'econ', 'dist', 'dep', 'stam'].forEach(k => {
+    p.set(k, derived.lv[k]);
+  });
+  location.href = 'index.html?' + p.toString();
+});
 </script>
 </body>
 </html>
