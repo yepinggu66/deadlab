@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>一页纸报告 · 程序员逆天卦-沙盘</title>
+<script src="i18n.js"></script>
 <style>
 :root{
   --red:#D8383F; --ink:#14161A; --mute:#6B7280; --line:#E4E6EB; --paper:#FFFFFF;
@@ -87,7 +88,10 @@ td.k{color:var(--mute);width:110px}
 </head>
 <body>
 <div class="toolbar">
-  <a href="index.html">← 回到沙盘</a>
+  <div style="display:flex;align-items:center;gap:10px">
+    <a href="index.html" data-i18n="nav.sandbox">← 回到沙盘</a>
+    <a href="javascript:void(0)" onclick="DL_I18N.setLang(DL_I18N.lang==='zh'?'en':'zh')" id="langSwitchBtn">🌐 <span data-i18n="nav.lang_switch">EN</span></a>
+  </div>
   <button id="printBtn">打印 / 存为 PDF</button>
 </div>
 <div class="projectbar">
@@ -120,10 +124,19 @@ function projectData(project){
   const vetoes = Object.keys(project.veto || {}).filter(k=>project.veto[k]).map(k=>DEADLAB.VETO_LABEL[k] || k);
   const causes = r.causes || Object.entries(r.causeShare || {}).sort((a,b)=>b[1]-a[1]).slice(0,3)
     .map(([k,v])=>[CAUSES[k].n, Math.round(v*100)]);
+  let benchmark = r.benchmark || null;
+  let fatalFlags = r.fatalFlags || [];
+  if(!benchmark && project.lv && typeof DEADLAB.forecast === 'function'){
+    try{
+      const fc = DEADLAB.forecast(project.lv, project.veto);
+      benchmark = fc.benchmark || null;
+      fatalFlags = fc.fatalFlags || [];
+    }catch(e){}
+  }
   return {
     project: project.name,
     id: r.simId || '—',
-    date: new Date(project.updatedAt).toLocaleDateString('zh-CN'),
+    date: new Date(project.updatedAt).toLocaleDateString(DEADLAB.LANG === 'en' ? 'en-US' : 'zh-CN'),
     hex: r.vetoed ? '—' : (r.s ? hexOf(project.lv)[2] : '—'),
     bits: VARS.map(v=>project.lv[v.k]>=2?1:0).join(''),
     lv: project.lv,
@@ -133,13 +146,24 @@ function projectData(project){
     causes,
     lever: r.lever || null,
     vetoed: !!r.vetoed,
-    source: project.source
+    source: project.source,
+    benchmark,
+    fatalFlags
   };
 }
 
 function legacyData(d){
   if(!d) return null;
   const bits = d.bits || VARS.map(v=>((d.lv && d.lv[v.k]) || 0)>=2?1:0).join('');
+  let benchmark = d.benchmark || null;
+  let fatalFlags = d.fatalFlags || [];
+  if(!benchmark && d.lv && typeof DEADLAB.forecast === 'function'){
+    try{
+      const fc = DEADLAB.forecast(d.lv, d.vetoed ? {copy:true} : {});
+      benchmark = fc.benchmark || null;
+      fatalFlags = fc.fatalFlags || [];
+    }catch(e){}
+  }
   return {
     project: d.project || '未命名项目',
     id: d.id || '—',
@@ -153,7 +177,9 @@ function legacyData(d){
     causes: d.causes || [],
     lever: d.lever || null,
     vetoed: !!d.vetoed,
-    source: d.source || ''
+    source: d.source || '',
+    benchmark,
+    fatalFlags
   };
 }
 
@@ -210,6 +236,26 @@ function renderReport(d){
     </div>
     ${d.verdict ? `<div class="vline">${esc(d.verdict)}</div>` : ''}
   `}
+
+  ${d.fatalFlags && d.fatalFlags.length ? `
+    <div style="background:rgba(216,56,63,.08);border:1px solid #D8383F;border-radius:10px;padding:12px 16px;margin:16px 0;font-size:12.5px;color:#D8383F;line-height:1.6">
+      <b style="display:block;margin-bottom:4px">⚠️ 致命瓶颈熔断预警 / FATAL BOTTLENECK FUSE:</b>
+      ${d.fatalFlags.map(f => `<div>• ${esc(f)}</div>`).join('')}
+    </div>
+  ` : ''}
+
+  ${d.benchmark ? `
+    <div class="sec" style="background:#F8F9FB;border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:18px 0">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div style="font-size:11px;font-family:var(--mono);color:var(--mute);letter-spacing:.12em;text-transform:uppercase">150 真实项目历史参照系 · Benchmark</div>
+        <div style="font-size:11px;color:var(--mute)">置信度 <b>${Math.round(d.benchmark.confidence||0)}%</b></div>
+      </div>
+      <div style="font-size:15px;font-weight:600;margin:8px 0 4px;color:var(--ink)">
+        ${esc(d.benchmark.label || '')} · <span style="color:#2E7D32">击败同类立项 ${Math.round(d.benchmark.percentile||0)}%</span>
+      </div>
+      ${d.benchmark.confNote ? `<div style="font-size:11.5px;color:var(--mute);line-height:1.5">${esc(d.benchmark.confNote)}</div>` : ''}
+    </div>
+  ` : ''}
 
   <div class="sec">
     <h2>六爻 · 六个变量</h2>
