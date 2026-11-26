@@ -4,7 +4,262 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>程序员逆天卦-沙盘 · 先算它怎么死</title>
-<script src="i18n.js"></script>
+<script src="i18n.js">
+/* ============ 3D 八卦交互控制器 ============ */
+const Bagua3D = (function(){
+  const world = document.getElementById("b3dWorld");
+  const viewport = document.getElementById("b3dViewport");
+  const layerOuter = document.getElementById("b3dLayerOuter");
+  const layerTaiji = document.getElementById("b3dLayerTaiji");
+  const canvas = document.getElementById("b3dCanvas");
+  const ctx = canvas ? canvas.getContext("2d") : null;
+  const zoomVal = document.getElementById("b3dZoomVal");
+  const autoSpinBtn = document.getElementById("b3dAutoSpin");
+  const hudProphecy = document.getElementById("b3dProphecy");
+  const hudBadge = document.getElementById("b3dBadge");
+  const hudText = document.getElementById("b3dText");
+
+  if (!world || !viewport) return null;
+
+  let rotX = 22;      // 俯仰视角，展现清晰3D立体层次
+  let rotY = -15;     // 偏航角
+  let rotZ = 0;       // 自转角
+  let outerZ = 0;     // 外盘相对转动
+  let scale = 1.0;
+  let autoSpin = true;
+  let isDragging = false;
+  let startX = 0, startY = 0;
+  let lastX = 0, lastY = 0;
+  let velX = 0, velY = 0;
+  let isDivining = false;
+
+  // 粒子系统
+  const particles = [];
+  function addSparks(x, y, count = 28, color = "#F0D392") {
+    if (!ctx) return;
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1.2 + Math.random() * 4.2;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: 1.5 + Math.random() * 2.2,
+        alpha: 1,
+        decay: 0.02 + Math.random() * 0.025,
+        color: Math.random() > 0.35 ? color : (Math.random() > 0.5 ? "#C3272B" : "#FFF")
+      });
+    }
+  }
+
+  function updateParticles() {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vx *= 0.95;
+      p.vy *= 0.95;
+      p.alpha -= p.decay;
+      if (p.alpha <= 0) {
+        particles.splice(i, 1);
+        continue;
+      }
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.alpha);
+      ctx.fillStyle = p.color;
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function applyTransform() {
+    world.style.transform = `scale3d(${scale}, ${scale}, ${scale}) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) rotateZ(${rotZ.toFixed(2)}deg)`;
+    if (layerOuter) {
+      layerOuter.style.transform = `translateZ(-8px) rotateZ(${(-outerZ).toFixed(2)}deg)`;
+    }
+    if (layerTaiji) {
+      layerTaiji.style.transform = `translateZ(58px) rotateZ(${(rotZ * 0.6).toFixed(2)}deg)`;
+    }
+  }
+
+  function tick() {
+    if (isDivining) {
+      // 疾转推演
+      rotZ = (rotZ + 18) % 360;
+      outerZ = (outerZ + 12) % 360;
+      if (Math.random() > 0.4) {
+        addSparks(135 + (Math.random() - 0.5) * 80, 135 + (Math.random() - 0.5) * 80, 4);
+      }
+    } else {
+      // 平常自转
+      if (autoSpin && !isDragging) {
+        rotZ = (rotZ + 0.35) % 360;
+        outerZ = (outerZ + 0.18) % 360;
+      }
+      // 惯性阻尼
+      if (!isDragging && (Math.abs(velX) > 0.05 || Math.abs(velY) > 0.05)) {
+        rotY += velX;
+        rotX -= velY;
+        velX *= 0.92;
+        velY *= 0.92;
+        rotX = Math.max(-65, Math.min(65, rotX));
+      }
+    }
+
+    applyTransform();
+    updateParticles();
+    requestAnimationFrame(tick);
+  }
+
+  // 鼠标与触摸拖拽
+  viewport.addEventListener("pointerdown", e => {
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    lastX = e.clientX;
+    lastY = e.clientY;
+    velX = 0;
+    velY = 0;
+    viewport.setPointerCapture(e.pointerId);
+  });
+
+  viewport.addEventListener("pointermove", e => {
+    if (!isDragging) return;
+    const dx = e.clientX - lastX;
+    const dy = e.clientY - lastY;
+    velX = dx * 0.35;
+    velY = dy * 0.35;
+    rotY += velX;
+    rotX = Math.max(-65, Math.min(65, rotX - velY));
+    lastX = e.clientX;
+    lastY = e.clientY;
+  });
+
+  const onPointerUp = e => {
+    if (isDragging) {
+      isDragging = false;
+      try { viewport.releasePointerCapture(e.pointerId); } catch(err) {}
+    }
+  };
+  viewport.addEventListener("pointerup", onPointerUp);
+  viewport.addEventListener("pointercancel", onPointerUp);
+
+  // 滚轮缩放
+  viewport.addEventListener("wheel", e => {
+    e.preventDefault();
+    const delta = e.deltaY < 0 ? 0.1 : -0.1;
+    setZoom(scale + delta);
+  }, { passive: false });
+
+  function setZoom(val) {
+    scale = Math.max(0.65, Math.min(2.0, val));
+    if (zoomVal) zoomVal.textContent = Math.round(scale * 100) + "%";
+  }
+
+  // 控制按钮绑定
+  const resetBtn = document.getElementById("b3dReset");
+  if (resetBtn) {
+    resetBtn.addEventListener("click", () => {
+      rotX = 22;
+      rotY = -15;
+      setZoom(1.0);
+      autoSpin = true;
+      if (autoSpinBtn) autoSpinBtn.classList.add("active");
+      addSparks(135, 135, 20);
+      if (hudText) hudText.textContent = "视角已复位 · 拖拽自由旋转";
+    });
+  }
+
+  const zoomInBtn = document.getElementById("b3dZoomIn");
+  if (zoomInBtn) zoomInBtn.addEventListener("click", () => setZoom(scale + 0.15));
+
+  const zoomOutBtn = document.getElementById("b3dZoomOut");
+  if (zoomOutBtn) zoomOutBtn.addEventListener("click", () => setZoom(scale - 0.15));
+
+  if (autoSpinBtn) {
+    autoSpinBtn.addEventListener("click", () => {
+      autoSpin = !autoSpin;
+      autoSpinBtn.classList.toggle("active", autoSpin);
+      if (hudText) hudText.textContent = autoSpin ? "太极运转 · 阴阳生克" : "静止感悟 · 点击卦位探寻天机";
+    });
+  }
+
+  // 点击八卦各个卦位产生酷炫特效与卦辞解惑
+  const trigramElements = document.querySelectorAll(".b3d-trigram");
+  trigramElements.forEach(el => {
+    el.addEventListener("click", e => {
+      e.stopPropagation();
+      const name = el.getAttribute("data-name");
+      const sym = el.getAttribute("data-sym");
+      const nature = el.getAttribute("data-nature");
+      const desc = el.getAttribute("data-desc");
+
+      const rect = viewport.getBoundingClientRect();
+      const x = (e.clientX - rect.left);
+      const y = (e.clientY - rect.top);
+      addSparks(x, y, 32, "#F0D392");
+
+      trigramElements.forEach(t => t.classList.remove("active"));
+      el.classList.add("active");
+      setTimeout(() => el.classList.remove("active"), 2000);
+
+      if (hudBadge && hudText && hudProphecy) {
+        hudBadge.textContent = `${name}卦 · ${sym} ${nature}`;
+        hudText.textContent = desc;
+        hudProphecy.classList.add("lit");
+        setTimeout(() => hudProphecy.classList.remove("lit"), 2500);
+      }
+    });
+  });
+
+  // 点击太极双鱼核心
+  const taijiLayer = document.getElementById("b3dLayerTaiji");
+  if (taijiLayer) {
+    taijiLayer.addEventListener("click", e => {
+      e.stopPropagation();
+      addSparks(135, 135, 40, "#EAE8E3");
+      if (hudBadge && hudText && hudProphecy) {
+        hudBadge.textContent = "太极天心";
+        hudText.textContent = "易有太极，是生两仪，两仪生四象，四象生八卦。";
+        hudProphecy.classList.add("lit");
+        setTimeout(() => hudProphecy.classList.remove("lit"), 2500);
+      }
+    });
+  }
+
+  requestAnimationFrame(tick);
+
+  return {
+    startDivining: () => {
+      isDivining = true;
+      rotX = 35;
+      rotY = 0;
+      autoSpin = true;
+      if (hudBadge && hudText && hudProphecy) {
+        hudBadge.textContent = "天机推演";
+        hudText.textContent = "八卦疾转 · 正在推演 5,000 次死法...";
+        hudProphecy.classList.add("lit");
+      }
+    },
+    stopDivining: () => {
+      isDivining = false;
+      addSparks(135, 135, 55, "#D4AF37");
+      if (hudBadge && hudText && hudProphecy) {
+        hudBadge.textContent = "卦象已定";
+        hudText.textContent = "天机显现 · 诊断结果已出";
+        setTimeout(() => hudProphecy.classList.remove("lit"), 2500);
+      }
+    }
+  };
+})();
+
+</script>
 <style>
 :root{
   --bg:#07080A;
@@ -335,6 +590,214 @@ footer .mono{font-family:var(--serif); font-size:13.5px; font-weight:600; color:
 .project-btns button:disabled{opacity:.35; cursor:default}
 .project-empty{font-size:13px; color:var(--dim2); padding:10px 0; font-family:var(--serif)}
 @media(max-width:760px){.project-row{grid-template-columns:1fr}.project-btns{justify-content:flex-start}}
+
+/* ============ 3D 八卦交互推演舞台 ============ */
+.bagua-3d-box {
+  position: relative;
+  width: 290px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  touch-action: none;
+}
+.b3d-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  z-index: 5;
+}
+.b3d-btn {
+  background: rgba(14, 16, 23, 0.85);
+  border: 1px solid var(--line);
+  color: var(--dim);
+  font-family: var(--serif);
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  backdrop-filter: blur(4px);
+}
+.b3d-btn:hover {
+  color: var(--gold-light);
+  border-color: var(--line-gold);
+  background: rgba(197, 160, 89, 0.12);
+}
+.b3d-btn.active {
+  color: #07080A;
+  background: var(--gold-light);
+  border-color: var(--gold-light);
+  font-weight: 700;
+}
+.b3d-zoom-group {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 1px 4px;
+  background: rgba(14, 16, 23, 0.7);
+}
+.b3d-zoom-group .b3d-btn {
+  border: none;
+  padding: 2px 6px;
+  background: transparent;
+}
+.b3d-zoom-val {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--gold);
+  min-width: 32px;
+  text-align: center;
+}
+
+.b3d-viewport {
+  position: relative;
+  width: 270px;
+  height: 270px;
+  perspective: 1000px;
+  perspective-origin: 50% 50%;
+  cursor: grab;
+}
+.b3d-viewport:active {
+  cursor: grabbing;
+}
+.b3d-world {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.b3d-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.b3d-layer svg {
+  display: block;
+  width: 260px;
+  height: 260px;
+  overflow: visible;
+}
+
+/* 各图层的 3D 深度 */
+.b3d-layer-base {
+  transform: translateZ(-35px);
+  filter: drop-shadow(0 20px 35px rgba(0,0,0,0.85));
+}
+.b3d-layer-outer {
+  transform: translateZ(-8px);
+}
+.b3d-layer-trigrams {
+  transform: translateZ(28px);
+}
+.b3d-layer-taiji {
+  transform: translateZ(58px);
+}
+
+/* 卦象与文字交互 */
+.b3d-trigram {
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+.trig-hit {
+  fill: transparent;
+}
+.trig-txt {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  font-weight: 700;
+  fill: var(--gold-light);
+  letter-spacing: 0.05em;
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.8));
+  transition: fill 0.2s, filter 0.2s;
+}
+.trig-sym {
+  font-family: var(--serif);
+  font-size: 15px;
+  fill: #EDEAE3;
+  opacity: 0.95;
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.8));
+  transition: fill 0.2s, filter 0.2s;
+}
+.b3d-trigram:hover .trig-txt,
+.b3d-trigram.active .trig-txt {
+  fill: #FFF7D6;
+  filter: drop-shadow(0 0 10px rgba(240, 211, 146, 0.85));
+}
+.b3d-trigram:hover .trig-sym,
+.b3d-trigram.active .trig-sym {
+  fill: var(--gold-light);
+  filter: drop-shadow(0 0 10px rgba(240, 211, 146, 0.85));
+}
+
+.taiji-rim {
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,0.8));
+}
+
+/* 特效粒子画布 */
+.b3d-canvas {
+  position: absolute;
+  inset: 0;
+  width: 270px;
+  height: 270px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* 底部天机浮动 HUD */
+.b3d-hud {
+  margin-top: 10px;
+  width: 100%;
+  text-align: center;
+}
+.b3d-hud-prophecy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(14, 16, 23, 0.85);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  max-width: 100%;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  transition: all 0.25s ease;
+}
+.b3d-hud-prophecy.lit {
+  border-color: var(--gold);
+  background: rgba(197, 160, 89, 0.12);
+  box-shadow: 0 0 20px rgba(197, 160, 89, 0.3);
+}
+.b3d-hud-badge {
+  font-family: var(--serif);
+  font-size: 11px;
+  color: #07080A;
+  background: var(--gold);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.b3d-hud-text {
+  font-family: var(--serif);
+  font-size: 11.5px;
+  color: var(--txt);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 </style>
 </head>
 <body>
@@ -369,100 +832,133 @@ footer .mono{font-family:var(--serif); font-size:13.5px; font-weight:600; color:
         </div>
       </div>
       <div class="hero-right">
-        <div class="bagua-wrap">
-          <div class="bagua-glow"></div>
-          <svg id="baguaDial" class="bagua-dial" viewBox="0 0 320 320" width="230" height="230" title="太极八卦推演盘">
-            <defs>
-              <radialGradient id="goldGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#C5A059" stop-opacity="0.35"/>
-                <stop offset="70%" stop-color="#C5A059" stop-opacity="0.08"/>
-                <stop offset="100%" stop-color="#C5A059" stop-opacity="0"/>
-              </radialGradient>
-            </defs>
+        <div class="bagua-3d-box" id="bagua3dBox">
+          <!-- 3D 交互控制栏：复位、缩放、自转 -->
+          <div class="b3d-toolbar">
+            <button type="button" class="b3d-btn" id="b3dReset" title="复位3D视角">↺ 视角复位</button>
+            <div class="b3d-zoom-group">
+              <button type="button" class="b3d-btn" id="b3dZoomOut" title="缩小">-</button>
+              <span class="b3d-zoom-val" id="b3dZoomVal">100%</span>
+              <button type="button" class="b3d-btn" id="b3dZoomIn" title="放大">+</button>
+            </div>
+            <button type="button" class="b3d-btn active" id="b3dAutoSpin" title="自转开关">☯ 自转</button>
+          </div>
 
-            <!-- 外层柔光 -->
-            <circle cx="160" cy="160" r="150" fill="url(#goldGlow)"/>
+          <!-- 3D 透视舞台 (按住拖拽自由旋转，滚轮缩放) -->
+          <div class="b3d-viewport" id="b3dViewport" title="按住拖拽在3D空间旋转，滚轮缩放，点击八卦感应">
+            <div class="b3d-world" id="b3dWorld">
+              <!-- Layer 0: 幽深底座环与阴影 (Z: -35px) -->
+              <div class="b3d-layer b3d-layer-base">
+                <svg viewBox="0 0 320 320" width="260" height="260">
+                  <circle cx="160" cy="160" r="150" fill="#06070B" stroke="#C5A059" stroke-width="1.5" stroke-opacity="0.35"/>
+                  <circle cx="160" cy="160" r="144" fill="none" stroke="#C5A059" stroke-width="0.8" stroke-dasharray="2 5" stroke-opacity="0.25"/>
+                </svg>
+              </div>
 
-            <!-- 动态旋转八卦盘群组 -->
-            <g class="bagua-rotator">
-              <!-- 外盘同心金环 -->
-              <circle cx="160" cy="160" r="142" fill="#0A0C11" stroke="#C5A059" stroke-width="1.8" stroke-opacity="0.6"/>
-              <circle cx="160" cy="160" r="136" fill="none" stroke="#C5A059" stroke-width="0.8" stroke-dasharray="2 4" stroke-opacity="0.4"/>
-              <circle cx="160" cy="160" r="108" fill="none" stroke="#C5A059" stroke-width="1" stroke-opacity="0.3"/>
-              <circle cx="160" cy="160" r="64" fill="none" stroke="#C5A059" stroke-width="1.2" stroke-opacity="0.4"/>
+              <!-- Layer 1: 周天六十四卦外星度天盘 (Z: -8px) -->
+              <div class="b3d-layer b3d-layer-outer" id="b3dLayerOuter">
+                <svg viewBox="0 0 320 320" width="260" height="260">
+                  <circle cx="160" cy="160" r="138" fill="#0A0D14" stroke="#C5A059" stroke-width="1.8" stroke-opacity="0.65"/>
+                  <circle cx="160" cy="160" r="132" fill="none" stroke="#C5A059" stroke-width="1" stroke-dasharray="2 4" stroke-opacity="0.5"/>
+                  <circle cx="160" cy="160" r="110" fill="none" stroke="#C5A059" stroke-width="1" stroke-opacity="0.35"/>
+                  <!-- 24节气及周天八宫分度刻度线 -->
+                  <g stroke="#C5A059" stroke-width="1" stroke-opacity="0.45">
+                    <line x1="160" y1="18" x2="160" y2="28" transform="rotate(0 160 160)"/>
+                    <line x1="160" y1="18" x2="160" y2="28" transform="rotate(45 160 160)"/>
+                    <line x1="160" y1="18" x2="160" y2="28" transform="rotate(90 160 160)"/>
+                    <line x1="160" y1="18" x2="160" y2="28" transform="rotate(135 160 160)"/>
+                    <line x1="160" y1="18" x2="160" y2="28" transform="rotate(180 160 160)"/>
+                    <line x1="160" y1="18" x2="160" y2="28" transform="rotate(225 160 160)"/>
+                    <line x1="160" y1="18" x2="160" y2="28" transform="rotate(270 160 160)"/>
+                    <line x1="160" y1="18" x2="160" y2="28" transform="rotate(315 160 160)"/>
+                    <line x1="160" y1="22" x2="160" y2="26" stroke-opacity="0.25" transform="rotate(22.5 160 160)"/>
+                    <line x1="160" y1="22" x2="160" y2="26" stroke-opacity="0.25" transform="rotate(67.5 160 160)"/>
+                    <line x1="160" y1="22" x2="160" y2="26" stroke-opacity="0.25" transform="rotate(112.5 160 160)"/>
+                    <line x1="160" y1="22" x2="160" y2="26" stroke-opacity="0.25" transform="rotate(157.5 160 160)"/>
+                    <line x1="160" y1="22" x2="160" y2="26" stroke-opacity="0.25" transform="rotate(202.5 160 160)"/>
+                    <line x1="160" y1="22" x2="160" y2="26" stroke-opacity="0.25" transform="rotate(247.5 160 160)"/>
+                    <line x1="160" y1="22" x2="160" y2="26" stroke-opacity="0.25" transform="rotate(292.5 160 160)"/>
+                    <line x1="160" y1="22" x2="160" y2="26" stroke-opacity="0.25" transform="rotate(337.5 160 160)"/>
+                  </g>
+                </svg>
+              </div>
 
-              <!-- 先天八卦卦象与文字 (0°乾, 45°兑, 90°离, 135°震, 180°坤, 225°艮, 270°坎, 315°巽) -->
-              <g class="trigram-group" transform="rotate(0 160 160)">
-                <text x="160" y="38" text-anchor="middle" class="trigram-char">乾</text>
-                <text x="160" y="52" text-anchor="middle" class="trigram-sym">☰</text>
-              </g>
-              <g class="trigram-group" transform="rotate(45 160 160)">
-                <text x="160" y="38" text-anchor="middle" class="trigram-char">兑</text>
-                <text x="160" y="52" text-anchor="middle" class="trigram-sym">☱</text>
-              </g>
-              <g class="trigram-group" transform="rotate(90 160 160)">
-                <text x="160" y="38" text-anchor="middle" class="trigram-char">离</text>
-                <text x="160" y="52" text-anchor="middle" class="trigram-sym">☲</text>
-              </g>
-              <g class="trigram-group" transform="rotate(135 160 160)">
-                <text x="160" y="38" text-anchor="middle" class="trigram-char">震</text>
-                <text x="160" y="52" text-anchor="middle" class="trigram-sym">☳</text>
-              </g>
-              <g class="trigram-group" transform="rotate(180 160 160)">
-                <text x="160" y="38" text-anchor="middle" class="trigram-char">坤</text>
-                <text x="160" y="52" text-anchor="middle" class="trigram-sym">☷</text>
-              </g>
-              <g class="trigram-group" transform="rotate(225 160 160)">
-                <text x="160" y="38" text-anchor="middle" class="trigram-char">艮</text>
-                <text x="160" y="52" text-anchor="middle" class="trigram-sym">☶</text>
-              </g>
-              <g class="trigram-group" transform="rotate(270 160 160)">
-                <text x="160" y="38" text-anchor="middle" class="trigram-char">坎</text>
-                <text x="160" y="52" text-anchor="middle" class="trigram-sym">☵</text>
-              </g>
-              <g class="trigram-group" transform="rotate(315 160 160)">
-                <text x="160" y="38" text-anchor="middle" class="trigram-char">巽</text>
-                <text x="160" y="52" text-anchor="middle" class="trigram-sym">☴</text>
-              </g>
+              <!-- Layer 2: 先天八卦卦位与象数 (Z: 28px 立体凸起层) -->
+              <div class="b3d-layer b3d-layer-trigrams" id="b3dLayerTrigrams">
+                <svg viewBox="0 0 320 320" width="260" height="260">
+                  <circle cx="160" cy="160" r="108" fill="#0C0F17" stroke="#D4AF37" stroke-width="1.6" stroke-opacity="0.7"/>
+                  <circle cx="160" cy="160" r="62" fill="none" stroke="#D4AF37" stroke-width="1.4" stroke-opacity="0.5"/>
+                  <!-- 先天八卦 8 个象限的文字、卦爻符与点击响应热区 -->
+                  <g class="b3d-trigram" data-name="乾" data-sym="☰" data-nature="天" data-desc="纯阳刚健 · 元亨利贞 · 刚强进取之象" transform="rotate(0 160 160)">
+                    <circle cx="160" cy="38" r="22" class="trig-hit"/>
+                    <text x="160" y="32" text-anchor="middle" class="trig-txt">乾</text>
+                    <text x="160" y="50" text-anchor="middle" class="trig-sym">☰</text>
+                  </g>
+                  <g class="b3d-trigram" data-name="兑" data-sym="☱" data-nature="泽" data-desc="和乐喜悦 · 顺天应人 · 灵动交流之象" transform="rotate(45 160 160)">
+                    <circle cx="160" cy="38" r="22" class="trig-hit"/>
+                    <text x="160" y="32" text-anchor="middle" class="trig-txt">兑</text>
+                    <text x="160" y="50" text-anchor="middle" class="trig-sym">☱</text>
+                  </g>
+                  <g class="b3d-trigram" data-name="离" data-sym="☲" data-nature="火" data-desc="明察秋毫 · 附丽光明 · 燃烧照耀之象" transform="rotate(90 160 160)">
+                    <circle cx="160" cy="38" r="22" class="trig-hit"/>
+                    <text x="160" y="32" text-anchor="middle" class="trig-txt">离</text>
+                    <text x="160" y="50" text-anchor="middle" class="trig-sym">☲</text>
+                  </g>
+                  <g class="b3d-trigram" data-name="震" data-sym="☳" data-nature="雷" data-desc="雷霆奋起 · 变动生机 · 警醒震撼之象" transform="rotate(135 160 160)">
+                    <circle cx="160" cy="38" r="22" class="trig-hit"/>
+                    <text x="160" y="32" text-anchor="middle" class="trig-txt">震</text>
+                    <text x="160" y="50" text-anchor="middle" class="trig-sym">☳</text>
+                  </g>
+                  <g class="b3d-trigram" data-name="坤" data-sym="☷" data-nature="地" data-desc="厚德载物 · 含弘光大 · 柔顺承载之象" transform="rotate(180 160 160)">
+                    <circle cx="160" cy="38" r="22" class="trig-hit"/>
+                    <text x="160" y="32" text-anchor="middle" class="trig-txt">坤</text>
+                    <text x="160" y="50" text-anchor="middle" class="trig-sym">☷</text>
+                  </g>
+                  <g class="b3d-trigram" data-name="艮" data-sym="☶" data-nature="山" data-desc="止于至善 · 沉静如山 · 见机而退之象" transform="rotate(225 160 160)">
+                    <circle cx="160" cy="38" r="22" class="trig-hit"/>
+                    <text x="160" y="32" text-anchor="middle" class="trig-txt">艮</text>
+                    <text x="160" y="50" text-anchor="middle" class="trig-sym">☶</text>
+                  </g>
+                  <g class="b3d-trigram" data-name="坎" data-sym="☵" data-nature="水" data-desc="行险不失 · 润下深邃 · 绝境求生之象" transform="rotate(270 160 160)">
+                    <circle cx="160" cy="38" r="22" class="trig-hit"/>
+                    <text x="160" y="32" text-anchor="middle" class="trig-txt">坎</text>
+                    <text x="160" y="50" text-anchor="middle" class="trig-sym">☵</text>
+                  </g>
+                  <g class="b3d-trigram" data-name="巽" data-sym="☴" data-nature="风" data-desc="顺达潜入 · 柔顺因势 · 无孔不入之象" transform="rotate(315 160 160)">
+                    <circle cx="160" cy="38" r="22" class="trig-hit"/>
+                    <text x="160" y="32" text-anchor="middle" class="trig-txt">巽</text>
+                    <text x="160" y="50" text-anchor="middle" class="trig-sym">☴</text>
+                  </g>
+                </svg>
+              </div>
 
-              <!-- 24节气与周天分度刻度线 -->
-              <g stroke="#C5A059" stroke-width="1" stroke-opacity="0.4">
-                <line x1="160" y1="18" x2="160" y2="26" transform="rotate(0 160 160)"/>
-                <line x1="160" y1="18" x2="160" y2="26" transform="rotate(45 160 160)"/>
-                <line x1="160" y1="18" x2="160" y2="26" transform="rotate(90 160 160)"/>
-                <line x1="160" y1="18" x2="160" y2="26" transform="rotate(135 160 160)"/>
-                <line x1="160" y1="18" x2="160" y2="26" transform="rotate(180 160 160)"/>
-                <line x1="160" y1="18" x2="160" y2="26" transform="rotate(225 160 160)"/>
-                <line x1="160" y1="18" x2="160" y2="26" transform="rotate(270 160 160)"/>
-                <line x1="160" y1="18" x2="160" y2="26" transform="rotate(315 160 160)"/>
-                <line x1="160" y1="21" x2="160" y2="25" stroke-opacity="0.25" transform="rotate(22.5 160 160)"/>
-                <line x1="160" y1="21" x2="160" y2="25" stroke-opacity="0.25" transform="rotate(67.5 160 160)"/>
-                <line x1="160" y1="21" x2="160" y2="25" stroke-opacity="0.25" transform="rotate(112.5 160 160)"/>
-                <line x1="160" y1="21" x2="160" y2="25" stroke-opacity="0.25" transform="rotate(157.5 160 160)"/>
-                <line x1="160" y1="21" x2="160" y2="25" stroke-opacity="0.25" transform="rotate(202.5 160 160)"/>
-                <line x1="160" y1="21" x2="160" y2="25" stroke-opacity="0.25" transform="rotate(247.5 160 160)"/>
-                <line x1="160" y1="21" x2="160" y2="25" stroke-opacity="0.25" transform="rotate(292.5 160 160)"/>
-                <line x1="160" y1="21" x2="160" y2="25" stroke-opacity="0.25" transform="rotate(337.5 160 160)"/>
-              </g>
-            </g>
+              <!-- Layer 3: 中心立体悬浮太极阴阳双鱼 (Z: 58px) -->
+              <div class="b3d-layer b3d-layer-taiji" id="b3dLayerTaiji">
+                <svg viewBox="0 0 320 320" width="260" height="260">
+                  <circle cx="160" cy="160" r="54" fill="#0A0C11" stroke="#D4AF37" stroke-width="2.2" class="taiji-rim"/>
+                  <circle cx="160" cy="160" r="50" fill="#080A0E"/>
+                  <!-- 阳鱼 (宣纸白 S曲线) -->
+                  <path d="M 160 110 A 50 50 0 0 1 160 210 A 25 25 0 0 1 160 160 A 25 25 0 0 0 160 110 Z" fill="#EAE8E3"/>
+                  <!-- 阳中阴眼 -->
+                  <circle cx="160" cy="135" r="7" fill="#080A0E"/>
+                  <!-- 阴中阳眼 -->
+                  <circle cx="160" cy="185" r="7" fill="#EAE8E3"/>
+                  <!-- 天心金元 -->
+                  <circle cx="160" cy="160" r="3.5" fill="#D4AF37"/>
+                </svg>
+              </div>
+            </div>
 
-            <!-- 中心太极双鱼图（平滑运转） -->
-            <g class="taiji-core">
-              <circle cx="160" cy="160" r="54" fill="#0A0C11" stroke="#C5A059" stroke-width="1.8"/>
-              <circle cx="160" cy="160" r="50" fill="#080A0E"/>
-              <!-- 阳鱼 (宣纸白，数学精准S曲线) -->
-              <path d="M 160 110 A 50 50 0 0 1 160 210 A 25 25 0 0 1 160 160 A 25 25 0 0 0 160 110 Z" fill="#EAE8E3"/>
-              <!-- 阳中阴眼 (黑色小鱼眼) -->
-              <circle cx="160" cy="135" r="7" fill="#080A0E"/>
-              <!-- 阴中阳眼 (白色小鱼眼) -->
-              <circle cx="160" cy="185" r="7" fill="#EAE8E3"/>
-              <!-- 太极天心 -->
-              <circle cx="160" cy="160" r="2.5" fill="#C5A059"/>
-            </g>
-          </svg>
-          <div class="bagua-label">
-            <span class="bagua-sub">太极生两仪 · 两仪推六爻</span>
-            <b id="baguaStatus" class="bagua-status">天机运转中</b>
+            <!-- 粒子特效 Canvas (点击爆炸、聚能闪烁、星辉) -->
+            <canvas id="b3dCanvas" class="b3d-canvas" width="270" height="270"></canvas>
+          </div>
+
+          <!-- 底部卦辞提示与操作指引 -->
+          <div class="b3d-hud">
+            <div class="b3d-hud-prophecy" id="b3dProphecy">
+              <span class="b3d-hud-badge" id="b3dBadge">太极天机</span>
+              <span class="b3d-hud-text" id="b3dText">拖拽3D空间旋转 · 滚轮缩放 · 点击卦象感应</span>
+            </div>
           </div>
         </div>
       </div>
