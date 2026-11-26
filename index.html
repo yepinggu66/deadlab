@@ -15,9 +15,9 @@
   --line:rgba(26,28,33,.12);   /* 淡墨线条 */
   --line2:rgba(26,28,33,.06);  /* 极细微墨痕 */
   --line-gold:rgba(166,124,46,.38); /* 泥金细线 */
-  --txt:#18191E;               /* 浓墨正文字色 */
-  --dim:#555966;               /* 烟墨中性文字 */
-  --dim2:#8A8F9E;              /* 淡岚次级文字 */
+  --txt:#111216;               /* 焦墨正文字色，黑如点漆 */
+  --dim:#252830;               /* 浓墨中性文字，对比清晰 */
+  --dim2:#484C58;              /* 重墨次级文字，不发虚飘 */
   --red:#C3272B;               /* 朱砂红（印章与警讯） */
   --red2:#D8383F;              /* 丹砂红 */
   --red-glow:rgba(195,39,43,.22);
@@ -262,17 +262,114 @@ button.ghost:hover{border-color:var(--gold); color:var(--gold); background:#FAF8
 .rec .state.due{color:var(--red); font-weight:600}
 .empty{margin:0; font-size:14.2px; color:var(--dim2); font-family:var(--serif)}
 
-/* footer */
-footer{margin-top:40px; padding-top:24px; border-top:1px solid var(--line); font-size:12.5px; color:var(--dim2); line-height:1.9; display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap}
-footer .mono{font-family:var(--serif); font-size:13.5px; font-weight:600; color:var(--txt)}
-.fnav{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
-.fnav a{
-  color:var(--dim); text-decoration:none; font-size:11.5px; font-family:var(--serif);
-  padding:5px 12px; border-radius:6px; border:1px solid var(--line);
-  background:#FFF; transition:all .18s ease; box-shadow:0 1px 3px rgba(0,0,0,.03);
+/* footer 水墨宣纸毛玻璃托盘卡片 */
+footer{
+  margin-top: 56px;
+  margin-bottom: 24px;
+  padding: 30px 36px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(26, 28, 33, 0.14);
+  border-radius: 20px;
+  box-shadow: 0 14px 40px rgba(20, 22, 28, 0.08), 0 2px 6px rgba(0, 0, 0, 0.02);
+  font-size: 13px;
+  color: #2D303A;
+  line-height: 1.9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
 }
-.fnav a:hover{
-  color:var(--txt); border-color:var(--gold); background:#FAF8F3; text-decoration:none;
+footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #C3272B 0%, #A67C2E 35%, rgba(26,28,33,0.12) 100%);
+}
+footer .footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+footer .footer-title {
+  font-family: var(--serif);
+  font-size: 15.5px;
+  font-weight: 700;
+  color: #111216;
+  letter-spacing: 0.5px;
+}
+footer .footer-seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  background: #C3272B;
+  color: #FFF;
+  font-size: 11px;
+  font-family: var(--serif);
+  font-weight: 700;
+  border-radius: 4px;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 6px rgba(195, 39, 43, 0.25);
+}
+.fnav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.fnav a {
+  color: #18191E !important;
+  text-decoration: none;
+  font-size: 12.5px;
+  font-family: var(--serif);
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(26, 28, 33, 0.16);
+  background: #FAF8F3;
+  transition: all .2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  display: inline-flex;
+  align-items: center;
+}
+.fnav a:hover {
+  color: #FFFFFF !important;
+  border-color: #111216 !important;
+  background: #18191E !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(24, 25, 30, 0.18);
+  text-decoration: none;
+}
+.footer-desc {
+  max-width: 520px;
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.85;
+  color: #2D303A;
+}
+.footer-desc-item {
+  margin-bottom: 6px;
+}
+.footer-desc-item:last-child {
+  margin-bottom: 0;
+}
+.footer-desc strong {
+  color: #111216;
+  font-weight: 700;
+}
+.seal-dot {
+  color: #C3272B;
+  font-weight: bold;
+  margin-right: 5px;
 }
 
 .toast{
@@ -918,13 +1015,19 @@ footer .mono{font-family:var(--serif); font-size:13.5px; font-weight:600; color:
 
   <footer>
     <div>
-      <div class="mono" style="margin-bottom:8px">程序员逆天卦-沙盘 · DEADLAB</div>
+      <div class="footer-brand">
+        <span class="footer-seal">逆天卦</span>
+        <span class="footer-title">程序员逆天卦-沙盘 · DEADLAB</span>
+      </div>
       <div class="fnav">
         <a href="index.html">沙盘</a><a href="import.html">导入</a><a href="cases.html">案例</a><a href="library.html">案例库</a>
         <a href="team.html">团队</a><a href="compare.html">对比</a><a href="report.html">报告</a><a href="api.html">API</a>
       </div>
     </div>
-    <span style="max-width:520px">不是预测，是压力测试。绝对值别信，排序可信。<br>我们不算：命运 · 合婚 · 荐股 · 你能不能成功。只算一件事：这个项目最先死在哪、改哪一爻。</span>
+    <div class="footer-desc">
+      <div class="footer-desc-item"><span class="seal-dot">▪</span> <strong>不是预测，是压力测试。</strong>绝对值别信，排序可信。</div>
+      <div class="footer-desc-item"><span class="seal-dot">▪</span> 我们不算：命运 · 合婚 · 荐股 · 个人成败。<strong>只算一件事：这个项目最先死在哪、改哪一爻最管用。</strong></div>
+    </div>
   </footer>
 </div>
 
