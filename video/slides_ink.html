@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>DEADLAB Promo Slides (Ink Wash Edition)</title>
+<style>
+:root {
+  --bg: #F6F4ED;
+  --txt: #111216;
+  --dim: #252830;
+  --dim2: #484C58;
+  --red: #C3272B;
+  --gold: #A67C2E;
+  --green: #2A7553;
+  --serif: "Noto Serif SC", "Source Han Serif CN", "Songti SC", "SimSun", serif;
+  --mono: "JetBrains Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 1920px; height: 1080px; overflow: hidden;
+  background-color: var(--bg);
+  background-image: url("../assets/ink_bg.jpg");
+  background-size: cover;
+  background-position: center top;
+  font-family: var(--serif);
+  color: var(--txt);
+}
+.scene {
+  position: absolute; inset: 0; padding: 90px 140px;
+  display: none; flex-direction: column; justify-content: center;
+}
+.scene.on { display: flex; }
+
+/* 顶部水墨印章栏 */
+.topbar {
+  position: absolute; top: 60px; left: 140px; right: 140px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.topbar-brand {
+  display: flex; align-items: center; gap: 14px;
+}
+.seal-red {
+  background: var(--red); color: #FFF; font-size: 16px; font-weight: 700;
+  padding: 4px 12px; border-radius: 6px; letter-spacing: 2px;
+  box-shadow: 0 4px 12px rgba(195,39,43,0.3);
+}
+.brand-name {
+  font-size: 26px; font-weight: 700; color: #111216; letter-spacing: 1px;
+}
+.topbar-meta {
+  font-family: var(--mono); font-size: 18px; color: #383B46; font-weight: 600;
+}
+
+/* 白宣毛玻璃主展板 */
+.ink-card {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(26, 28, 33, 0.16);
+  border-radius: 28px;
+  padding: 56px 64px;
+  box-shadow: 0 20px 60px rgba(26, 28, 33, 0.08);
+  position: relative;
+}
+.ink-card::before {
+  content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+  background: linear-gradient(90deg, #C3272B 0%, #A67C2E 35%, rgba(26,28,33,0.12) 100%);
+  border-radius: 28px 28px 0 0;
+}
+
+h1.hero-title {
+  font-size: 64px; font-weight: 800; line-height: 1.2; color: #111216;
+  letter-spacing: -1px; margin-bottom: 24px;
+}
+h2.card-title {
+  font-size: 44px; font-weight: 800; color: #111216; margin-bottom: 20px;
+}
+p.hero-desc {
+  font-size: 26px; color: #2D303A; line-height: 1.8; max-width: 1200px;
+}
+
+/* 视觉网格 */
+.grid-2 {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 36px;
+}
+.box {
+  background: #FAF8F3; border: 1px solid rgba(26, 28, 33, 0.14);
+  border-radius: 18px; padding: 32px;
+}
+.box h3 { font-size: 24px; font-weight: 700; color: #111216; margin-bottom: 12px; }
+.box p { font-size: 20px; color: #383B46; line-height: 1.7; }
+
+/* 六爻示意 */
+.yao-list {
+  display: flex; flex-direction: column; gap: 12px; margin-top: 24px;
+}
+.yao-item {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #FFF; padding: 14px 24px; border-radius: 12px;
+  border: 1px solid rgba(26,28,33,0.1); font-size: 20px; font-weight: 600;
+}
+.yao-line {
+  font-family: var(--mono); font-weight: 800; font-size: 24px;
+}
+</style>
+</head>
+<body>
+
+<!-- Scene 1: 立论开篇 -->
+<div class="scene on" id="s1">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <span class="seal-red">逆天卦</span>
+      <span class="brand-name">程序员逆天卦-沙盘 · DEADLAB</span>
+    </div>
+    <div class="topbar-meta">PHASE 01 / 事前验尸分析</div>
+  </div>
+  <div class="ink-card">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <span class="seal-red">立项第一问</span>
+      <span style="font-size:22px;color:var(--gold);font-weight:700">知止不殆 · 方能逆天</span>
+    </div>
+    <h1 class="hero-title">先算它怎么死，<br>再决定要不要做。</h1>
+    <p class="hero-desc">
+      在技术狂热膨胀的浪潮里，最清醒的智慧不是狂热加速，而是主动刹车。<br>
+      几千年来人类都在问卦占卜吉凶，但在现代商业与软件工程里，最科学的占卜，其实叫<strong>事前验尸推演</strong>。
+    </p>
+  </div>
+</div>
+
+<!-- Scene 2: 时代痛点 -->
+<div class="scene" id="s2">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <span class="seal-red">时代警钟</span>
+      <span class="brand-name">AI 时代的立项陷阱</span>
+    </div>
+    <div class="topbar-meta">PHASE 02 / 膨胀与清醒</div>
+  </div>
+  <div class="ink-card">
+    <h2 class="card-title">AI 让写代码变成了白菜价，<br>也让“做没人要的垃圾”成本极度隐蔽。</h2>
+    <div class="grid-2">
+      <div class="box" style="border-left:5px solid var(--dim2)">
+        <h3 style="color:#555966">廉价的立项幻觉</h3>
+        <p>所有大模型都在狂热帮你写架构、堆功能、拼命生成。AI 让你感觉自己无所不能，周末就能做出一个产品。</p>
+      </div>
+      <div class="box" style="border-left:5px solid var(--red)">
+        <h3 style="color:var(--red)">稀缺的商业清醒</h3>
+        <p>没有任何一个 AI 会残忍地告诉你：这个项目从第一天起，结构上就注定活不过半年。生成是廉价的膨胀，杀死才是稀缺的清醒。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scene 3: 六爻风控与蒙特卡洛 -->
+<div class="scene" id="s3">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <span class="seal-red">古今融合</span>
+      <span class="brand-name">易经六爻 × 150 真实样本校准</span>
+    </div>
+    <div class="topbar-meta">PHASE 03 / 量化风控模型</div>
+  </div>
+  <div class="ink-card">
+    <h2 class="card-title">将三千年《易经》六爻，<br>重构为现代商业的六维状态约束。</h2>
+    <div class="grid-2">
+      <div class="yao-list">
+        <div class="yao-item"><span>上爻 · 续航 (Runway)</span><span class="yao-line" style="color:var(--green)">━━━━━━━ 阳</span></div>
+        <div class="yao-item"><span>五爻 · 依赖 (Moat)</span><span class="yao-line" style="color:var(--red)">━━━ ━━━ 阴</span></div>
+        <div class="yao-item"><span>四爻 · 分发 (Distribution)</span><span class="yao-line" style="color:var(--green)">━━━━━━━ 阳</span></div>
+        <div class="yao-item"><span>三爻 · 经济 (Unit Econ)</span><span class="yao-line" style="color:var(--red)">━━━ ━━━ 阴</span></div>
+        <div class="yao-item"><span>二爻 · 能力 (Execution)</span><span class="yao-line" style="color:var(--green)">━━━━━━━ 阳</span></div>
+        <div class="yao-item"><span>初爻 · 需求 (Demand)</span><span class="yao-line" style="color:var(--green)">━━━━━━━ 阳</span></div>
+      </div>
+      <div class="box" style="display:flex;flex-direction:column;justify-content:center">
+        <div style="font-size:20px;color:var(--gold);font-weight:700;margin-bottom:8px">三票否决断头台</div>
+        <p style="font-size:18px;margin-bottom:16px">版权 · 牌照 · 平台红线。任意一票红，存活率瞬间归零。</p>
+        <div style="font-size:20px;color:var(--red);font-weight:700;margin-bottom:8px">5,000 次蒙特卡洛危险率推演</div>
+        <p style="font-size:22px;color:#111216;font-weight:700">交出三张真实底牌：死法 · 死期 · 命门。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scene 4: 公开真实败局复盘 -->
+<div class="scene" id="s4">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <span class="seal-red">商业案例</span>
+      <span class="brand-name">全球公开真实败局深度复盘</span>
+    </div>
+    <div class="topbar-meta">PHASE 04 / 现实很残酷</div>
+  </div>
+  <div class="ink-card">
+    <h2 class="card-title">真实商业世界里，<br>致命短板在立项第一天往往就已注定。</h2>
+    <div class="grid-2">
+      <div class="box">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <h3>Quibi (融资17.5亿美元)</h3>
+          <span style="color:var(--red);font-weight:700;font-size:18px">存活率 4%</span>
+        </div>
+        <p>全明星团队与好莱坞巨制，但第一爻【需求真实度】为零。没人愿意为锁屏短剧付费，上线6个月猝死。</p>
+      </div>
+      <div class="box">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <h3>Fast (估值5.8亿美元)</h3>
+          <span style="color:var(--red);font-weight:700;font-size:18px">存活率 12%</span>
+        </div>
+        <p>年入60万月烧千万美元，每赚$1倒贴$16做补贴。第三爻【单位经济】严重倒挂，资本潮退瞬间断裂。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scene 5: 动爻状态机与变卦 -->
+<div class="scene" id="s5">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <span class="seal-red">全新升级</span>
+      <span class="brand-name">动爻连锁与变卦演化状态机</span>
+    </div>
+    <div class="topbar-meta">PHASE 05 / 商业因果剧本</div>
+  </div>
+  <div class="ink-card">
+    <h2 class="card-title">它不止是静态计算，<br>更是跨越 24 个月的时序变卦推演。</h2>
+    <div style="background:#FAF8F3;border:1px solid rgba(166,124,46,0.3);border-radius:18px;padding:28px 36px;margin-top:20px">
+      <div style="display:flex;align-items:center;gap:16px;font-size:26px;font-weight:700;color:#111216">
+        <span>立项本卦【地泽临】(用户涌入)</span>
+        <span style="color:var(--red);font-size:22px">──( 第4月 三爻动·流量反噬经济 )──></span>
+        <span>终局变卦【泽水困】(预算见底)</span>
+      </div>
+      <p style="font-size:20px;color:#2D303A;margin-top:16px;line-height:1.75">
+        动态演化剧本：当流量暴增（分发=3）而毛利极低（经济=0），第 4 个月算力与买量账单滞后爆发，第三爻剧变发动动爻，直接击穿资金链，将存活率从 58% 拉低至 11%。
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Scene 6: 审讯室与活体脉搏 -->
+<div class="scene" id="s6">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <span class="seal-red">两大神兵</span>
+      <span class="brand-name">证据审讯室 & 活体生存脉搏</span>
+    </div>
+    <div class="topbar-meta">PHASE 06 / 全方位监护</div>
+  </div>
+  <div class="ink-card">
+    <div class="grid-2" style="margin-top:0">
+      <div class="box">
+        <h3 style="color:var(--red)">⚖️ 冷酷投资人审讯室</h3>
+        <p>贴入落地页或商业案，AI 尽调反问 3 个尖锐死穴。未见陌生人付费证明，强制开启【证据折扣锁定】，逼你直面残酷真相。</p>
+      </div>
+      <div class="box">
+        <h3 style="color:var(--gold)">💓 GitHub 活体生存心电图</h3>
+        <p>连线公开仓库，实时测算代码失温指数。连续 21 天未提交代码？系统亮红灯触发续航失温预警，防拖延防烂尾。</p>
+      </div>
+    </div>
+    <div style="margin-top:24px;background:#111216;color:#FFF;border-radius:14px;padding:18px 28px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:20px;font-weight:700">更支持作为 Cursor / Claude Code 的【AI 编程立项熔断器】</span>
+      <span style="font-family:var(--mono);color:var(--gold);font-size:18px">npx deadlab-check --mcp</span>
+    </div>
+  </div>
+</div>
+
+<!-- Scene 7: 品牌收尾 -->
+<div class="scene" id="s7">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <span class="seal-red">知止不殆</span>
+      <span class="brand-name">程序员逆天卦-沙盘 · DEADLAB</span>
+    </div>
+    <div class="topbar-meta">PHASE 07 / 立即推演</div>
+  </div>
+  <div class="ink-card" style="text-align:center;padding:70px 60px">
+    <div style="display:inline-block;margin-bottom:16px"><span class="seal-red" style="font-size:20px;padding:6px 18px">先算它怎么死</span></div>
+    <h1 class="hero-title" style="margin-bottom:16px">知止不殆，方能逆天。</h1>
+    <p class="hero-desc" style="margin:0 auto 32px;font-size:24px">
+      在敲下下一行代码前，先来逆天卦，算算它最先死在哪。
+    </p>
+    <div style="display:inline-flex;gap:20px;align-items:center">
+      <div style="background:#FAF8F3;border:1px solid rgba(26,28,33,0.18);padding:14px 28px;border-radius:12px;font-family:var(--mono);font-size:20px;font-weight:700">
+        npx deadlab-check
+      </div>
+      <div style="background:#111216;color:#FFF;padding:14px 28px;border-radius:12px;font-family:var(--serif);font-size:20px;font-weight:700">
+        https://pingguye.cn/deadlab/
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 供截图脚本切换场景
+function showScene(idx) {
+  document.querySelectorAll('.scene').forEach(s => s.classList.remove('on'));
+  const target = document.getElementById('s' + idx);
+  if (target) target.classList.add('on');
+}
+</script>
+</body>
+</html>

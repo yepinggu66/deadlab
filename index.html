@@ -422,6 +422,154 @@ footer .footer-seal {
   margin-right: 5px;
 }
 
+
+/* 商业付费门禁与遮罩 (Paywall & Anti-Piracy Styles) */
+.paywall-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  background: rgba(246, 244, 237, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 24px;
+  text-align: center;
+  box-shadow: inset 0 0 30px rgba(26, 28, 33, 0.04);
+}
+.paywall-overlay-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(195, 39, 43, 0.3);
+  border-radius: 16px;
+  padding: 24px 30px;
+  max-width: 460px;
+  box-shadow: 0 12px 36px rgba(195, 39, 43, 0.08);
+}
+.paywall-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  background: rgba(18, 19, 22, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.paywall-modal.hidden { display: none !important; }
+.paywall-card {
+  background: #FFF;
+  border: 1px solid rgba(26, 28, 33, 0.15);
+  border-radius: 20px;
+  padding: 32px 34px;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  font-family: var(--serif);
+}
+.paywall-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: var(--dim);
+  cursor: pointer;
+  line-height: 1;
+}
+.paywall-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.paywall-seal {
+  background: #C3272B;
+  color: #FFF;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+.paywall-head h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111216;
+}
+.paywall-desc {
+  font-size: 13.5px;
+  color: #2D303A;
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+.paywall-pricing {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  background: #FAF8F3;
+  border: 1px solid rgba(166, 124, 46, 0.28);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+}
+.paywall-price-badge {
+  background: #A67C2E;
+  color: #FFF;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.paywall-price-val {
+  font-family: var(--mono);
+  font-size: 24px;
+  font-weight: 700;
+  color: #C3272B;
+}
+.paywall-price-val span {
+  font-size: 12.5px;
+  color: var(--dim);
+  font-weight: normal;
+  font-family: var(--serif);
+}
+.paywall-input-box {
+  margin-bottom: 16px;
+}
+.paywall-input-box label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #111216;
+}
+.license-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-family: var(--serif);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.license-badge.pro {
+  background: #2A7553;
+  color: #FFF;
+  box-shadow: 0 2px 6px rgba(42, 117, 83, 0.25);
+}
+.license-badge.free {
+  background: rgba(26, 28, 33, 0.08);
+  color: #555966;
+  border: 1px solid rgba(26, 28, 33, 0.12);
+}
+
 .toast{
   position:fixed; left:50%; bottom:32px; transform:translate(-50%,16px); z-index:9;
   background:#18191E; border:1px solid var(--gold); color:#FFF; padding:11px 22px;
@@ -910,7 +1058,7 @@ footer .footer-seal {
   </section>
 
   <!-- 01 -->
-  <section class="card">
+  <section class="card" style="position:relative"">
     <div class="sec"><span class="n">01</span><h2>DIE</h2><em>六爻定体质</em><span class="rule"></span></div>
     <p class="desc">六个变量，每爻四档（老阴 0 / 少阴 1 / 少阳 2 / 老阳 3）。阴爻越多，越容易死在那一条上。</p>
     <div class="pname"><input id="appName" maxlength="30" placeholder="项目名（会写进报告和分享卡）"></div>
@@ -935,6 +1083,21 @@ footer .footer-seal {
   <section class="card hidden" id="resultCard">
     <div class="sec"><span class="n">02</span><h2>DIAGNOSE</h2><em>它怎么死</em><span class="rule"></span></div>
     <p class="desc" id="subId">—</p>
+    
+    <!-- 商业推演核心遮罩 (未付费时锁定) -->
+    <div id="paywallOverlay" class="paywall-overlay hidden">
+      <div class="paywall-overlay-card">
+        <div style="font-size:28px;margin-bottom:6px">🔐</div>
+        <div style="font-size:16px;font-weight:700;color:#111216;margin-bottom:6px">商业深度推演已锁定</div>
+        <div style="font-size:13px;color:#2D303A;line-height:1.75;margin-bottom:16px">
+          24 个月真实存活曲线、动爻变卦因果剧本与避坑锦囊属于独家量化风控资产。
+        </div>
+        <button class="primary" style="width:auto;padding:12px 28px;margin:0 auto" onclick="openPaywallModal()">
+          解锁完整商业推演 (¥9.9 终身) →
+        </button>
+      </div>
+    </div>
+
     <div class="veto-banner hidden" id="vetoBanner"></div>
 
     <div class="res" id="resBox">
@@ -1092,6 +1255,62 @@ footer .footer-seal {
   </footer>
 </div>
 
+
+<!-- 付费门禁激活弹窗 -->
+<div id="paywallModal" class="paywall-modal hidden">
+  <div class="paywall-card">
+    <button class="paywall-close" onclick="closePaywallModal()">&times;</button>
+    <div class="paywall-head">
+      <span class="paywall-seal">商业版专享</span>
+      <h3>DEADLAB 深度商业推演与避坑锦囊</h3>
+    </div>
+    <p class="paywall-desc">
+      为保护本引擎独家 150 样本校准模型与《易经》动爻状态机知识产权，<strong>深度死因推演、24 个月存活曲线与避坑锦囊</strong>需付费激活后解锁。
+    </p>
+
+    <div class="paywall-pricing">
+      <div class="paywall-price-badge">限时特惠</div>
+      <div class="paywall-price-val">¥ 9.9 <span>/ 终身无限次推演</span></div>
+    </div>
+
+    <!-- 激活码输入区域 -->
+    <div class="paywall-input-box">
+      <label>输入专属激活码 (License Key):</label>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <input type="text" id="licenseCodeInput" placeholder="例如: DL-KD3N-GHV3" class="inp" style="padding:10px 14px;font-family:var(--mono);text-transform:uppercase">
+        <button class="primary" style="width:auto;padding:10px 20px;white-space:nowrap" onclick="submitLicenseActivation()">立即解锁 →</button>
+      </div>
+      <div id="licenseErrorMsg" style="font-size:12px;color:var(--red);margin-top:6px;min-height:18px"></div>
+    </div>
+
+    <!-- 支付与获取激活码途径 -->
+    <div class="paywall-payment-guide" style="border-top:1px solid rgba(26,28,33,.1);padding-top:14px;margin-top:12px">
+      <div style="font-size:12.5px;font-weight:700;color:var(--txt);margin-bottom:8px">获取官方激活码通道:</div>
+      <div style="font-size:12px;color:var(--dim);line-height:1.7;background:#FAF8F3;border:1px solid rgba(26,28,33,.12);border-radius:10px;padding:10px 14px">
+        支付 ¥9.9 即可获取正版一机一码序列号。测试体验可直接点击填入体验码: <strong style="color:var(--red);cursor:pointer;text-decoration:underline" onclick="fillTestCode('DEADLAB-VIP-2026')">DEADLAB-VIP-2026</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 宣传视频弹窗 Video Modal -->
+<div id="videoModal" class="paywall-modal hidden" onclick="if(event.target===this)closeVideoModal()">
+  <div class="paywall-card" style="max-width:960px;padding:24px;background:#111216;color:#FFF;border:1px solid var(--gold)">
+    <button class="paywall-close" style="color:#FFF;top:12px;right:16px" onclick="closeVideoModal()">&times;</button>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <span class="paywall-seal">宣传概念片</span>
+      <h3 style="color:#FFF;margin:0;font-size:18px">DEADLAB · 先算它怎么死 (1080P 沉浸解说)</h3>
+    </div>
+    <div style="position:relative;padding-top:56.25%;width:100%;background:#000;border-radius:12px;overflow:hidden">
+      <video id="promoVideo" controls style="position:absolute;top:0;left:0;width:100%;height:100%" preload="metadata">
+        <source src="assets/deadlab_promo_v2.mp4" type="video/mp4">
+        您的浏览器不支持 HTML5 视频播放。
+      </video>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <div id="cardModal">
   <img id="cardImg" alt="分享卡">
@@ -1103,6 +1322,7 @@ footer .footer-seal {
 
 <script src="store.js"></script>
 <script src="engine.js"></script>
+<script src="license.js"></script>
 <script>
 const {VARS, CAUSES, CKEYS, BASE, K, runSim, bitsOf, hexOf, verseOf, fnv1a} = DEADLAB;
 const {escapeHTML:esc} = DEADLAB_STORE;
@@ -1197,7 +1417,85 @@ function verdictOf(r){
   if(p >= 0.15) return '这局很难翻。先改「' + lever + '」，改不动就别做。';
   return '别做。这不是优化能解决的问题。';
 }
+
+// 商业付费与门禁逻辑
+function updateLicenseStateUI() {
+  const isPro = DEADLAB_LICENSE.isLicensed();
+  const badge = $("licenseBadge");
+  const overlay = $("paywallOverlay");
+  
+  if (badge) {
+    if (isPro) {
+      badge.textContent = "已激活商业版";
+      badge.className = "license-badge pro";
+    } else {
+      badge.textContent = "免费试看版";
+      badge.className = "license-badge free";
+    }
+  }
+
+  if (overlay) {
+    // 若未授权，显示遮罩锁定核心深度推演
+    if (!isPro) {
+      overlay.classList.remove("hidden");
+    } else {
+      overlay.classList.add("hidden");
+    }
+  }
+}
+
+function openPaywallModal() {
+  $("paywallModal").classList.remove("hidden");
+  $("licenseErrorMsg").textContent = "";
+}
+
+function closePaywallModal() {
+  $("paywallModal").classList.add("hidden");
+}
+
+function fillTestCode(c) {
+  $("licenseCodeInput").value = c;
+  submitLicenseActivation();
+}
+
+function submitLicenseActivation() {
+  const code = $("licenseCodeInput").value.trim();
+  const res = DEADLAB_LICENSE.verifyCode(code);
+  if (res.valid) {
+    DEADLAB_LICENSE.activateLicense(res.token);
+    $("licenseErrorMsg").style.color = "var(--green)";
+    $("licenseErrorMsg").textContent = "✔ " + res.message;
+    setTimeout(() => {
+      closePaywallModal();
+      updateLicenseStateUI();
+      showToast("🎉 商业版已成功激活！已解锁 24 个月全量推演模型。");
+    }, 400);
+  } else {
+    $("licenseErrorMsg").style.color = "var(--red)";
+    $("licenseErrorMsg").textContent = "✖ " + res.message;
+  }
+}
+
+// 页面初始化时检查授权状态
+window.addEventListener("DOMContentLoaded", () => {
+  updateLicenseStateUI();
+});
+
+
+function openVideoModal() {
+  $("videoModal").classList.remove("hidden");
+  const vid = $("promoVideo");
+  if (vid) vid.play();
+}
+
+function closeVideoModal() {
+  $("videoModal").classList.add("hidden");
+  const vid = $("promoVideo");
+  if (vid) vid.pause();
+}
+
 function renderResult(){
+  updateLicenseStateUI();
   const r = state.result, lv = state.lv, hx = hexOf(lv);
   $("vetoBanner").classList.add("hidden");
   ["resBox","curve","causeHead","causes","actionsBox"].forEach(id=>$(id).classList.remove("hidden"));
