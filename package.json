@@ -1,0 +1,33 @@
+{
+  "name": "deadlab",
+  "version": "2.1.0",
+  "description": "程序员逆天卦 · AI 时代立项沙盘与商业熔断器 (CLI & MCP Server)",
+  "main": "engine.js",
+  "bin": {
+    "deadlab": "./bin/deadlab.js",
+    "deadlab-check": "./bin/deadlab.js"
+  },
+  "scripts": {
+    "test": "node tests/store-engine.test.js && node tests/cli-mcp.test.js",
+    "start": "node bin/deadlab.js",
+    "mcp": "node bin/deadlab.js --mcp"
+  },
+  "keywords": [
+    "cli",
+    "mcp",
+    "mcp-server",
+    "cursor",
+    "claude-code",
+    "windsurf",
+    "antigravity",
+    "startup",
+    "risk-analysis",
+    "monte-carlo",
+    "i-ching"
+  ],
+  "author": "DEADLAB Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

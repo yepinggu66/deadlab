@@ -32,6 +32,49 @@ textarea:focus{border-color:rgba(255,90,95,.45)}
     <p class="lead">一个 JS 文件，一个函数。不联网、不上传、不收集数据——所有推演都在浏览器里算完。</p>
   </section>
 
+  
+  <section class="card" style="border-left: 3px solid var(--red);">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px">
+      <span style="background:var(--red); color:#FFF; font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px;">NEW v2.1</span>
+      <h2 style="margin:0; font-size:18px; color:var(--txt);">AI 编程立项熔断器 (MCP Server)</h2>
+    </div>
+    <p style="font-size:13.5px; color:var(--dim); line-height:1.8;">
+      支持在 <strong>Cursor / Claude Code / Windsurf / Antigravity</strong> 等 AI 编程助手新建仓库或编写第一行代码前，自动调用沙盘商业模型进行推演。一旦发现致命短板（零需求、负毛利、上游绞杀），智能体主动在控制台亮红灯拦截，并生成 3 条最小化闭环验证避坑指南。
+    </p>
+    
+    <div style="font-size:13px; font-weight:600; color:var(--txt); margin-top:14px;">在 IDE 的 MCP 配置文件中添加 (<code>~/.cursor/mcp.json</code> 或 <code>claude_desktop_config.json</code>):</div>
+    <pre><code>{
+  "mcpServers": {
+    "deadlab": {
+      "command": "npx",
+      "args": ["-y", "deadlab", "--mcp"]
+    }
+  }
+}</code></pre>
+    <div style="font-size:12.5px; color:var(--dim); margin-top:8px;">
+      提供核心工具 <code>deadlab_check</code>，入参六爻等级 <code>{need, cap, econ, dist, dep, stam}</code>，即时返回存活预测、动爻因果演化与立项熔断警告。
+    </div>
+  </section>
+
+  <section class="card">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px">
+      <span style="background:var(--gold); color:#FFF; font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px;">CLI TOOL</span>
+      <h2 style="margin:0; font-size:18px; color:var(--txt);">终端极客命令行 (npx deadlab-check)</h2>
+    </div>
+    <p style="font-size:13.5px; color:var(--dim); line-height:1.8;">
+      无需配置复杂的 GUI 环境，直接在 Terminal 控制台完成项目沙盘推演，支持彩色 ASCII 卦象绘制与 JSON 输出：
+    </p>
+
+    <pre><code># 1. 运行典型预设案例 (ai-wrapper / solo-saas / open-source / hard-tech)
+npx deadlab-check --preset ai-wrapper
+
+# 2. 自定义项目六爻推演
+npx deadlab-check --need 2 --cap 2 --econ 0 --dist 3 --dep 1 --stam 2
+
+# 3. 输出纯 JSON (供 CI/CD 自动化或脚本集成)
+npx deadlab-check --preset solo-saas --json</code></pre>
+  </section>
+
   <section class="card">
     <div class="sec"><span class="n">01</span><h2>USAGE</h2><em>三行接入</em><span class="rule"></span></div>
     <pre>&lt;script src="engine.js"&gt;&lt;/script&gt;

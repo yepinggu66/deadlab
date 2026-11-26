@@ -177,6 +177,56 @@ button.ghost:hover{border-color:var(--gold); color:var(--gold); background:#FAF8
 
 /* result */
 .res{display:grid; grid-template-columns:1.1fr 1fr; gap:26px; align-items:center; margin:20px 0 6px}
+
+.evo-box {
+  margin-top: 18px;
+  padding: 16px 20px;
+  background: rgba(250, 248, 243, 0.95);
+  border: 1px solid rgba(166, 124, 46, 0.32);
+  border-left: 3px solid var(--gold);
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(26, 28, 33, 0.04);
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.8;
+  color: #2D303A;
+}
+.evo-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.evo-seal {
+  background: #C3272B;
+  color: #FFF;
+  font-size: 11px;
+  font-family: var(--serif);
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+.evo-title {
+  font-weight: 700;
+  color: #111216;
+  font-size: 14.5px;
+}
+.evo-badge {
+  font-size: 11.5px;
+  background: rgba(26, 28, 33, 0.06);
+  border: 1px solid rgba(26, 28, 33, 0.12);
+  padding: 2px 8px;
+  border-radius: 20px;
+  color: #555966;
+}
+.evo-body {
+  color: #2D303A;
+  font-size: 13px;
+  line-height: 1.85;
+}
+
 .verdict{margin:6px 0 14px; padding:16px 20px; border-left:3px solid var(--red); background:#FFF3F3; border-radius:0 10px 10px 0; font-size:16.5px; line-height:1.75; color:#2A2323; font-family:var(--serif)}
 .verdict span{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.22em; color:var(--red); margin-bottom:6px}
 @media(max-width:820px){.res{grid-template-columns:1fr}}
@@ -905,6 +955,17 @@ footer .footer-seal {
       </div>
     </div>
 
+    
+    <!-- 动爻连锁与变卦演化状态机模块 -->
+    <div class="evo-box" id="evoBox">
+      <div class="evo-head">
+        <span class="evo-seal">动爻演化</span>
+        <span class="evo-title" id="evoTransmutation">本卦【—】 ──(动爻)──> 变卦【—】</span>
+        <span class="evo-badge" id="evoBadge">0 动爻</span>
+      </div>
+      <div class="evo-body" id="evoNarrative">正在推演 24 个月跨爻连锁因果...</div>
+    </div>
+
     <div class="verdict" id="verdict"><span>一句话判词 / ONE LINE</span>—</div>
 
     <svg class="curve" id="curve" viewBox="0 0 660 268">
@@ -1145,6 +1206,23 @@ function renderResult(){
   $("hexTag").textContent = hx[3];
   $("hexVerse").textContent = verseOf(lv);
   $("bits").textContent = bitsOf(lv).map(b=>b?"1":"0").join(" ");
+
+  // 动爻与变卦推演
+  const evo = r.evolution || DEADLAB.evolveHexagram(lv);
+  const evoCount = evo.movingLines.length;
+  $("evoTransmutation").textContent = "本卦【" + evo.primaryHex[2] + "】 ──(" + (evoCount ? evoCount + " 处动爻突变" : "静卦安定") + ")──> 变卦【" + evo.resultHex[2] + "】";
+  $("evoBadge").textContent = evoCount ? (evoCount + " 个动爻发动") : "静卦稳定";
+  if (evoCount) {
+    $("evoBadge").style.background = "rgba(195,39,43,0.1)";
+    $("evoBadge").style.color = "#C3272B";
+    $("evoBadge").style.borderColor = "rgba(195,39,43,0.25)";
+  } else {
+    $("evoBadge").style.background = "rgba(42,117,83,0.1)";
+    $("evoBadge").style.color = "#2A7553";
+    $("evoBadge").style.borderColor = "rgba(42,117,83,0.25)";
+  }
+  $("evoNarrative").textContent = evo.narrative;
+
   drawHex(lv);
 
   $("s12").textContent = Math.round(r.s[12]*100) + "%";

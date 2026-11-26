@@ -1,5 +1,12 @@
 /* DEADLAB engine v2.0 — 150-Cohort Calibrated Survival & Hexagram Engine (ZH / EN) */
-(function (g) {
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    module.exports = factory();
+  } else {
+    root.DEADLAB = factory();
+    if (typeof window !== 'undefined') window.DEADLAB = root.DEADLAB;
+  }
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   function detectLang() {
     try {
       const u = new URLSearchParams(location.search).get('lang');
@@ -262,6 +269,151 @@
 
   function bitsOf(lv){ return VARS.map(v => lv[v.k] >= 2 ? 1 : 0); }
   function hexOf(lv){ return HEX[HEXMAP[bitsOf(lv).join("")]]; }
+
+  /* 动爻与变卦状态机 (Moving Lines & Hexagram Transmutation State Machine) */
+  function evolveHexagram(lv, options) {
+    options = options || {};
+    const months = options.months || 24;
+    const initialBits = bitsOf(lv);
+    const primaryHex = hexOf(lv);
+
+    let cur = Object.assign({}, lv);
+    const movingLines = [];
+    const monthlyLog = [];
+
+    for (let m = 1; m <= months; m++) {
+      // 1. 流量反噬经济连锁 (Traffic Trap Cascade)
+      // 条件：第 3-8 个月，流量 >= 2 但 经济 <= 1
+      if (m >= 3 && m <= 8 && cur.dist >= 2 && cur.econ <= 1) {
+        if (!movingLines.some(l => l.dim === 'econ')) {
+          cur.stam = Math.max(0, cur.stam - 1);
+          movingLines.push({
+            index: 2,
+            yao: isEn ? '3rd Line' : '九三（三爻）',
+            dim: 'econ',
+            name: VARS[2].name,
+            month: m,
+            type: isEn ? 'Yang turns Yin' : '老阳变阴',
+            rule: 'TRAFFIC_TRAP',
+            desc: isEn
+              ? `Month ${m}: 3rd line (Unit Econ) mutates. Traffic scale (${cur.dist}) bleeds cash on thin margins (${cur.econ}), draining Runway to lv=${cur.stam}.`
+              : `第 ${m} 月：第三爻（经济）发动动爻。流量激增（分发=${cur.dist}）反噬微薄毛利（经济=${cur.econ}），算力与获客成本撕裂资金链，续航直接跌至 ${cur.stam}。`
+          });
+        }
+      }
+
+      // 2. 虚火退潮连锁 (False Peak Decay)
+      // 条件：第 2-5 个月，需求 <= 1 (自嗨/无人真痛)，但早期靠炒作/买量拉高分发 >= 2
+      if (m >= 2 && m <= 5 && cur.need <= 1 && cur.dist >= 2) {
+        if (!movingLines.some(l => l.dim === 'need')) {
+          cur.dist = 0;
+          movingLines.push({
+            index: 0,
+            yao: isEn ? '1st Line' : '初九（初爻）',
+            dim: 'need',
+            name: VARS[0].name,
+            month: m,
+            type: isEn ? 'False Yang to Yin' : '伪阳转阴',
+            rule: 'FALSE_PEAK',
+            desc: isEn
+              ? `Month ${m}: 1st line (Demand) collapses. Zero Day-7 retention kicks in; launch hype evaporates, distribution drops to 0.`
+              : `第 ${m} 月：初爻（需求）发动。次月留存暴跌，上线虚火散尽，分发入口跌回 0（无人问津）。`
+          });
+        }
+      }
+
+      // 3. 技术债务与架构失控 (Tech Debt Cascade)
+      // 条件：第 4-9 个月，做不出/原型简陋 cap <= 1，却承载分发 dist >= 2
+      if (m >= 4 && m <= 9 && cur.cap <= 1 && cur.dist >= 2) {
+        if (!movingLines.some(l => l.dim === 'cap')) {
+          cur.stam = Math.max(0, cur.stam - 1);
+          movingLines.push({
+            index: 1,
+            yao: isEn ? '2nd Line' : '六二（二爻）',
+            dim: 'cap',
+            name: VARS[1].name,
+            month: m,
+            type: isEn ? 'Yin volatility' : '阴极动摇',
+            rule: 'TECH_DEBT',
+            desc: isEn
+              ? `Month ${m}: 2nd line (Execution) fails under load. Bugs and downtime cascades force founder into non-stop fire-fighting.`
+              : `第 ${m} 月：二爻（能力）动摇。并发负载与边界异常频发，创始人陷入无休止人工灭火，团队精力严重透支。`
+          });
+        }
+      }
+
+      // 4. 上游绞杀风险 (Upstream Decapitation)
+      // 条件：依赖单点 dep == 0，在第 6-14 个月面临平台收网
+      if (m >= 6 && m <= 14 && cur.dep === 0) {
+        if (!movingLines.some(l => l.dim === 'dep')) {
+          cur.need = Math.max(0, cur.need - 1);
+          movingLines.push({
+            index: 4,
+            yao: isEn ? '5th Line' : '九五（五爻）',
+            dim: 'dep',
+            name: VARS[4].name,
+            month: m,
+            type: isEn ? 'Platform Sever' : '天命动爻',
+            rule: 'UPSTREAM_KILL',
+            desc: isEn
+              ? `Month ${m}: 5th line (Moat) severed. Upstream platform releases native competitor or alters API policies, crushing core value.`
+              : `第 ${m} 月：五爻（依赖）突遭天命斩。上游生态版本迭代直接将核心功能原生化或收紧接口，商业护城河瞬间瓦解。`
+          });
+        }
+      }
+
+      // 5. 续航耗尽 (Burnout / Out of Runway)
+      if (cur.stam === 0 && !movingLines.some(l => l.dim === 'stam')) {
+        movingLines.push({
+          index: 5,
+          yao: isEn ? 'Top Line' : '上六（上爻）',
+          dim: 'stam',
+          name: VARS[5].name,
+          month: m,
+          type: isEn ? 'Runway Extinguished' : '亢龙有悔',
+          rule: 'BURNOUT',
+          desc: isEn
+            ? `Month ${m}: Top line (Runway) exhausted. Cash or energy drops to absolute zero; project enters vegetative state.`
+            : `第 ${m} 月：上爻（续航）气数已尽。资金或个人精力彻底归零，代码停更，项目进入植物人状态。`
+        });
+        break;
+      }
+
+      const curBits = bitsOf(cur);
+      const curHex = HEX[HEXMAP[curBits.join("")]];
+      monthlyLog.push({ month: m, hex: curHex, bits: curBits, lv: Object.assign({}, cur) });
+    }
+
+    // 计算变卦
+    const mutatedBits = [...initialBits];
+    movingLines.forEach(l => {
+      mutatedBits[l.index] = mutatedBits[l.index] === 1 ? 0 : 1;
+    });
+    const resultHex = HEX[HEXMAP[mutatedBits.join("")]];
+
+    let narrative = "";
+    if (!movingLines.length) {
+      narrative = isEn
+        ? `Stable Hexagram: ${primaryHex[2]} remains invariant across 24 months. No critical phase transitions detected.`
+        : `【静卦·无动爻】全盘 24 个月六爻未见剧烈相位突变，维持【${primaryHex[2]}】（${primaryHex[3]}）之局，平稳演进。`;
+    } else {
+      const linesSummary = movingLines.map(l => `${l.yao}[${l.name}]在第 ${l.month} 月发动`).join('，');
+      narrative = isEn
+        ? `Primary Hexagram [${primaryHex[2]}] experiences ${movingLines.length} moving line(s). By month ${movingLines[movingLines.length-1].month}, the dynamic state transmutes into [${resultHex[2]}] (${resultHex[3]}). Cause: ${movingLines[0].desc}`
+        : `立项本卦为【${primaryHex[2]}】（${primaryHex[3]}）。推演至第 ${movingLines[0].month} 月触发动爻连锁（${linesSummary}），终局变卦为【${resultHex[2]}】（${resultHex[3]}）。\n核心死生因果：${movingLines[0].desc}`;
+    }
+
+    return {
+      primaryHex,
+      movingLines,
+      resultHex,
+      mutatedBits,
+      initialBits,
+      monthlyLog,
+      narrative
+    };
+  }
+
   function verseOf(lv){
     const weak = VARS.filter(v=>lv[v.k] <= 1);
     const strong = VARS.filter(v=>lv[v.k] >= 2);
@@ -286,13 +438,14 @@
         fatalFlags:[isEn
           ? '[Hard Veto] Regulatory / copyright / platform TOS violation triggered. Survival drops to 0%.'
           : '【硬性一票否决】触碰合规/版权/平台红线，存活率直接归零'],
-        benchmark: evaluateBenchmark(lv, 0)
+        benchmark: evaluateBenchmark(lv, 0),
+        evolution: evolveHexagram(lv)
       };
     }
-    return Object.assign(runSim(lv, N, seed), {vetoed:false, vetoes:[]});
+    return Object.assign(runSim(lv, N, seed), {vetoed:false, vetoes:[], evolution: evolveHexagram(lv)});
   }
-  g.DEADLAB = {
+  return {
     LANG, T, HEX, HEXMAP, VARS, CAUSES, CKEYS, BASE, K, CALIBRATION,
-    runSim, bitsOf, hexOf, verseOf, forecast, VETO_LABEL, mulberry32, fnv1a
+    runSim, bitsOf, hexOf, verseOf, forecast, evolveHexagram, VETO_LABEL, mulberry32, fnv1a
   };
-})(window);
+});
