@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/registry/main/schema.json",
+  "name": "deadlab",
+  "title": "DEADLAB · Pre-Mortem Circuit Breaker",
+  "description": "Pre-mortem simulator and commercial circuit breaker for AI coding agents (Cursor, Claude Code, Windsurf). Powered by I Ching dynamics and Monte Carlo hazard integration.",
+  "version": "2.1.2",
+  "homepage": "https://pingguye.cn/deadlab/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yepinggu66/deadlab"
+  },
+  "package": {
+    "registry": "npm",
+    "name": "deadlab"
+  },
+  "command": {
+    "type": "stdio",
+    "executable": "npx",
+    "args": ["-y", "deadlab", "--mcp"]
+  },
+  "capabilities": {
+    "tools": true
+  }
+}
