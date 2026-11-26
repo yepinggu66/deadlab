@@ -4,9 +4,20 @@
   "description": "程序员逆天卦 · AI 时代立项沙盘与商业熔断器 (CLI & MCP Server)",
   "main": "engine.js",
   "bin": {
-    "deadlab": "./bin/deadlab.js",
-    "deadlab-check": "./bin/deadlab.js"
+    "deadlab": "bin/deadlab.js",
+    "deadlab-check": "bin/deadlab.js"
   },
+  "files": [
+    "bin",
+    "engine.js",
+    "store.js",
+    "telemetry.js",
+    "license.js",
+    "codes.json",
+    ".cursorrules",
+    ".windsurfrules",
+    "CLAUDE.md"
+  ],
   "scripts": {
     "test": "node tests/store-engine.test.js && node tests/cli-mcp.test.js",
     "start": "node bin/deadlab.js",

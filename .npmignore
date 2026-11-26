@@ -1,0 +1,9 @@
+# NPM 发布排除清单
+video/
+assets/*.mp4
+*.png
+*.jpg
+*.tgz
+*.log
+tests/
+tmp*
