@@ -32,8 +32,23 @@
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{
-  background:var(--bg); color:var(--txt); font-family:var(--sans);
-  line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  background-color: var(--bg);
+  background-image: url("assets/ink_bg.jpg");
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: cover;
+  background-attachment: fixed;
+  color: var(--txt);
+  font-family: var(--sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+@media(max-width:760px){
+  body{
+    background-size: auto 100vh;
+    background-position: 75% top;
+  }
 }
 /* 宣纸自然纤维与水墨远岫氤氲背景 */
 body::before{
@@ -94,9 +109,15 @@ a.cases-link:hover{color:var(--txt); border-color:var(--gold); box-shadow:0 2px 
 
 /* cards */
 .card{
-  background:var(--panel); border:1px solid var(--line); border-radius:18px;
-  padding:28px 30px; margin-bottom:18px; animation:rise .45s ease both;
-  box-shadow:0 8px 26px rgba(26,28,33,.04);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(26, 28, 33, 0.1);
+  border-radius: 18px;
+  padding: 28px 30px;
+  margin-bottom: 18px;
+  animation: rise .45s ease both;
+  box-shadow: 0 10px 32px rgba(26, 28, 33, 0.05);
 }
 @keyframes rise{from{opacity:0; transform:translateY(9px)} to{opacity:1; transform:none}}
 .card:nth-of-type(2){animation-delay:.04s}
@@ -538,6 +559,25 @@ footer .mono{font-family:var(--serif); font-size:13.5px; font-weight:600; color:
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.hero-header-wrap{display:flex; gap:24px; align-items:flex-start}
+.vertical-poem{
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  padding:12px 7px; background:rgba(255,255,255,0.75); border:1px solid rgba(195,39,43,0.3);
+  border-radius:6px; box-shadow:0 4px 14px rgba(26,28,33,0.04); backdrop-filter:blur(6px);
+  margin-top:8px;
+}
+.vertical-poem .v-seal{
+  display:inline-block; font-family:var(--serif); font-size:11px; font-weight:700;
+  color:#FFF; background:var(--red); padding:2px 4px; border-radius:3px; margin-bottom:4px;
+}
+.vertical-poem .v-char{
+  font-family:var(--serif); font-size:13px; font-weight:600; color:var(--txt);
+  line-height:1.2; letter-spacing:0.05em;
+}
+.vertical-poem .v-dot{color:var(--red); font-size:14px; line-height:1}
+@media(max-width:760px){.vertical-poem{display:none}}
+
 </style>
 </head>
 <body>
@@ -563,13 +603,29 @@ footer .mono{font-family:var(--serif); font-size:13.5px; font-weight:600; color:
   <section class="hero">
     <div class="hero-grid">
       <div class="hero-left">
-        <div class="eyebrow">00 / PRE-MORTEM SANDBOX · 天机沙盘</div>
+        <div class="hero-header-wrap">
+          <div class="vertical-poem">
+            <span class="v-seal">逆天</span>
+            <span class="v-char">预</span>
+            <span class="v-char">演</span>
+            <span class="v-char">死</span>
+            <span class="v-char">法</span>
+            <span class="v-dot">·</span>
+            <span class="v-char">知</span>
+            <span class="v-char">止</span>
+            <span class="v-char">不</span>
+            <span class="v-char">殆</span>
+          </div>
+          <div>
+            <div class="eyebrow">00 / PRE-MORTEM SANDBOX · 天机沙盘</div>
         <h1>先算它<span class="red">怎么死</span></h1>
         <p class="lead">再决定要不要做。
           <span class="en">Every AI writes your plan. We kill it first.</span>
         </p>
         <div class="chips">
           <span>5,000 RUNS</span><span>24 MONTHS</span><span>6 VARIABLES</span><span>NO 98% PROMISE</span>
+        </div>
+          </div>
         </div>
       </div>
       <div class="hero-right">
