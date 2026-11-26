@@ -886,6 +886,7 @@ footer .footer-seal {
       <span class="name">程序员逆天卦 · 沙盘</span> <span class="cn">DEADLAB</span>
     </div>
     <div class="top-right">
+      <a class="cases-link" href="javascript:void(0)" onclick="openVideoModal()" style="border:1px solid var(--gold);color:var(--gold);font-weight:700">📺 宣传片</a>
       <a class="cases-link" href="import.html" data-i18n="nav.import">导入项目</a>
       <a class="cases-link" href="cases.html" data-i18n="nav.cases">CASE FILES →</a>
       <a class="cases-link" href="team.html" data-i18n="nav.team">团队</a>
@@ -1298,9 +1299,15 @@ footer .footer-seal {
 <div id="videoModal" class="paywall-modal hidden" onclick="if(event.target===this)closeVideoModal()">
   <div class="paywall-card" style="max-width:960px;padding:24px;background:#111216;color:#FFF;border:1px solid var(--gold)">
     <button class="paywall-close" style="color:#FFF;top:12px;right:16px" onclick="closeVideoModal()">&times;</button>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-      <span class="paywall-seal">宣传概念片</span>
-      <h3 style="color:#FFF;margin:0;font-size:18px">DEADLAB · 先算它怎么死 (1080P 沉浸解说)</h3>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="paywall-seal">宣传概念片</span>
+        <h3 id="videoTitle" style="color:#FFF;margin:0;font-size:18px">DEADLAB · 先算它怎么死 (1080P 沉浸解说)</h3>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button id="btnLangZh" style="cursor:pointer;padding:5px 14px;border-radius:20px;font-size:12.5px;font-weight:700;border:1px solid var(--gold);background:var(--gold);color:#FFF;" onclick="switchPromoLang('zh')">🇨🇳 中文解说</button>
+        <button id="btnLangEn" style="cursor:pointer;padding:5px 14px;border-radius:20px;font-size:12.5px;font-weight:700;border:1px solid rgba(255,255,255,0.3);background:transparent;color:#BBB;" onclick="switchPromoLang('en')">🇺🇸 English Voiceover</button>
+      </div>
     </div>
     <div style="position:relative;padding-top:56.25%;width:100%;background:#000;border-radius:12px;overflow:hidden">
       <video id="promoVideo" controls style="position:absolute;top:0;left:0;width:100%;height:100%" preload="metadata">
@@ -1492,6 +1499,36 @@ function closeVideoModal() {
   $("videoModal").classList.add("hidden");
   const vid = $("promoVideo");
   if (vid) vid.pause();
+}
+
+function switchPromoLang(lang) {
+  const vid = $("promoVideo");
+  const title = $("videoTitle");
+  const btnZh = $("btnLangZh");
+  const btnEn = $("btnLangEn");
+  const wasPlaying = vid && !vid.paused;
+  
+  if (lang === 'en') {
+    vid.src = "assets/deadlab_promo_en.mp4";
+    title.textContent = "DEADLAB · Pre-Mortem Simulator for Indie Builders (1080P English)";
+    btnEn.style.background = "var(--gold)";
+    btnEn.style.borderColor = "var(--gold)";
+    btnEn.style.color = "#FFF";
+    btnZh.style.background = "transparent";
+    btnZh.style.borderColor = "rgba(255,255,255,0.3)";
+    btnZh.style.color = "#BBB";
+  } else {
+    vid.src = "assets/deadlab_promo_v2.mp4";
+    title.textContent = "DEADLAB · 先算它怎么死 (1080P 沉浸解说)";
+    btnZh.style.background = "var(--gold)";
+    btnZh.style.borderColor = "var(--gold)";
+    btnZh.style.color = "#FFF";
+    btnEn.style.background = "transparent";
+    btnEn.style.borderColor = "rgba(255,255,255,0.3)";
+    btnEn.style.color = "#BBB";
+  }
+  vid.load();
+  if (wasPlaying) vid.play();
 }
 
 function renderResult(){

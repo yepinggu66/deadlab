@@ -112,6 +112,7 @@ textarea.inp{min-height:130px;font-family:var(--sans);font-size:13.5px;line-heig
       <a href="compare.html">对比</a>
       <a href="report.html">报告</a>
       <a href="api.html">API</a>
+      <a href="javascript:void(0)" onclick="openVideoModal()" style="border:1px solid var(--gold);color:var(--gold);font-weight:700">📺 宣传片</a>
     </div>
   </div>
 
@@ -533,6 +534,71 @@ $('goBtn').addEventListener('click', () => {
   });
   location.href = 'index.html?' + p.toString();
 });
+
+function openVideoModal() {
+  document.getElementById("videoModal").classList.remove("hidden");
+  const vid = document.getElementById("promoVideo");
+  if (vid) vid.play();
+}
+
+function closeVideoModal() {
+  document.getElementById("videoModal").classList.add("hidden");
+  const vid = document.getElementById("promoVideo");
+  if (vid) vid.pause();
+}
+
+function switchPromoLang(lang) {
+  const vid = document.getElementById("promoVideo");
+  const title = document.getElementById("videoTitle");
+  const btnZh = document.getElementById("btnLangZh");
+  const btnEn = document.getElementById("btnLangEn");
+  const wasPlaying = vid && !vid.paused;
+  
+  if (lang === 'en') {
+    vid.src = "assets/deadlab_promo_en.mp4";
+    title.textContent = "DEADLAB · Pre-Mortem Simulator for Indie Builders (1080P English)";
+    btnEn.style.background = "var(--gold)";
+    btnEn.style.borderColor = "var(--gold)";
+    btnEn.style.color = "#FFF";
+    btnZh.style.background = "transparent";
+    btnZh.style.borderColor = "rgba(255,255,255,0.3)";
+    btnZh.style.color = "#BBB";
+  } else {
+    vid.src = "assets/deadlab_promo_v2.mp4";
+    title.textContent = "DEADLAB · 先算它怎么死 (1080P 沉浸解说)";
+    btnZh.style.background = "var(--gold)";
+    btnZh.style.borderColor = "var(--gold)";
+    btnZh.style.color = "#FFF";
+    btnEn.style.background = "transparent";
+    btnEn.style.borderColor = "rgba(255,255,255,0.3)";
+    btnEn.style.color = "#BBB";
+  }
+  vid.load();
+  if (wasPlaying) vid.play();
+}
 </script>
+
+<!-- 宣传视频弹窗 Video Modal -->
+<div id="videoModal" class="paywall-modal hidden" onclick="if(event.target===this)closeVideoModal()" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;padding:20px;">
+  <div class="paywall-card" style="width:100%;max-width:960px;padding:24px;background:#111216;color:#FFF;border:1px solid var(--gold);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.6);position:relative;">
+    <button style="position:absolute;top:12px;right:16px;background:transparent;border:none;color:#FFF;font-size:24px;cursor:pointer;" onclick="closeVideoModal()">&times;</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="background:#C3272B;color:#FFF;padding:3px 8px;border-radius:4px;font-size:12px;font-weight:700">宣传概念片</span>
+        <h3 id="videoTitle" style="color:#FFF;margin:0;font-size:18px">DEADLAB · 先算它怎么死 (1080P 沉浸解说)</h3>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button id="btnLangZh" style="cursor:pointer;padding:5px 14px;border-radius:20px;font-size:12.5px;font-weight:700;border:1px solid var(--gold);background:var(--gold);color:#FFF;" onclick="switchPromoLang('zh')">🇨🇳 中文解说</button>
+        <button id="btnLangEn" style="cursor:pointer;padding:5px 14px;border-radius:20px;font-size:12.5px;font-weight:700;border:1px solid rgba(255,255,255,0.3);background:transparent;color:#BBB;" onclick="switchPromoLang('en')">🇺🇸 English Voiceover</button>
+      </div>
+    </div>
+    <div style="position:relative;padding-top:56.25%;width:100%;background:#000;border-radius:12px;overflow:hidden">
+      <video id="promoVideo" controls style="position:absolute;top:0;left:0;width:100%;height:100%" preload="metadata">
+        <source src="assets/deadlab_promo_v2.mp4" type="video/mp4">
+        您的浏览器不支持 HTML5 视频播放。
+      </video>
+    </div>
+  </div>
+</div>
 </body>
 </html>
