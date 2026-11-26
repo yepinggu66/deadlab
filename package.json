@@ -1,6 +1,6 @@
 {
   "name": "deadlab",
-  "version": "2.1.0",
+  "version": "2.1.2",
   "description": "程序员逆天卦 · AI 时代立项沙盘与商业熔断器 (CLI & MCP Server)",
   "main": "engine.js",
   "bin": {
