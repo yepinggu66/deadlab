@@ -17,7 +17,62 @@
 ├─ import.html         导入项目（GitHub / 本地文件夹 / JSON → 推断六爻 + 证据）
 ├─ cases.html          案例档案（4 个深案 + 导航）
 ├─ library.html        案例库（100 个原型，可搜索/筛选）
-├─ team.html           团队模式（三人各填六爻 → 共识卦 + 分歧标红）
+├─ team.html           团队模式（三人各填六爻 → 共识）
+├─ api.html            API & MCP IDE 开发者配置中心
+├─ bin/deadlab.js      CLI 命令行推演 & MCP Server (供 Cursor / Windsurf / Claude 调用)
+├─ license.js          商业版授权门禁与离线算法校验
+```
+
+## 🛠️ 将 DEADLAB 做进开发者的 IDE (Cursor / Claude Code / Windsurf)
+
+在 AI 编程时代，大模型（Cursor Composer / Claude Code / Windsurf Cascade）写代码极快，也极易让开发者陷入“做出一个无人问津的产品”的自嗨试错成本。
+
+DEADLAB 现已全面支持通过 **MCP (Model Context Protocol)** 接入各类 IDE，作为立项前期的**“防自嗨/防破产熔断器”**：
+
+### 1. 终端一键自动配置 (推荐)
+```bash
+npx -y deadlab --install
+```
+> 该命令会自动探测本机安装的 **Cursor**、**Windsurf**、**Claude Desktop**，自动注入 `mcpServers.deadlab` 配置，并在当前项目生成 `.cursorrules`、`CLAUDE.md` 与 `.windsurfrules` 熔断规则。
+
+### 2. 手动在各 IDE 中挂载
+
+#### ⚡ Cursor
+编辑 `~/.cursor/mcp.json`（或项目根目录 `.cursor/mcp.json`）：
+```json
+{
+  "mcpServers": {
+    "deadlab": {
+      "command": "npx",
+      "args": ["-y", "deadlab", "--mcp"]
+    }
+  }
+}
+```
+
+#### 🧠 Claude Code (Anthropic CLI)
+在终端执行一行命令：
+```bash
+claude mcp add deadlab npx -y deadlab --mcp
+```
+
+#### 🌊 Windsurf (Codeium)
+编辑 `~/.codeium/windsurf/mcp_config.json`：
+```json
+{
+  "mcpServers": {
+    "deadlab": {
+      "command": "npx",
+      "args": ["-y", "deadlab", "--mcp"]
+    }
+  }
+}
+```
+
+### 3. 在 IDE 对话中实机使用
+重启 IDE 后，在 Chat / Composer 对话中直接输入：
+- *"我计划开发一个基于 OpenAI 的自动化记账工具，月费 $19，帮我调用 deadlab 算算存活率并评估风险"*
+- AI 智能体将调用 `deadlab_circuit_breaker` 与 `deadlab_check` 工具，若发现负毛利或缺乏付费证据，**智能体将在控制台主动拦截代码生成**，要求开发者先完成最小化闭环验证。卦 + 分歧标红）
 ├─ compare.html        反事实对比（A/B 两条生存曲线）
 ├─ report.html         一页纸报告（A4 打印 / 存 PDF）
 ├─ api.html            API 文档 + 线上试跑

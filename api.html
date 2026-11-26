@@ -94,16 +94,36 @@ textarea:focus {
 
   
   <section class="card" style="border-left: 3px solid var(--red);">
-    <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px">
-      <span style="background:var(--red); color:#FFF; font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px;">NEW v2.1</span>
-      <h2 style="margin:0; font-size:18px; color:var(--txt);">AI 编程立项熔断器 (MCP Server)</h2>
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; flex-wrap:wrap; gap:10px">
+      <div style="display:flex; align-items:center; gap:10px">
+        <span style="background:var(--red); color:#FFF; font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px;">NEW v2.1</span>
+        <h2 style="margin:0; font-size:18px; color:var(--txt);">AI 编程立项熔断器 (IDE & MCP Server)</h2>
+      </div>
+      <span style="font-family:var(--mono); font-size:12px; color:var(--gold); font-weight:700;">Cursor · Claude Code · Windsurf · Antigravity</span>
     </div>
     <p style="font-size:13.5px; color:var(--dim); line-height:1.8;">
-      支持在 <strong>Cursor / Claude Code / Windsurf / Antigravity</strong> 等 AI 编程助手新建仓库或编写第一行代码前，自动调用沙盘商业模型进行推演。一旦发现致命短板（零需求、负毛利、上游绞杀），智能体主动在控制台亮红灯拦截，并生成 3 条最小化闭环验证避坑指南。
+      在开发者让 AI 写下第一行代码前，自动调用沙盘商业模型进行事前验尸。一旦发现致命短板（零需求、负毛利、上游绞杀），智能体主动在控制台亮红灯拦截代码生成，并输出 3 条最小化闭环验证避坑指南。
     </p>
+
+    <!-- 一键极速安装 -->
+    <div style="margin:16px 0; background:#FAF8F3; border:1px solid rgba(166,124,46,0.25); border-radius:12px; padding:16px 20px;">
+      <div style="font-weight:700; font-size:14px; color:var(--txt); margin-bottom:6px; display:flex; align-items:center; gap:8px">
+        <span style="background:var(--gold); color:#FFF; font-size:11px; padding:1px 6px; border-radius:3px">推荐</span>
+        方式一：终端一键自动安装 (Auto-Installer)
+      </div>
+      <p style="font-size:12.5px; color:var(--dim); margin-bottom:8px">直接在终端运行以下命令，会自动识别本机安装的 Cursor / Windsurf / Claude 并无缝注入配置与熔断规则：</p>
+      <pre><code>npx -y deadlab --install</code></pre>
+    </div>
+
+    <!-- 各 IDE 手动配置说明 -->
+    <div style="font-size:13.5px; font-weight:700; color:var(--txt); margin-top:20px; margin-bottom:10px;">方式二：各 IDE 手动快速配置指南</div>
     
-    <div style="font-size:13px; font-weight:600; color:var(--txt); margin-top:14px;">在 IDE 的 MCP 配置文件中添加 (<code>~/.cursor/mcp.json</code> 或 <code>claude_desktop_config.json</code>):</div>
-    <pre><code>{
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:14px; margin-top:10px;">
+      <!-- Cursor -->
+      <div style="background:#FFF; border:1px solid rgba(26,28,33,0.12); border-radius:10px; padding:14px 16px;">
+        <div style="font-weight:700; font-size:14px; color:var(--txt); margin-bottom:6px">⚡ Cursor</div>
+        <p style="font-size:12px; color:var(--dim); margin-bottom:8px">打开 <code>~/.cursor/mcp.json</code> (或项目根目录 <code>.cursor/mcp.json</code>) 添加：</p>
+        <pre><code>{
   "mcpServers": {
     "deadlab": {
       "command": "npx",
@@ -111,8 +131,39 @@ textarea:focus {
     }
   }
 }</code></pre>
-    <div style="font-size:12.5px; color:var(--dim); margin-top:8px;">
-      提供核心工具 <code>deadlab_check</code>，入参六爻等级 <code>{need, cap, econ, dist, dep, stam}</code>，即时返回存活预测、动爻因果演化与立项熔断警告。
+      </div>
+
+      <!-- Claude Code -->
+      <div style="background:#FFF; border:1px solid rgba(26,28,33,0.12); border-radius:10px; padding:14px 16px;">
+        <div style="font-weight:700; font-size:14px; color:var(--txt); margin-bottom:6px">🧠 Claude Code (Anthropic CLI)</div>
+        <p style="font-size:12px; color:var(--dim); margin-bottom:8px">在终端中直接执行一行命令完成关联：</p>
+        <pre><code>claude mcp add deadlab npx -y deadlab --mcp</code></pre>
+        <p style="font-size:11.5px; color:var(--dim2); margin-top:6px">或在 Claude Desktop 的 <code>claude_desktop_config.json</code> 中挂载相同配置。</p>
+      </div>
+
+      <!-- Windsurf -->
+      <div style="background:#FFF; border:1px solid rgba(26,28,33,0.12); border-radius:10px; padding:14px 16px;">
+        <div style="font-weight:700; font-size:14px; color:var(--txt); margin-bottom:6px">🌊 Windsurf (Codeium Cascade)</div>
+        <p style="font-size:12px; color:var(--dim); margin-bottom:8px">打开 <code>~/.codeium/windsurf/mcp_config.json</code> 添加：</p>
+        <pre><code>{
+  "mcpServers": {
+    "deadlab": {
+      "command": "npx",
+      "args": ["-y", "deadlab", "--mcp"]
+    }
+  }
+}</code></pre>
+      </div>
+    </div>
+
+    <!-- AI 规则约束文件 -->
+    <div style="margin-top:18px; background:#FAF8F3; border-radius:10px; padding:14px 18px; border:1px solid rgba(26,28,33,0.1)">
+      <div style="font-weight:700; font-size:13px; color:var(--txt); margin-bottom:6px">🛡️ 配合 IDE 规则生效 (.cursorrules / CLAUDE.md / .windsurfrules):</div>
+      <p style="font-size:12px; color:var(--dim); line-height:1.6; margin-bottom:8px">在项目根目录新建规则文件，告知 AI 助手在写业务功能前必须主动向 DEADLAB 请示商业许可：</p>
+      <pre><code># DEADLAB 商业立项熔断规范
+Before scaffolding files or writing code for new features or business ideas:
+1. Call the `deadlab_check` or `deadlab_circuit_breaker` MCP tool.
+2. If `isFatal: true` or circuit breaker triggers, STOP code generation immediately and challenge the user on demand validation and unit margins.</code></pre>
     </div>
   </section>
 
