@@ -4,262 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>程序员逆天卦-沙盘 · 先算它怎么死</title>
-<script src="i18n.js">
-/* ============ 3D 八卦交互控制器 ============ */
-const Bagua3D = (function(){
-  const world = document.getElementById("b3dWorld");
-  const viewport = document.getElementById("b3dViewport");
-  const layerOuter = document.getElementById("b3dLayerOuter");
-  const layerTaiji = document.getElementById("b3dLayerTaiji");
-  const canvas = document.getElementById("b3dCanvas");
-  const ctx = canvas ? canvas.getContext("2d") : null;
-  const zoomVal = document.getElementById("b3dZoomVal");
-  const autoSpinBtn = document.getElementById("b3dAutoSpin");
-  const hudProphecy = document.getElementById("b3dProphecy");
-  const hudBadge = document.getElementById("b3dBadge");
-  const hudText = document.getElementById("b3dText");
-
-  if (!world || !viewport) return null;
-
-  let rotX = 22;      // 俯仰视角，展现清晰3D立体层次
-  let rotY = -15;     // 偏航角
-  let rotZ = 0;       // 自转角
-  let outerZ = 0;     // 外盘相对转动
-  let scale = 1.0;
-  let autoSpin = true;
-  let isDragging = false;
-  let startX = 0, startY = 0;
-  let lastX = 0, lastY = 0;
-  let velX = 0, velY = 0;
-  let isDivining = false;
-
-  // 粒子系统
-  const particles = [];
-  function addSparks(x, y, count = 28, color = "#F0D392") {
-    if (!ctx) return;
-    for (let i = 0; i < count; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = 1.2 + Math.random() * 4.2;
-      particles.push({
-        x, y,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        size: 1.5 + Math.random() * 2.2,
-        alpha: 1,
-        decay: 0.02 + Math.random() * 0.025,
-        color: Math.random() > 0.35 ? color : (Math.random() > 0.5 ? "#C3272B" : "#FFF")
-      });
-    }
-  }
-
-  function updateParticles() {
-    if (!ctx) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let i = particles.length - 1; i >= 0; i--) {
-      const p = particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vx *= 0.95;
-      p.vy *= 0.95;
-      p.alpha -= p.decay;
-      if (p.alpha <= 0) {
-        particles.splice(i, 1);
-        continue;
-      }
-      ctx.save();
-      ctx.globalAlpha = Math.max(0, p.alpha);
-      ctx.fillStyle = p.color;
-      ctx.shadowBlur = 6;
-      ctx.shadowColor = p.color;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-  }
-
-  function applyTransform() {
-    world.style.transform = `scale3d(${scale}, ${scale}, ${scale}) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) rotateZ(${rotZ.toFixed(2)}deg)`;
-    if (layerOuter) {
-      layerOuter.style.transform = `translateZ(-8px) rotateZ(${(-outerZ).toFixed(2)}deg)`;
-    }
-    if (layerTaiji) {
-      layerTaiji.style.transform = `translateZ(58px) rotateZ(${(rotZ * 0.6).toFixed(2)}deg)`;
-    }
-  }
-
-  function tick() {
-    if (isDivining) {
-      // 疾转推演
-      rotZ = (rotZ + 18) % 360;
-      outerZ = (outerZ + 12) % 360;
-      if (Math.random() > 0.4) {
-        addSparks(135 + (Math.random() - 0.5) * 80, 135 + (Math.random() - 0.5) * 80, 4);
-      }
-    } else {
-      // 平常自转
-      if (autoSpin && !isDragging) {
-        rotZ = (rotZ + 0.35) % 360;
-        outerZ = (outerZ + 0.18) % 360;
-      }
-      // 惯性阻尼
-      if (!isDragging && (Math.abs(velX) > 0.05 || Math.abs(velY) > 0.05)) {
-        rotY += velX;
-        rotX -= velY;
-        velX *= 0.92;
-        velY *= 0.92;
-        rotX = Math.max(-65, Math.min(65, rotX));
-      }
-    }
-
-    applyTransform();
-    updateParticles();
-    requestAnimationFrame(tick);
-  }
-
-  // 鼠标与触摸拖拽
-  viewport.addEventListener("pointerdown", e => {
-    isDragging = true;
-    startX = e.clientX;
-    startY = e.clientY;
-    lastX = e.clientX;
-    lastY = e.clientY;
-    velX = 0;
-    velY = 0;
-    viewport.setPointerCapture(e.pointerId);
-  });
-
-  viewport.addEventListener("pointermove", e => {
-    if (!isDragging) return;
-    const dx = e.clientX - lastX;
-    const dy = e.clientY - lastY;
-    velX = dx * 0.35;
-    velY = dy * 0.35;
-    rotY += velX;
-    rotX = Math.max(-65, Math.min(65, rotX - velY));
-    lastX = e.clientX;
-    lastY = e.clientY;
-  });
-
-  const onPointerUp = e => {
-    if (isDragging) {
-      isDragging = false;
-      try { viewport.releasePointerCapture(e.pointerId); } catch(err) {}
-    }
-  };
-  viewport.addEventListener("pointerup", onPointerUp);
-  viewport.addEventListener("pointercancel", onPointerUp);
-
-  // 滚轮缩放
-  viewport.addEventListener("wheel", e => {
-    e.preventDefault();
-    const delta = e.deltaY < 0 ? 0.1 : -0.1;
-    setZoom(scale + delta);
-  }, { passive: false });
-
-  function setZoom(val) {
-    scale = Math.max(0.65, Math.min(2.0, val));
-    if (zoomVal) zoomVal.textContent = Math.round(scale * 100) + "%";
-  }
-
-  // 控制按钮绑定
-  const resetBtn = document.getElementById("b3dReset");
-  if (resetBtn) {
-    resetBtn.addEventListener("click", () => {
-      rotX = 22;
-      rotY = -15;
-      setZoom(1.0);
-      autoSpin = true;
-      if (autoSpinBtn) autoSpinBtn.classList.add("active");
-      addSparks(135, 135, 20);
-      if (hudText) hudText.textContent = "视角已复位 · 拖拽自由旋转";
-    });
-  }
-
-  const zoomInBtn = document.getElementById("b3dZoomIn");
-  if (zoomInBtn) zoomInBtn.addEventListener("click", () => setZoom(scale + 0.15));
-
-  const zoomOutBtn = document.getElementById("b3dZoomOut");
-  if (zoomOutBtn) zoomOutBtn.addEventListener("click", () => setZoom(scale - 0.15));
-
-  if (autoSpinBtn) {
-    autoSpinBtn.addEventListener("click", () => {
-      autoSpin = !autoSpin;
-      autoSpinBtn.classList.toggle("active", autoSpin);
-      if (hudText) hudText.textContent = autoSpin ? "太极运转 · 阴阳生克" : "静止感悟 · 点击卦位探寻天机";
-    });
-  }
-
-  // 点击八卦各个卦位产生酷炫特效与卦辞解惑
-  const trigramElements = document.querySelectorAll(".b3d-trigram");
-  trigramElements.forEach(el => {
-    el.addEventListener("click", e => {
-      e.stopPropagation();
-      const name = el.getAttribute("data-name");
-      const sym = el.getAttribute("data-sym");
-      const nature = el.getAttribute("data-nature");
-      const desc = el.getAttribute("data-desc");
-
-      const rect = viewport.getBoundingClientRect();
-      const x = (e.clientX - rect.left);
-      const y = (e.clientY - rect.top);
-      addSparks(x, y, 32, "#F0D392");
-
-      trigramElements.forEach(t => t.classList.remove("active"));
-      el.classList.add("active");
-      setTimeout(() => el.classList.remove("active"), 2000);
-
-      if (hudBadge && hudText && hudProphecy) {
-        hudBadge.textContent = `${name}卦 · ${sym} ${nature}`;
-        hudText.textContent = desc;
-        hudProphecy.classList.add("lit");
-        setTimeout(() => hudProphecy.classList.remove("lit"), 2500);
-      }
-    });
-  });
-
-  // 点击太极双鱼核心
-  const taijiLayer = document.getElementById("b3dLayerTaiji");
-  if (taijiLayer) {
-    taijiLayer.addEventListener("click", e => {
-      e.stopPropagation();
-      addSparks(135, 135, 40, "#EAE8E3");
-      if (hudBadge && hudText && hudProphecy) {
-        hudBadge.textContent = "太极天心";
-        hudText.textContent = "易有太极，是生两仪，两仪生四象，四象生八卦。";
-        hudProphecy.classList.add("lit");
-        setTimeout(() => hudProphecy.classList.remove("lit"), 2500);
-      }
-    });
-  }
-
-  requestAnimationFrame(tick);
-
-  return {
-    startDivining: () => {
-      isDivining = true;
-      rotX = 35;
-      rotY = 0;
-      autoSpin = true;
-      if (hudBadge && hudText && hudProphecy) {
-        hudBadge.textContent = "天机推演";
-        hudText.textContent = "八卦疾转 · 正在推演 5,000 次死法...";
-        hudProphecy.classList.add("lit");
-      }
-    },
-    stopDivining: () => {
-      isDivining = false;
-      addSparks(135, 135, 55, "#D4AF37");
-      if (hudBadge && hudText && hudProphecy) {
-        hudBadge.textContent = "卦象已定";
-        hudText.textContent = "天机显现 · 诊断结果已出";
-        setTimeout(() => hudProphecy.classList.remove("lit"), 2500);
-      }
-    }
-  };
-})();
-
-</script>
+<script src="i18n.js"></script>
 <style>
 :root{
   --bg:#07080A;
@@ -1826,6 +1571,278 @@ if(DEMO){
     if(location.search.indexOf("card")>=0) setTimeout(makeCard, 1200);
   }, 150);
 }
+
+/* ============ 3D 八卦交互控制器 ============ */
+const Bagua3D = (function(){
+  let world, viewport, layerOuter, layerTaiji, canvas, ctx, zoomVal, autoSpinBtn, hudProphecy, hudBadge, hudText;
+  let rotX = 22;      // 俯仰视角，展现清晰3D立体层次
+  let rotY = -15;     // 偏航角
+  let rotZ = 0;       // 自转角
+  let outerZ = 0;     // 外盘相对转动
+  let scale = 1.0;
+  let autoSpin = true;
+  let isDragging = false;
+  let startX = 0, startY = 0;
+  let lastX = 0, lastY = 0;
+  let velX = 0, velY = 0;
+  let isDivining = false;
+  let particles = [];
+  let initialized = false;
+
+  function addSparks(x, y, count = 28, color = "#F0D392") {
+    if (!ctx) return;
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1.2 + Math.random() * 4.2;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: 1.5 + Math.random() * 2.2,
+        alpha: 1,
+        decay: 0.02 + Math.random() * 0.025,
+        color: Math.random() > 0.35 ? color : (Math.random() > 0.5 ? "#C3272B" : "#FFF")
+      });
+    }
+  }
+
+  function updateParticles() {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vx *= 0.95;
+      p.vy *= 0.95;
+      p.alpha -= p.decay;
+      if (p.alpha <= 0) {
+        particles.splice(i, 1);
+        continue;
+      }
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.alpha);
+      ctx.fillStyle = p.color;
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function applyTransform() {
+    if (!world) return;
+    world.style.transform = "scale3d(" + scale + ", " + scale + ", " + scale + ") rotateX(" + rotX.toFixed(2) + "deg) rotateY(" + rotY.toFixed(2) + "deg) rotateZ(" + rotZ.toFixed(2) + "deg)";
+    if (layerOuter) {
+      layerOuter.style.transform = "translateZ(-8px) rotateZ(" + (-outerZ).toFixed(2) + "deg)";
+    }
+    if (layerTaiji) {
+      layerTaiji.style.transform = "translateZ(58px) rotateZ(" + (rotZ * 0.6).toFixed(2) + "deg)";
+    }
+  }
+
+  function tick() {
+    if (!initialized) return;
+    if (isDivining) {
+      rotZ = (rotZ + 18) % 360;
+      outerZ = (outerZ + 12) % 360;
+      if (Math.random() > 0.4) {
+        addSparks(135 + (Math.random() - 0.5) * 80, 135 + (Math.random() - 0.5) * 80, 4);
+      }
+    } else {
+      if (autoSpin && !isDragging) {
+        rotZ = (rotZ + 0.35) % 360;
+        outerZ = (outerZ + 0.18) % 360;
+      }
+      if (!isDragging && (Math.abs(velX) > 0.05 || Math.abs(velY) > 0.05)) {
+        rotY += velX;
+        rotX -= velY;
+        velX *= 0.92;
+        velY *= 0.92;
+        rotX = Math.max(-65, Math.min(65, rotX));
+      }
+    }
+
+    applyTransform();
+    updateParticles();
+    requestAnimationFrame(tick);
+  }
+
+  function setZoom(val) {
+    scale = Math.max(0.65, Math.min(2.0, val));
+    if (zoomVal) zoomVal.textContent = Math.round(scale * 100) + "%";
+    applyTransform();
+  }
+
+  function init() {
+    world = document.getElementById("b3dWorld");
+    viewport = document.getElementById("b3dViewport");
+    layerOuter = document.getElementById("b3dLayerOuter");
+    layerTaiji = document.getElementById("b3dLayerTaiji");
+    canvas = document.getElementById("b3dCanvas");
+    ctx = canvas ? canvas.getContext("2d") : null;
+    zoomVal = document.getElementById("b3dZoomVal");
+    autoSpinBtn = document.getElementById("b3dAutoSpin");
+    hudProphecy = document.getElementById("b3dProphecy");
+    hudBadge = document.getElementById("b3dBadge");
+    hudText = document.getElementById("b3dText");
+
+    if (!world || !viewport) {
+      console.warn("Bagua3D DOM elements not found, will retry...");
+      setTimeout(init, 100);
+      return;
+    }
+
+    // 鼠标与触摸拖拽
+    viewport.addEventListener("pointerdown", e => {
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      velX = 0;
+      velY = 0;
+      viewport.setPointerCapture(e.pointerId);
+    });
+
+    viewport.addEventListener("pointermove", e => {
+      if (!isDragging) return;
+      const dx = e.clientX - lastX;
+      const dy = e.clientY - lastY;
+      velX = dx * 0.35;
+      velY = dy * 0.35;
+      rotY += velX;
+      rotX = Math.max(-65, Math.min(65, rotX - velY));
+      lastX = e.clientX;
+      lastY = e.clientY;
+      applyTransform();
+    });
+
+    const onPointerUp = e => {
+      if (isDragging) {
+        isDragging = false;
+        try { viewport.releasePointerCapture(e.pointerId); } catch(err) {}
+      }
+    };
+    viewport.addEventListener("pointerup", onPointerUp);
+    viewport.addEventListener("pointercancel", onPointerUp);
+
+    // 滚轮缩放
+    viewport.addEventListener("wheel", e => {
+      e.preventDefault();
+      const delta = e.deltaY < 0 ? 0.1 : -0.1;
+      setZoom(scale + delta);
+    }, { passive: false });
+
+    // 按钮事件绑定
+    const resetBtn = document.getElementById("b3dReset");
+    if (resetBtn) {
+      resetBtn.addEventListener("click", () => {
+        rotX = 22;
+        rotY = -15;
+        setZoom(1.0);
+        autoSpin = true;
+        if (autoSpinBtn) autoSpinBtn.classList.add("active");
+        addSparks(135, 135, 20);
+        if (hudText) hudText.textContent = "视角已复位 · 拖拽自由旋转";
+      });
+    }
+
+    const zoomInBtn = document.getElementById("b3dZoomIn");
+    if (zoomInBtn) zoomInBtn.addEventListener("click", () => setZoom(scale + 0.15));
+
+    const zoomOutBtn = document.getElementById("b3dZoomOut");
+    if (zoomOutBtn) zoomOutBtn.addEventListener("click", () => setZoom(scale - 0.15));
+
+    if (autoSpinBtn) {
+      autoSpinBtn.addEventListener("click", () => {
+        autoSpin = !autoSpin;
+        autoSpinBtn.classList.toggle("active", autoSpin);
+        if (hudText) hudText.textContent = autoSpin ? "太极运转 · 阴阳生克" : "静止感悟 · 点击卦位探寻天机";
+      });
+    }
+
+    // 各卦位点击互动
+    const trigramElements = document.querySelectorAll(".b3d-trigram");
+    trigramElements.forEach(el => {
+      el.addEventListener("click", e => {
+        e.stopPropagation();
+        const name = el.getAttribute("data-name");
+        const sym = el.getAttribute("data-sym");
+        const nature = el.getAttribute("data-nature");
+        const desc = el.getAttribute("data-desc");
+
+        const rect = viewport.getBoundingClientRect();
+        const x = (e.clientX - rect.left);
+        const y = (e.clientY - rect.top);
+        addSparks(x, y, 32, "#F0D392");
+
+        trigramElements.forEach(t => t.classList.remove("active"));
+        el.classList.add("active");
+        setTimeout(() => el.classList.remove("active"), 2000);
+
+        if (hudBadge && hudText && hudProphecy) {
+          hudBadge.textContent = name + "卦 · " + sym + " " + nature;
+          hudText.textContent = desc;
+          hudProphecy.classList.add("lit");
+          setTimeout(() => hudProphecy.classList.remove("lit"), 2500);
+        }
+      });
+    });
+
+    // 太极双鱼核心点击
+    if (layerTaiji) {
+      layerTaiji.addEventListener("click", e => {
+        e.stopPropagation();
+        addSparks(135, 135, 40, "#EAE8E3");
+        if (hudBadge && hudText && hudProphecy) {
+          hudBadge.textContent = "太极天心";
+          hudText.textContent = "易有太极，是生两仪，两仪生四象，四象生八卦。";
+          hudProphecy.classList.add("lit");
+          setTimeout(() => hudProphecy.classList.remove("lit"), 2500);
+        }
+      });
+    }
+
+    initialized = true;
+    requestAnimationFrame(tick);
+    console.log("Bagua3D initialized successfully!");
+  }
+
+  // 页面加载完成后自动初始化
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    setTimeout(init, 50);
+  }
+
+  return {
+    init: init,
+    startDivining: () => {
+      isDivining = true;
+      rotX = 35;
+      rotY = 0;
+      autoSpin = true;
+      if (hudBadge && hudText && hudProphecy) {
+        hudBadge.textContent = "天机推演";
+        hudText.textContent = "八卦疾转 · 正在推演 5,000 次死法...";
+        hudProphecy.classList.add("lit");
+      }
+    },
+    stopDivining: () => {
+      isDivining = false;
+      addSparks(135, 135, 55, "#D4AF37");
+      if (hudBadge && hudText && hudProphecy) {
+        hudBadge.textContent = "卦象已定";
+        hudText.textContent = "天机显现 · 诊断结果已出";
+        setTimeout(() => hudProphecy.classList.remove("lit"), 2500);
+      }
+    }
+  };
+})();
+
 </script>
 </body>
 </html>
