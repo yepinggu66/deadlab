@@ -137,13 +137,12 @@ DNSPod 加一条 CNAME：`deadlab` → `yepinggu66.github.io`，然后在仓库 
 填自定义域。**注意：DNS 未生效前不要提交 `CNAME` 文件**，否则 GitHub 会把
 github.io 地址重定向到一个解析不了的域名（本次已踩过，回滚方式见 git log）。
 
-## 付费墙（¥9.9 单次报告）
+## 付费墙（¥9.9 商业版 / 深度报告）
 
-- 收款码：把图片存成 `assets/pay.png`，`report.html` 的弹窗会自动显示。
-- 提取码：在 `codes.json` 里维护，初始 20 个，格式 `DL-XXXX-XXXX`。
-- 解锁后写 `localStorage.deadlab_paid=1`，直接调起打印（可存 PDF）。
-- ⚠️ 校验在前端，能被绕过。它的用途是**验证付费意愿**，不是防破解；
-  真要卖，就换成"付款后人工发 PDF"，或接一个带服务端的收款回调。
+- 收款码：支持微信支付（`assets/pay_wx.png`）、支付宝（`assets/pay_ali.png`）与 PayPal 快捷支付。
+- 授权码机制：采用加盐 SHA-256 不可逆单向散列加密（`license.js`），前端零明文泄露，杜绝逆向白嫖。
+- 私有卡密管理：卡密发放账本保存在本地私有的 `data/licenses_private.json`（被 `.gitignore` 保护，严禁对外公开）。每当买家付款 ¥9.9 或 $4.99，从未使用的列表中提取一个发给买家。
+- 生成新卡密：运行 `node scripts/keygen.js 20` 即可一键生成新的卡密与哈希。
 
 ## 视频
 

@@ -1284,11 +1284,35 @@ footer .footer-seal {
       <div id="licenseErrorMsg" style="font-size:12px;color:var(--red);margin-top:6px;min-height:18px"></div>
     </div>
 
-    <!-- 支付与获取激活码途径 -->
-    <div class="paywall-payment-guide" style="border-top:1px solid rgba(26,28,33,.1);padding-top:14px;margin-top:12px">
-      <div style="font-size:12.5px;font-weight:700;color:var(--txt);margin-bottom:8px">获取官方激活码通道:</div>
-      <div style="font-size:12px;color:var(--dim);line-height:1.7;background:#FAF8F3;border:1px solid rgba(26,28,33,.12);border-radius:10px;padding:10px 14px">
-        激活码由卖家在确认收款后单独发放。微信、支付宝收款码和 PayPal 入口在 <a href="report.html?pay">报告页</a>，扫码或付款不会自动解锁。
+    <!-- 支付与获取激活码途径 (原生聚合收银台) -->
+    <div class="paywall-payment-guide" style="border-top:1px solid rgba(26,28,33,.1);padding-top:14px;margin-top:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:13px;font-weight:700;color:var(--txt)">扫码获取正版激活码:</span>
+        <span style="font-size:11px;color:var(--dim)">转账备注邮箱 3 分钟内发卡</span>
+      </div>
+      
+      <!-- 支付方式切换 Tab -->
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button type="button" id="payTabWx" style="flex:1;padding:6px 8px;font-size:11.5px;border-radius:8px;cursor:pointer;border:1px solid #52C41A;background:rgba(82,196,26,.1);color:#237804;font-weight:700" onclick="switchPayChannel('wx')">🟢 微信支付 (¥9.9)</button>
+        <button type="button" id="payTabAli" style="flex:1;padding:6px 8px;font-size:11.5px;border-radius:8px;cursor:pointer;border:1px solid rgba(26,28,33,.15);background:#FAF8F3;color:var(--dim);font-weight:600" onclick="switchPayChannel('ali')">🔵 支付宝 (¥9.9)</button>
+        <button type="button" id="payTabPaypal" style="flex:1;padding:6px 8px;font-size:11.5px;border-radius:8px;cursor:pointer;border:1px solid rgba(26,28,33,.15);background:#FAF8F3;color:var(--dim);font-weight:600" onclick="switchPayChannel('paypal')">🌐 PayPal ($4.99)</button>
+      </div>
+
+      <!-- 二维码与支付卡片容器 -->
+      <div style="background:#FAF8F3;border:1px solid rgba(26,28,33,.12);border-radius:12px;padding:12px;text-align:center">
+        <div id="payQrBox" style="margin-bottom:8px">
+          <img id="payQrImg" src="assets/pay_wx.png" alt="收款码" style="width:150px;height:150px;object-fit:contain;margin:0 auto;border-radius:8px;border:1px solid rgba(0,0,0,.08);background:#FFF;display:block">
+        </div>
+        <div id="payPaypalBox" style="display:none;padding:12px 6px">
+          <div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:4px">PayPal 国际极速通道 · $4.99 USD</div>
+          <div style="font-size:11.5px;color:var(--dim);margin-bottom:10px">支持全球信用卡、借记卡及 PayPal 余额</div>
+          <a href="https://paypal.me/pinggu80/4.99USD" target="_blank" style="display:inline-block;background:#0070BA;color:#FFF;padding:8px 18px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none">前往 PayPal 快捷支付 →</a>
+        </div>
+
+        <!-- 详细取码流程说明 -->
+        <div style="font-size:11px;color:var(--dim);line-height:1.7;text-align:left;border-top:1px dashed rgba(26,28,33,.12);padding-top:8px;margin-top:6px">
+          <div><strong style="color:var(--txt)">如何取码：</strong>① 付款时在【转账备注】中填写您的<strong>接收邮箱</strong>；<br>② 或付款后点击 <a href="mailto:yepinggu6@gmail.com?subject=DEADLAB%E6%BF%80%E6%B4%BB%E7%A0%81%E7%94%B3%E8%AF%B7&body=%E6%82%A8%E5%A5%BD%EF%BC%8C%E6%88%91%E5%B7%B2%E6%94%AF%E4%BB%989.9%E5%85%83%EF%BC%8C%E8%BD%AC%E8%B4%A6%E5%8D%95%E5%8F%B7/%E6%88%AA%E5%9B%BE%E5%A6%82%E4%B8%8B%EF%BC%9A" style="color:var(--red);font-weight:700;text-decoration:underline">发送截图取码 (yepinggu6@gmail.com)</a>，站长核验后秒发专属卡密。收到卡密后在上方粘贴即可立即解锁！</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1475,6 +1499,48 @@ function submitLicenseActivation() {
   } else {
     $("licenseErrorMsg").style.color = "var(--red)";
     $("licenseErrorMsg").textContent = "✖ " + res.message;
+  }
+}
+
+function switchPayChannel(ch) {
+  const tabWx = $("payTabWx");
+  const tabAli = $("payTabAli");
+  const tabPaypal = $("payTabPaypal");
+  const qrBox = $("payQrBox");
+  const qrImg = $("payQrImg");
+  const paypalBox = $("payPaypalBox");
+  if (!tabWx || !tabAli || !tabPaypal) return;
+
+  [tabWx, tabAli, tabPaypal].forEach(t => {
+    t.style.border = "1px solid rgba(26,28,33,.15)";
+    t.style.background = "#FAF8F3";
+    t.style.color = "var(--dim)";
+    t.style.fontWeight = "600";
+  });
+
+  if (ch === "wx") {
+    tabWx.style.border = "1px solid #52C41A";
+    tabWx.style.background = "rgba(82,196,26,.1)";
+    tabWx.style.color = "#237804";
+    tabWx.style.fontWeight = "700";
+    if (qrImg) qrImg.src = "assets/pay_wx.png";
+    if (qrBox) qrBox.style.display = "block";
+    if (paypalBox) paypalBox.style.display = "none";
+  } else if (ch === "ali") {
+    tabAli.style.border = "1px solid #1677FF";
+    tabAli.style.background = "rgba(22,119,255,.1)";
+    tabAli.style.color = "#0958D9";
+    tabAli.style.fontWeight = "700";
+    if (qrImg) qrImg.src = "assets/pay_ali.png";
+    if (qrBox) qrBox.style.display = "block";
+    if (paypalBox) paypalBox.style.display = "none";
+  } else if (ch === "paypal") {
+    tabPaypal.style.border = "1px solid #0070BA";
+    tabPaypal.style.background = "rgba(0,112,186,.1)";
+    tabPaypal.style.color = "#0070BA";
+    tabPaypal.style.fontWeight = "700";
+    if (qrBox) qrBox.style.display = "none";
+    if (paypalBox) paypalBox.style.display = "block";
   }
 }
 

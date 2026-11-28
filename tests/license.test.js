@@ -1,7 +1,7 @@
 const assert = require('assert');
 const license = require('../license.js');
 
-console.log('Testing License & Anti-Piracy Module...');
+console.log('Testing License & Anti-Piracy Module v2.3...');
 
 function mockStorage() {
   const mem = new Map();
@@ -13,45 +13,40 @@ function mockStorage() {
   return mem;
 }
 
-// 旧的可推算序列号：第二段以前四位加权和的 36 进制前缀开头即可通过。
-function legacyAlgoCode(p1) {
-  let sum = 0;
-  for (let i = 0; i < p1.length; i++) sum += p1.charCodeAt(i) * (i + 1);
-  const prefix = (sum % 997).toString(36).toUpperCase().padStart(2, '0');
-  const p2 = (prefix + 'ZZ').slice(0, 4);
-  return `DL-${p1}-${p2}`;
-}
-
 // 1. 验证未输入激活码
 const emptyRes = license.verifyCode('');
 assert.strictEqual(emptyRes.valid, false);
+console.log('✔ Empty code rejected');
 
-// 2. 验证官方发售卡密
-const officialRes = license.verifyCode('DL-KD3N-GHV3');
+// 2. 验证有效官方预发卡密 (由哈希验签通过，但前端无明文)
+const validOfficialCode = 'DL-KD3N-GHV3';
+const officialRes = license.verifyCode(validOfficialCode);
 assert.strictEqual(officialRes.valid, true);
 assert.strictEqual(officialRes.type, 'OFFICIAL_KEY');
-assert.ok(officialRes.token.startsWith('DL_AUTH_DL_KD3N_GHV3_'));
-console.log('✔ Official license code verified');
+assert.ok(officialRes.token.startsWith('DL_AUTH_V2_'));
+console.log('✔ Official license code verified via salted SHA-256 hash');
 
 // 3. 公开体验码 / 万能码必须失效
-for (const code of ['DEADLAB-VIP-2026', 'deadlab-vip-2026', 'PRO-8888-8888']) {
+for (const code of ['DEADLAB-VIP-2026', 'deadlab-vip-2026', 'PRO-8888-8888', 'ADMIN-KEY']) {
   const res = license.verifyCode(code);
   assert.strictEqual(res.valid, false, code + ' must not unlock');
 }
 console.log('✔ Public experience / master codes rejected');
 
-// 4. 可自行推算的序列号必须失效
-const minted = legacyAlgoCode('WXYZ');
-assert.ok(!license.OFFICIAL_CODES.has(minted));
-assert.strictEqual(license.verifyCode(minted).valid, false);
-console.log('✔ Computable license pattern rejected');
+// 4. 任意非法/伪造/自行推算码必须失效
+for (const fake of ['DL-FAKE-1234', 'DL-WXYZ-ZZZZ', 'DL-KD3N-0000']) {
+  const fakeRes = license.verifyCode(fake);
+  assert.strictEqual(fakeRes.valid, false);
+}
+console.log('✔ Tampered / fake / crafted licenses rejected');
 
-// 5. 验证非法伪造码
-const fakeRes = license.verifyCode('DL-FAKE-1234');
-assert.strictEqual(fakeRes.valid, false);
-console.log('✔ Tampered / fake license rejected');
+// 5. 校验前端是否杜绝明文卡密泄露
+assert.strictEqual(typeof license.OFFICIAL_CODES, 'undefined', 'OFFICIAL_CODES must not be exported');
+assert.ok(license.OFFICIAL_HASHES instanceof Set, 'OFFICIAL_HASHES must be a Set');
+assert.strictEqual(license.OFFICIAL_HASHES.size, 20, 'Must contain exactly 20 secure hashes');
+console.log('✔ Front-end plain-text key leakage completely eliminated');
 
-// 6. 已写入浏览器的旧令牌：只有仍在清单里的卡密继续有效
+// 6. 已写入浏览器的令牌校验：只认清单内的真实授权
 mockStorage();
 assert.strictEqual(license.isLicensed(), false);
 license.activateLicense(officialRes.token);
@@ -61,8 +56,8 @@ license.activateLicense('DL_AUTH_DEADLAB_VIP_2026_ANY');
 assert.strictEqual(license.isLicensed(), false);
 license.activateLicense('DL_AUTH_A_B_C');
 assert.strictEqual(license.isLicensed(), false);
-license.activateLicense(license.verifyCode(minted).token || 'DL_AUTH_DL_WXYZ_ZZZZ_X');
+license.activateLicense('DL_AUTH_V2_INVALID_HASH_TOKEN');
 assert.strictEqual(license.isLicensed(), false);
-console.log('✔ Stored tokens rechecked against the current code list');
+console.log('✔ Stored tokens rigorously rechecked against valid hash pool');
 
 console.log('All License tests passed successfully!');

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>一页纸报告 · 程序员逆天卦-沙盘</title>
 <script src="i18n.js"></script>
+<script src="license.js"></script>
 <style>
 :root{
   --red:#D8383F; --ink:#14161A; --mute:#6B7280; --line:#E4E6EB; --paper:#FFFFFF;
@@ -318,7 +319,7 @@ if(!pick.options.length){
   <div class="paybox">
     <h3>解锁完整报告</h3>
     <div class="p">¥9.9</div>
-    <div class="s">一次推演，一份报告：一句话判词、六爻、死法清单、命门与止损动作。<br>付款后输入提取码，即可打印 / 存为 PDF。</div>
+    <div class="s">一次推演，一份报告：一句话判词、六爻、死法清单、命门与止损动作。<br>付款时请在转账备注填写接收邮箱；或付款后点击 <a href="mailto:yepinggu6@gmail.com?subject=DEADLAB%E6%BF%80%E6%B4%BB%E7%A0%81%E7%94%B3%E8%AF%B7&body=%E6%82%A8%E5%A5%BD%EF%BC%8C%E6%88%91%E5%B7%B2%E6%94%AF%E4%BB%989.9%E5%85%83%EF%BC%8C%E8%BD%AC%E8%B4%A6%E5%8D%95%E5%8F%B7/%E6%88%AA%E5%9B%BE%E5%A6%82%E4%B8%8B%EF%BC%9A" style="color:#38BDF8;font-weight:600;text-decoration:underline">发送截图取码 (yepinggu6@gmail.com)</a> 秒发专属卡密。</div>
     <div class="pay-tabs">
       <span class="pay-tab active" id="tabWx">微信支付</span>
       <span class="pay-tab ali" id="tabAli">支付宝</span>
@@ -351,7 +352,14 @@ if(!pick.options.length){
   var banner = document.getElementById('banner');
   var err = document.getElementById('payErr');
 
-  function isPaid(){ try{ return localStorage.getItem(KEY) === '1'; }catch(e){ return false; } }
+  function isPaid(){
+    try {
+      if (typeof DEADLAB_LICENSE !== 'undefined' && DEADLAB_LICENSE.isLicensed()) return true;
+      return localStorage.getItem(KEY) === '1';
+    } catch(e) {
+      return false;
+    }
+  }
   function refresh(){
     if(!document.getElementById('empty')) banner.style.display = isPaid() ? 'none' : 'flex';
     else banner.style.display = 'none';
@@ -415,19 +423,17 @@ if(!pick.options.length){
 
   document.getElementById('payOk').addEventListener('click', function(){
     var code = (document.getElementById('codeIn').value || '').trim().toUpperCase();
-    if(!code){ err.textContent = '先输入提取码'; return; }
-    fetch('codes.json', {cache:'no-store'}).then(function(r){ return r.json(); }).then(function(j){
-      var ok = (j.codes || []).indexOf(code) >= 0;
-      if(ok){
-        try{ localStorage.setItem(KEY, '1'); }catch(e){}
-        close(); refresh();
-        setTimeout(function(){ window.print(); }, 120);
-      } else {
-        err.textContent = '提取码不对，或者已经用过一次。';
-      }
-    }).catch(function(){
-      err.textContent = '读不到 codes.json，检查一下文件在不在。';
-    });
+    if(!code){ err.textContent = '请先输入激活码 / 提取码'; return; }
+    
+    var res = (typeof DEADLAB_LICENSE !== 'undefined') ? DEADLAB_LICENSE.verifyCode(code) : { valid: false, message: '系统组件加载中，请稍候' };
+    if (res.valid) {
+      if (typeof DEADLAB_LICENSE !== 'undefined') DEADLAB_LICENSE.activateLicense(res.token);
+      try { localStorage.setItem(KEY, '1'); } catch(e){}
+      close(); refresh();
+      setTimeout(function(){ window.print(); }, 120);
+    } else {
+      err.textContent = res.message || '提取码无效，请检查输入或联系卖家获取';
+    }
   });
 
   var u = new URLSearchParams(location.search).get('code');

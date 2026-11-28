@@ -1,2 +1,8 @@
-﻿video/s*.wav\nvideo/seg*.mp4\nvideo/list.txt\nvideo/_*.png\n_*.png\n预览-*.png
+﻿video/s*.wav
+video/seg*.mp4
+video/list.txt
+video/_*.png
+_*.png
+预览-*.png
 CNAME
+data/licenses_private.json
