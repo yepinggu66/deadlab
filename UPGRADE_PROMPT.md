@@ -54,9 +54,9 @@
    npx wrangler secret put JWT_SECRET
    npx wrangler secret put WEBHOOK_SECRET
    ```
-3. **生成首批测试兑换码**：
+3. **生成首批兑换码**（在私有数据库里生成，不要把真实卡密写进仓库、页面或前端脚本）：
    ```bash
-   npx wrangler d1 execute deadlab-db --remote --command="INSERT INTO licenses (code, plan, max_uses, used_count, created_at) VALUES ('DL-VIP-202601', 'team', 5, 0, 1764120000000);"
+   npx wrangler d1 execute deadlab-db --remote --command="INSERT INTO licenses (code, plan, max_uses, used_count, created_at) VALUES ('DL-REPLACE-WITH-PRIVATE-CODE', 'team', 5, 0, 1764120000000);"
    ```
 4. **一键发布覆盖旧版本**：
    ```bash

@@ -1278,7 +1278,7 @@ footer .footer-seal {
     <div class="paywall-input-box">
       <label>输入专属激活码 (License Key):</label>
       <div style="display:flex;gap:8px;margin-top:6px">
-        <input type="text" id="licenseCodeInput" placeholder="例如: DL-KD3N-GHV3" class="inp" style="padding:10px 14px;font-family:var(--mono);text-transform:uppercase">
+        <input type="text" id="licenseCodeInput" placeholder="例如: DL-XXXX-XXXX" class="inp" style="padding:10px 14px;font-family:var(--mono);text-transform:uppercase">
         <button class="primary" style="width:auto;padding:10px 20px;white-space:nowrap" onclick="submitLicenseActivation()">立即解锁 →</button>
       </div>
       <div id="licenseErrorMsg" style="font-size:12px;color:var(--red);margin-top:6px;min-height:18px"></div>
@@ -1288,7 +1288,7 @@ footer .footer-seal {
     <div class="paywall-payment-guide" style="border-top:1px solid rgba(26,28,33,.1);padding-top:14px;margin-top:12px">
       <div style="font-size:12.5px;font-weight:700;color:var(--txt);margin-bottom:8px">获取官方激活码通道:</div>
       <div style="font-size:12px;color:var(--dim);line-height:1.7;background:#FAF8F3;border:1px solid rgba(26,28,33,.12);border-radius:10px;padding:10px 14px">
-        支付 ¥9.9 即可获取正版一机一码序列号。测试体验可直接点击填入体验码: <strong style="color:var(--red);cursor:pointer;text-decoration:underline" onclick="fillTestCode('DEADLAB-VIP-2026')">DEADLAB-VIP-2026</strong>
+        激活码由卖家在确认收款后单独发放。微信、支付宝收款码和 PayPal 入口在 <a href="report.html?pay">报告页</a>，扫码或付款不会自动解锁。
       </div>
     </div>
   </div>
@@ -1458,11 +1458,6 @@ function openPaywallModal() {
 
 function closePaywallModal() {
   $("paywallModal").classList.add("hidden");
-}
-
-function fillTestCode(c) {
-  $("licenseCodeInput").value = c;
-  submitLicenseActivation();
 }
 
 function submitLicenseActivation() {
