@@ -19,7 +19,7 @@
     "CLAUDE.md"
   ],
   "scripts": {
-    "test": "node tests/store-engine.test.js && node tests/cli-mcp.test.js",
+    "test": "node tests/store-engine.test.js && node tests/cli-mcp.test.js && node tests/license.test.js",
     "start": "node bin/deadlab.js",
     "mcp": "node bin/deadlab.js --mcp"
   },

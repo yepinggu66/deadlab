@@ -218,7 +218,8 @@ function randomHex(len) {
 async function signToken(payload, secret) {
   const enc = new TextEncoder();
   const data = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  const key = await crypto.subtle.importKey('raw', enc.encode(secret || 'deadlab-dev-secret'), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  if (!secret) throw new Error('JWT_SECRET is not configured');
+  const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   const sigBuf = await crypto.subtle.sign('HMAC', key, enc.encode(data));
   const sig = btoa(String.fromCharCode(...new Uint8Array(sigBuf)));
   return `${data}.${sig}`;
@@ -230,7 +231,8 @@ async function verifyAuthHeader(request, secret) {
   const [data, sig] = token.split('.');
   if (!data || !sig) return null;
   const enc = new TextEncoder();
-  const key = await crypto.subtle.importKey('raw', enc.encode(secret || 'deadlab-dev-secret'), { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']);
+  if (!secret) return null;
+  const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']);
   const sigBytes = Uint8Array.from(atob(sig), (c) => c.charCodeAt(0));
   const valid = await crypto.subtle.verify('HMAC', key, sigBytes, enc.encode(data));
   if (!valid) return null;

@@ -1,9 +1,9 @@
 /**
  * DEADLAB · 商业授权与防复刻安全卫士 (License & Anti-Piracy Guard v2.2)
  * 职责:
- *   1. 激活码与授权凭证防伪验签 (离线算法 + 正式卡密库)
+ *   1. 激活码校验：只接受另行发放、且仍在预发卡密清单中的序列号
  *   2. 商业推演核心算法授权门禁 (未付费锁定深度死因与动爻因果)
- *   3. 前端反盗版防复刻加固 (防止非法扒皮与白嫖复刻)
+ *   3. 已保存的授权必须能对上当前清单，过期或公开码一律失效
  */
 
 (function (root, factory) {
@@ -21,8 +21,7 @@
     "DL-HALX-4EVD", "DL-AG6H-7UKD", "DL-TLD7-X6N9", "DL-PHXK-6UHD",
     "DL-YTFN-EWDM", "DL-FC3F-NMTD", "DL-TGMG-KTHK", "DL-TMHT-LLFL",
     "DL-9YNK-N496", "DL-HVYW-DHQD", "DL-UVXW-HAXG", "DL-L43W-NPA3",
-    "DL-4NGU-7HUW", "DL-HQ7V-3RGL", "DL-4F9W-UPE7", "DL-CH9T-AHNX",
-    "DEADLAB-VIP-2026", "PRO-8888-8888"
+    "DL-4NGU-7HUW", "DL-HQ7V-3RGL", "DL-4F9W-UPE7", "DL-CH9T-AHNX"
   ]);
 
   // 简易哈希验签
@@ -35,44 +34,32 @@
     return Math.abs(hash).toString(36).toUpperCase();
   }
 
-  // 校验激活码是否合法
+  function tokenFor(cleaned) {
+    return 'DL_AUTH_' + cleaned.replace(/-/g, '_') + '_' + simpleChecksum(cleaned + '_SALT_2026');
+  }
+
+  // 校验激活码是否合法。只认预发卡密，不接受公开体验码，也不接受可自行推算的序列号。
   function verifyCode(code) {
     if (!code) return { valid: false, message: '请输入激活码' };
     const cleaned = String(code).trim().toUpperCase();
 
-    // 1. 是否在官方发行卡密库中
     if (OFFICIAL_CODES.has(cleaned)) {
-      const token = 'DL_AUTH_' + cleaned.replace(/-/g, '_') + '_' + simpleChecksum(cleaned + '_SALT_2026');
-      return { valid: true, token, type: 'OFFICIAL_KEY', message: '官方授权码激活成功' };
-    }
-
-    // 2. 离线算法校验 (格式: DL-[A-Z0-9]{4}-[A-Z0-9]{4})
-    const match = cleaned.match(/^DL-([A-Z0-9]{4})-([A-Z0-9]{4})$/);
-    if (match) {
-      const p1 = match[1];
-      const p2 = match[2];
-      // 算法校验和：p1 与 p2 字符乘积模校验
-      let sum = 0;
-      for (let i = 0; i < p1.length; i++) sum += p1.charCodeAt(i) * (i + 1);
-      const expectedPrefix = (sum % 997).toString(36).toUpperCase().padStart(2, '0');
-      if (p2.startsWith(expectedPrefix)) {
-        const token = 'DL_AUTH_' + cleaned.replace(/-/g, '_') + '_' + simpleChecksum(cleaned);
-        return { valid: true, token, type: 'ALGO_KEY', message: '算法序列号激活成功' };
-      }
+      return { valid: true, token: tokenFor(cleaned), type: 'OFFICIAL_KEY', message: '官方授权码激活成功' };
     }
 
     return { valid: false, message: '激活码无效或已被使用，请检查输入或重新购买' };
   }
 
-  // 检查当前环境是否已经获得授权
+  // 已保存的令牌必须对得上当前仍有效的卡密。旧体验码和随意写入的令牌不再放行。
   function isLicensed() {
     if (typeof localStorage === 'undefined') return false;
     try {
       const token = localStorage.getItem('dl_license_token');
-      if (!token || !token.startsWith('DL_AUTH_')) return false;
-      const parts = token.split('_');
-      if (parts.length < 4) return false;
-      return true;
+      if (!token) return false;
+      for (const code of OFFICIAL_CODES) {
+        if (tokenFor(code) === token) return true;
+      }
+      return false;
     } catch (e) {
       return false;
     }
